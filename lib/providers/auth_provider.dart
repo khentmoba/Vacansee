@@ -3,7 +3,7 @@ import '../models/user_model.dart';
 import '../services/auth_service.dart';
 
 /// Authentication state for the app
-enum AuthStatus { uninitialized, authenticated, unauthenticated }
+enum AuthStatus { uninitialized, authenticated, unauthenticated, recovery }
 
 /// Provider for authentication state management
 class AuthProvider extends ChangeNotifier {
@@ -29,15 +29,18 @@ class AuthProvider extends ChangeNotifier {
   /// Initialize auth state listener
   Future<void> initialize() async {
     _authService.authStateChanges.listen((authState) async {
-      final user = authState.session?.user;
-      if (user == null) {
+      final event = authState.event;
+      final session = authState.session;
+      final user = session?.user;
+
+      if (event == AuthChangeEvent.passwordRecovery) {
+        _status = AuthStatus.recovery;
+      } else if (user == null) {
         _status = AuthStatus.unauthenticated;
         _user = null;
       } else {
         _user = await _authService.getUserModel(user.id);
-        _status = _user != null
-            ? AuthStatus.authenticated
-            : AuthStatus.unauthenticated;
+        _status = _user != null ? AuthStatus.authenticated : AuthStatus.unauthenticated;
       }
       notifyListeners();
     });
@@ -151,6 +154,26 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       await _authService.sendPasswordResetEmail(email);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on AppAuthException catch (e) {
+      _errorMessage = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Update password (used during recovery flow)
+  Future<bool> updatePassword(String newPassword) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _authService.updatePassword(newPassword);
+      _status = AuthStatus.authenticated; // Switch to authenticated after update
       _isLoading = false;
       notifyListeners();
       return true;

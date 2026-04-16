@@ -193,12 +193,26 @@ class AuthService {
   /// Send password reset email
   Future<void> sendPasswordResetEmail(String email) async {
     try {
-      await _supabase.auth.resetPasswordForEmail(email);
+      await _supabase.auth.resetPasswordForEmail(
+        email,
+        redirectTo: kIsWeb ? 'https://vacansee-xi.vercel.app' : null,
+      );
     } catch (e) {
       if (e is AuthException) {
         throw AppAuthException.fromSupabase(e);
       }
-      throw AppAuthException('Failed to send reset email: ${e.toString()}');
+    }
+  }
+
+  /// Update password
+  Future<void> updatePassword(String newPassword) async {
+    try {
+      await _supabase.auth.updateUser(UserAttributes(password: newPassword));
+    } catch (e) {
+      if (e is AuthException) {
+        throw AppAuthException.fromSupabase(e);
+      }
+      throw AppAuthException('Failed to update password: ${e.toString()}');
     }
   }
 }
