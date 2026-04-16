@@ -202,19 +202,23 @@ USING ( bucket_id = 'property_images' AND auth.role() = 'authenticated' );
 -- 7. Triggers for automatic profile creation
 -- This handles the creation of a 'public.users' row whenever a new user signs up via Supabase Auth
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
   INSERT INTO public.users (id, email, display_name, role, phone_number)
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_metadata->>'display_name', 'User'),
+    COALESCE(NEW.raw_user_meta_data->>'display_name', 'User'),
     CASE 
-      WHEN NEW.raw_user_metadata->>'role' = 'owner' THEN 'owner'::public.user_role
-      WHEN NEW.raw_user_metadata->>'role' = 'admin' THEN 'admin'::public.user_role
-      ELSE 'student'::public.user_role
+      WHEN NEW.raw_user_meta_data->>'role' = 'owner' THEN 'owner'::user_role
+      WHEN NEW.raw_user_meta_data->>'role' = 'admin' THEN 'admin'::user_role
+      ELSE 'student'::user_role
     END,
-    NEW.raw_user_metadata->>'phone_number'
+    NEW.raw_user_meta_data->>'phone_number'
   )
   ON CONFLICT (id) DO UPDATE SET
     email = EXCLUDED.email,
@@ -223,7 +227,7 @@ BEGIN
     phone_number = EXCLUDED.phone_number;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 -- Trigger to call the function on every user creation
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;

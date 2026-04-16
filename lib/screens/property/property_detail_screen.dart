@@ -93,7 +93,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             expandedHeight: 350,
             pinned: true,
             backgroundColor: Colors.white,
-            foregroundColor: const Color(0xFF1D1B16),
+            foregroundColor: const Color(0xFF5287B2), // Changed from 0xFF1D1B16
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
@@ -435,36 +435,36 @@ class _RoomCardState extends State<_RoomCard> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(20),
-        transform: Matrix4.identity()
-          ..translateByDouble(0.0, _isHovered ? -4.0 : 0.0, 0.0, 0.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: _isHovered
-                ? const Color(0xFF5287B2).withValues(alpha: 0.3)
-                : Colors.transparent,
-            width: _isHovered ? 2 : 0,
-          ),
-          boxShadow: [
-            BoxShadow(
+    return RepaintBoundary(
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        cursor: SystemMouseCursors.click,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
               color: _isHovered
-                  ? const Color(0xFF5287B2).withValues(alpha: 0.15)
-                  : Colors.black.withValues(alpha: 0.03),
-              blurRadius: _isHovered ? 20 : 10,
-              offset: Offset(0, _isHovered ? 8 : 4),
+                  ? const Color(0xFF5287B2).withValues(alpha: 0.3)
+                  : Colors.transparent,
+              width: _isHovered ? 2 : 0,
             ),
-          ],
-        ),
+            boxShadow: [
+              BoxShadow(
+                color: _isHovered
+                    ? const Color(0xFF5287B2).withValues(alpha: 0.15)
+                    : Colors.black.withValues(alpha: 0.03),
+                blurRadius: _isHovered ? 24 : 10,
+                spreadRadius: _isHovered ? 1 : 0,
+                offset: Offset(0, _isHovered ? 8 : 4),
+              ),
+            ],
+          ),
         child: Row(
           children: [
             Container(
@@ -531,6 +531,7 @@ class _RoomCardState extends State<_RoomCard> {
           ],
         ),
       ),
+    ),
     );
   }
 }
