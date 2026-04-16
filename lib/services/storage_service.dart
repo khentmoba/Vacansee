@@ -30,10 +30,14 @@ class StorageService {
 
       await _supabase.storage
           .from(bucketName)
-          .upload(
+          .uploadBinary(
             path,
-            file as dynamic, // Support both File and Uint8List
-            fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
+            file,
+            fileOptions: const FileOptions(
+              cacheControl: '3600',
+              upsert: true,
+              contentType: 'image/jpeg',
+            ),
           );
 
       final String downloadUrl = _supabase.storage
@@ -96,10 +100,14 @@ class StorageService {
 
       await _supabase.storage
           .from(bucketName)
-          .upload(
+          .uploadBinary(
             path,
-            file as dynamic, // Support both File and Uint8List
-            fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
+            file,
+            fileOptions: const FileOptions(
+              cacheControl: '3600',
+              upsert: true,
+              contentType: 'image/jpeg',
+            ),
           );
 
       return _supabase.storage.from(bucketName).getPublicUrl(path);
