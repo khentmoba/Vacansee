@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
-import '../../models/user_model.dart';
 import 'register_screen.dart';
 import '../home/home_screen.dart';
 
@@ -16,10 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  UserRole? _selectedRole;
-
   final Map<String, String?> _errors = {
-    'role': null,
     'email': null,
     'password': null,
   };
@@ -33,7 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _validateAndSubmit() {
     setState(() {
-      _errors['role'] = _selectedRole == null ? 'Please select a role' : null;
       _errors['email'] =
           _emailController.text.isEmpty || !_emailController.text.contains('@')
           ? 'Please enter a valid email'
@@ -398,27 +393,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         const SizedBox(height: 24),
 
-        // Role Selector (Button tabs)
-        _buildLabel('Login as:'),
-        Row(
-          children: [
-            Expanded(child: _buildRoleButton('Tenant', UserRole.student)),
-            const SizedBox(width: 12),
-            Expanded(child: _buildRoleButton('Owner', UserRole.owner)),
-            const SizedBox(width: 12),
-            Expanded(child: _buildRoleButton('Admin', UserRole.admin)),
-          ],
-        ),
-        if (_errors['role'] != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 6, left: 4),
-            child: Text(
-              _errors['role']!,
-              style: const TextStyle(color: Colors.red, fontSize: 12),
-            ),
-          ),
-        const SizedBox(height: 16),
-
         // Forgot Password
         Align(
           alignment: Alignment.centerRight,
@@ -582,41 +556,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildRoleButton(String label, UserRole role) {
-    final isSelected = _selectedRole == role;
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedRole = role;
-          _clearError('role');
-        });
-      },
-      child: Container(
-        height: 48,
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF5287B2) : Colors.white,
-          border: Border.all(
-            color: isSelected
-                ? const Color(0xFF5287B2)
-                : const Color(0xFFE0E0E0),
-            width: 1.5,
-          ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: isSelected ? Colors.white : const Color(0xFF1D1B16),
-            ),
-          ),
-        ),
-      ),
     );
   }
 
