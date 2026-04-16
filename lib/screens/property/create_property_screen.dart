@@ -169,7 +169,7 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
         // Update property with image URLs
         await propertyProvider.updateProperty(
           property.copyWith(
-            images: [imageUrls.first],
+            images: imageUrls,
           ),
         );
       } else if (isEditing) {

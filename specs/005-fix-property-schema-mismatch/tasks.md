@@ -15,8 +15,8 @@
 
 **Purpose**: Project initialization and validation
 
-- [ ] T001 Review `lib/models/property_model.dart` and `schema.sql` for consistency
-- [ ] T002 [P] Prepare Supabase migration script based on `quickstart.md`
+- [x] T001 Review `lib/models/property_model.dart` and `schema.sql` for consistency
+- [x] T002 [P] Prepare Supabase migration script based on `quickstart.md`
 
 ---
 
@@ -26,9 +26,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until the database schema is aligned.
 
-- [ ] T003 Update `schema.sql` to include `property_status` enum and `images` column in `properties` table
-- [ ] T004 Apply schema changes to Supabase (Add `images`, Add `status`, Drop `is_verified`, Drop `cover_image_url`)
-- [ ] T005 Update Supabase RLS policies in `schema.sql` to filter by `status = 'verified'` and allow owners to see `deleted` properties
+- [x] T003 Update `schema.sql` to include `property_status` enum and `images` column in `properties` table
+- [x] T004 Apply schema changes to Supabase (Add `images`, Add `status`, Drop `is_verified`, Drop `cover_image_url`)
+- [x] T005 Update Supabase RLS policies in `schema.sql` to filter by `status = 'verified'` and allow owners to see `deleted` properties
 
 **Checkpoint**: Foundation ready - user story implementation can now begin.
 
@@ -42,9 +42,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T006 [P] [US1] Update `PropertyService.createProperty` in `lib/services/property_service.dart` to include `images` and handle `property_status`
-- [ ] T007 [P] [US1] Update `PropertyService.updateProperty` in `lib/services/property_service.dart` to reset `status` to `pending` on address change
-- [ ] T008 [US1] Verify property creation and image rendering in `lib/screens/booking/owner_bookings_screen.dart`
+- [x] T006 [P] [US1] Update `PropertyService.createProperty` in `lib/services/property_service.dart` to include `images` and handle `property_status`
+- [x] T007 [P] [US1] Update `PropertyService.updateProperty` in `lib/services/property_service.dart` to reset `status` to `pending` on address change
+- [x] T008 [US1] Verify property creation and image rendering in `lib/screens/booking/owner_bookings_screen.dart`
 
 **Checkpoint**: User Story 1 (Creation) functional and testable.
 
@@ -58,10 +58,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T009 [P] [US2] Update `ListingService.deletePropertyListing` in `lib/services/listing_service.dart` to use `status = 'deleted'` (Soft Delete)
-- [ ] T010 [P] [US2] Implement non-blocking `try-catch` for storage cleanup in `lib/services/listing_service.dart`
-- [ ] T011 [US2] Update `PropertyService.deleteProperty` in `lib/services/property_service.dart` to call `ListingService.deletePropertyListing` (or ensure consistency)
-- [ ] T012 [US2] Verify soft delete and storage cleanup logs in the console
+- [x] T009 [P] [US2] Update `ListingService.deletePropertyListing` in `lib/services/listing_service.dart` to use `status = 'deleted'` (Soft Delete)
+- [x] T010 [P] [US2] Implement non-blocking `try-catch` for storage cleanup in `lib/services/listing_service.dart`
+- [x] T011 [US2] Update `PropertyService.deleteProperty` in `lib/services/property_service.dart` to call `ListingService.deletePropertyListing` (or ensure consistency)
+- [x] T012 [US2] Verify soft delete and storage cleanup logs in the console
 
 **Checkpoint**: User Story 2 (Deletion) functional and testable.
 
@@ -71,9 +71,9 @@
 
 **Purpose**: Quality assurance and code hygiene
 
-- [ ] T013 [P] Remove any legacy `cover_image_url` references in UI widgets (search for `coverImageUrl` getter usage)
-- [ ] T014 Run `flutter analyze` to ensure zero lint errors
-- [ ] T015 Perform final verification using `quickstart.md` scenarios
+- [x] T013 [P] Remove any legacy `cover_image_url` references in UI widgets (search for `coverImageUrl` getter usage)
+- [x] T014 Run `flutter analyze` to ensure zero lint errors
+- [x] T015 Perform final verification using `quickstart.md` scenarios
 
 ---
 

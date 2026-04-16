@@ -136,7 +136,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     children: [
                       _buildStatCard(
                         Icons.home_outlined,
-                        properties.length.toString(),
+                        properties.where((p) => p.status != PropertyStatus.deleted).length.toString(),
                         'Total Listings',
                         const Color(0xFF3B82F6),
                       ),
@@ -490,6 +490,40 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     ),
                   ),
                 ),
+                // Status Badge (Pending/Verified/Deleted)
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(property.status).withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _getStatusIcon(property.status),
+                          size: 10,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          property.status.name.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -591,5 +625,27 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
         ],
       ),
     );
+  }
+
+  Color _getStatusColor(PropertyStatus status) {
+    switch (status) {
+      case PropertyStatus.verified:
+        return const Color(0xFF10B981);
+      case PropertyStatus.pending:
+        return Colors.orange;
+      case PropertyStatus.deleted:
+        return Colors.red;
+    }
+  }
+
+  IconData _getStatusIcon(PropertyStatus status) {
+    switch (status) {
+      case PropertyStatus.verified:
+        return Icons.verified_rounded;
+      case PropertyStatus.pending:
+        return Icons.pending_actions_rounded;
+      case PropertyStatus.deleted:
+        return Icons.delete_forever_rounded;
+    }
   }
 }

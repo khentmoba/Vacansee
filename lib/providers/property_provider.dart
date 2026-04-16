@@ -239,7 +239,7 @@ class PropertyProvider extends ChangeNotifier {
     required List<String> amenities,
     required PriceRange priceRange,
     String? description,
-    String? coverImageUrl,
+    List<String>? images,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -256,7 +256,7 @@ class PropertyProvider extends ChangeNotifier {
         amenities: amenities,
         priceRange: priceRange,
         description: description,
-        images: coverImageUrl != null ? [coverImageUrl] : null,
+        images: images,
       );
       _properties.insert(0, property);
       _isLoading = false;
@@ -281,7 +281,7 @@ class PropertyProvider extends ChangeNotifier {
     required List<String> amenities,
     required PriceRange priceRange,
     String? description,
-    String? coverImageUrl,
+    List<String>? images,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -298,7 +298,7 @@ class PropertyProvider extends ChangeNotifier {
         amenities: amenities,
         priceRange: priceRange,
         description: description,
-        images: coverImageUrl != null ? [coverImageUrl] : null,
+        images: images,
       );
       _properties.insert(0, property);
       _isLoading = false;

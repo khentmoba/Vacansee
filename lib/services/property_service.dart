@@ -41,7 +41,7 @@ class PropertyService {
         genderOrientation: genderOrientation,
         amenities: amenities,
         priceRange: priceRange,
-        status: PropertyStatus.verified,
+        status: PropertyStatus.pending,
         lastUpdated: DateTime.now(),
         description: description,
         images: images ?? [],
@@ -133,7 +133,26 @@ class PropertyService {
   /// Update a property
   Future<void> updateProperty(PropertyModel property) async {
     try {
-      final updated = property.copyWith(lastUpdated: DateTime.now());
+      // 1. Fetch current address to check for changes
+      final currentData = await _supabase
+          .from('properties')
+          .select('address')
+          .eq('id', property.propertyId)
+          .single();
+      
+      final currentAddress = currentData['address'] as String;
+      
+      // 2. Determine if status should be reset to pending
+      var status = property.status;
+      if (property.address != currentAddress) {
+        status = PropertyStatus.pending;
+      }
+
+      final updated = property.copyWith(
+        status: status,
+        lastUpdated: DateTime.now(),
+      );
+      
       final json = updated.toJson();
       json.remove('has_vacancy'); // UI-only field not in DB schema
 
@@ -146,13 +165,13 @@ class PropertyService {
     }
   }
 
-  /// Delete a property and its rooms
+  /// Soft delete a property
   Future<void> deleteProperty(String propertyId) async {
     try {
-      // Postgres ON DELETE CASCADE will handle rooms if set up correctly,
-      // but otherwise we manually delete rooms first
-      await _supabase.from('rooms').delete().eq('property_id', propertyId);
-      await _supabase.from('properties').delete().eq('id', propertyId);
+      await _supabase
+          .from('properties')
+          .update({'status': 'deleted'})
+          .eq('id', propertyId);
     } catch (e) {
       throw PropertyException('Failed to delete property: $e');
     }

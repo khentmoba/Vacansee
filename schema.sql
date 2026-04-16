@@ -6,6 +6,7 @@ CREATE TYPE user_role AS ENUM ('student', 'owner', 'admin');
 CREATE TYPE gender_orientation AS ENUM ('male', 'female', 'mixed');
 CREATE TYPE room_status AS ENUM ('vacant', 'occupied', 'maintenance');
 CREATE TYPE booking_status AS ENUM ('pending', 'approved', 'rejected', 'cancelled', 'completed');
+CREATE TYPE property_status AS ENUM ('pending', 'verified', 'deleted');
 
 -- 2. Create Tables
 
@@ -31,9 +32,9 @@ CREATE TABLE public.properties (
   gender_orientation gender_orientation NOT NULL DEFAULT 'mixed',
   amenities TEXT[] DEFAULT '{}',
   price_range JSONB NOT NULL,
-  is_verified BOOLEAN NOT NULL DEFAULT false,
+  status property_status NOT NULL DEFAULT 'pending',
+  images TEXT[] DEFAULT '{}',
   description TEXT,
-  cover_image_url TEXT,
   last_updated TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -93,9 +94,9 @@ ON public.users FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- Properties RLS
 CREATE POLICY "Public can view verified properties" 
-ON public.properties FOR SELECT USING (is_verified = true);
+ON public.properties FOR SELECT USING (status = 'verified');
 
-CREATE POLICY "Owners can view their own properties regardless of verification" 
+CREATE POLICY "Owners can view their own properties" 
 ON public.properties FOR SELECT USING (auth.uid() = owner_id);
 
 CREATE POLICY "Owners can insert their own properties" 

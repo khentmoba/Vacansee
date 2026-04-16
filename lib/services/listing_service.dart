@@ -100,10 +100,13 @@ class ListingService {
           .expand((r) => List<String>.from(r['images'] ?? []))
           .toList();
 
-      // 3. Delete from Database (Cascade handles rooms and bookings)
-      // We do this BEFORE storage cleanup to ensure the listing is removed from UI 
-      // even if storage cleanup has issues.
-      await _supabase.from('properties').delete().eq('id', propertyId);
+      // 3. Soft Delete from Database
+      // We update the status to 'deleted' to hide it from students while 
+      // preserving records for owners.
+      await _supabase
+          .from('properties')
+          .update({'status': 'deleted'})
+          .eq('id', propertyId);
 
       // 4. Cleanup Storage
       final allImages = [...images, ...roomImages].where((img) => img.isNotEmpty).toSet().toList();
