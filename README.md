@@ -1,17 +1,37 @@
-# vacansee
+# VacanSee
 
-A new Flutter project.
+[![Deploy to Vercel](https://github.com/khentmoba/Vacansee/actions/workflows/deploy.yml/badge.svg)](https://github.com/khentmoba/Vacansee/actions/workflows/deploy.yml)
 
-## Getting Started
+A real-time boarding house vacancy tracker for university students in Cagayan de Oro City. Students can filter verified listings by budget, location, and gender orientation while property owners update room availability in real-time.
 
-This project is a starting point for a Flutter application.
+## Live Deployment
 
-A few resources to get you started if this is your first Flutter project:
+The application is automatically synchronized with GitHub and deployed to Vercel:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- **Production**: [vacansee.vercel.app](https://vacansee.vercel.app)
+- **Status**: Every push to `main` triggers a production build. Feature branches generate unique preview URLs.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Tech Stack
+
+- **Frontend**: Flutter Web (Stable channel)
+- **Backend**: Supabase (PostgreSQL, Auth, Storage)
+- **CI/CD**: GitHub Actions + Vercel CLI
+
+## Development
+
+### Prerequisites
+
+- Flutter SDK (Stable)
+- Supabase Project
+- Vercel Account (for deployment)
+
+### Setup
+
+1. Clone the repository.
+2. Run `flutter pub get`.
+3. Configure your Supabase environment variables (`SUPABASE_URL`, `SUPABASE_ANON_KEY`).
+4. Run locally: `flutter run -d chrome`.
+
+### CI/CD Configuration
+
+The deployment pipeline is defined in `.github/workflows/deploy.yml`. It ensures that all code passes `flutter analyze` and `flutter test` before being built for the web and deployed to Vercel.
