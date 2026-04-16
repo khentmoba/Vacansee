@@ -23,10 +23,14 @@ _$PropertyModelImpl _$$PropertyModelImplFromJson(
       (json['amenities'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
   priceRange: PriceRange.fromJson(json['price_range'] as Map<String, dynamic>),
-  isVerified: json['is_verified'] as bool? ?? false,
+  status:
+      $enumDecodeNullable(_$PropertyStatusEnumMap, json['status']) ??
+      PropertyStatus.pending,
   lastUpdated: DateTime.parse(json['last_updated'] as String),
+  images:
+      (json['images'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
   description: json['description'] as String?,
-  coverImageUrl: json['cover_image_url'] as String?,
   hasVacancy: json['has_vacancy'] as bool? ?? true,
 );
 
@@ -42,10 +46,10 @@ Map<String, dynamic> _$$PropertyModelImplToJson(
   'gender_orientation': _$GenderOrientationEnumMap[instance.genderOrientation]!,
   'amenities': instance.amenities,
   'price_range': instance.priceRange,
-  'is_verified': instance.isVerified,
+  'status': _$PropertyStatusEnumMap[instance.status]!,
   'last_updated': instance.lastUpdated.toIso8601String(),
+  'images': instance.images,
   'description': instance.description,
-  'cover_image_url': instance.coverImageUrl,
   'has_vacancy': instance.hasVacancy,
 };
 
@@ -53,6 +57,12 @@ const _$GenderOrientationEnumMap = {
   GenderOrientation.male: 'male',
   GenderOrientation.female: 'female',
   GenderOrientation.mixed: 'mixed',
+};
+
+const _$PropertyStatusEnumMap = {
+  PropertyStatus.pending: 'pending',
+  PropertyStatus.verified: 'verified',
+  PropertyStatus.deleted: 'deleted',
 };
 
 _$PriceRangeImpl _$$PriceRangeImplFromJson(Map<String, dynamic> json) =>

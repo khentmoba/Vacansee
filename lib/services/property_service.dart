@@ -28,7 +28,7 @@ class PropertyService {
     required List<String> amenities,
     required PriceRange priceRange,
     String? description,
-    String? coverImageUrl,
+    List<String>? images,
   }) async {
     try {
       final property = PropertyModel(
@@ -41,10 +41,10 @@ class PropertyService {
         genderOrientation: genderOrientation,
         amenities: amenities,
         priceRange: priceRange,
-        isVerified: false,
+        status: PropertyStatus.verified,
         lastUpdated: DateTime.now(),
         description: description,
-        coverImageUrl: coverImageUrl,
+        images: images ?? [],
       );
 
       final json = property.toJson();

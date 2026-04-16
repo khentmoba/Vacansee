@@ -7,7 +7,8 @@ import '../../providers/property_provider.dart';
 import '../../services/storage_service.dart';
 
 class CreatePropertyScreen extends StatefulWidget {
-  const CreatePropertyScreen({super.key});
+  final PropertyModel? property;
+  const CreatePropertyScreen({super.key, this.property});
 
   @override
   State<CreatePropertyScreen> createState() => _CreatePropertyScreenState();
@@ -20,10 +21,24 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
   final _minPriceController = TextEditingController();
   final _maxPriceController = TextEditingController();
 
-  final GenderOrientation _genderOrientation = GenderOrientation.mixed;
-  final List<String> _selectedAmenities = [];
+  GenderOrientation _genderOrientation = GenderOrientation.mixed;
+  List<String> _selectedAmenities = [];
   final List<XFile> _selectedImages = [];
   bool _isUploadingImages = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.property != null) {
+      _nameController.text = widget.property!.name;
+      _addressController.text = widget.property!.address;
+      _descriptionController.text = widget.property!.description ?? '';
+      _minPriceController.text = widget.property!.priceRange.min.toString();
+      _maxPriceController.text = widget.property!.priceRange.max.toString();
+      _genderOrientation = widget.property!.genderOrientation;
+      _selectedAmenities = List.from(widget.property!.amenities);
+    }
+  }
 
   final List<String> _availableAmenities = [
     'WiFi',
@@ -105,22 +120,36 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
 
     final minPrice = int.tryParse(_minPriceController.text) ?? 0;
     final maxPrice = int.tryParse(_maxPriceController.text) ?? 0;
+    final isEditing = widget.property != null;
 
     setState(() => _isUploadingImages = true);
 
     try {
-      // Create property first to get the property ID
-      final property = await propertyProvider.createPropertyWithId(
-        ownerId: authProvider.user!.uid,
-        name: _nameController.text.trim(),
-        address: _addressController.text.trim(),
-        lat: 0.0,
-        lng: 0.0,
-        genderOrientation: _genderOrientation,
-        amenities: _selectedAmenities,
-        priceRange: PriceRange(min: minPrice, max: maxPrice),
-        description: _descriptionController.text.trim(),
-      );
+      final PropertyModel property;
+      if (isEditing) {
+        property = widget.property!.copyWith(
+          name: _nameController.text.trim(),
+          address: _addressController.text.trim(),
+          priceRange: PriceRange(min: minPrice, max: maxPrice),
+          description: _descriptionController.text.trim(),
+          genderOrientation: _genderOrientation,
+          amenities: _selectedAmenities,
+          lastUpdated: DateTime.now(),
+        );
+      } else {
+        // Create property first to get the property ID
+        property = await propertyProvider.createPropertyWithId(
+          ownerId: authProvider.user!.uid,
+          name: _nameController.text.trim(),
+          address: _addressController.text.trim(),
+          lat: 0.0,
+          lng: 0.0,
+          genderOrientation: _genderOrientation,
+          amenities: _selectedAmenities,
+          priceRange: PriceRange(min: minPrice, max: maxPrice),
+          description: _descriptionController.text.trim(),
+        );
+      }
 
       // Upload images if any
       List<String> imageUrls = [];
@@ -138,16 +167,24 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
         // Update property with image URLs
         await propertyProvider.updateProperty(
           property.copyWith(
-            coverImageUrl: imageUrls.first,
-            // Store additional images in a separate field if needed
+            images: [imageUrls.first],
           ),
         );
+      } else if (isEditing) {
+        // Just update the base fields if no new images
+        await propertyProvider.updateProperty(property);
       }
 
       if (mounted) {
         setState(() => _isUploadingImages = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Property created successfully!')),
+          SnackBar(
+            content: Text(
+              isEditing
+                  ? 'Property updated successfully!'
+                  : 'Property created successfully!',
+            ),
+          ),
         );
         Navigator.pop(context);
       }
@@ -166,7 +203,7 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FBFD),
       appBar: AppBar(
-        title: const Text('Add New Property'),
+        title: Text(widget.property != null ? 'Edit Property' : 'Add New Property'),
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF1D1B16),
         elevation: 0,
@@ -213,7 +250,9 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                                 ),
                               ),
                               Text(
-                                'Fill in the details to create a new listing for students',
+                                widget.property != null
+                                    ? 'Update details for your boarding house listing'
+                                    : 'Fill in the details to create a new listing for students',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey[600],
@@ -526,9 +565,11 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                         strokeWidth: 2,
                       ),
                     )
-                  : const Text(
-                      'Publish Listing Now',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  : Text(
+                      widget.property != null
+                          ? 'Save Changes'
+                          : 'Publish Listing Now',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
             ),
           ),

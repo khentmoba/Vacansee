@@ -10,6 +10,7 @@ class UserModel {
   final String? phoneNumber;
   final DateTime createdAt;
   final DateTime? lastLoginAt;
+  final bool isVerified;
 
   const UserModel({
     required this.uid,
@@ -19,6 +20,7 @@ class UserModel {
     this.phoneNumber,
     required this.createdAt,
     this.lastLoginAt,
+    this.isVerified = false,
   });
 
   /// Create UserModel from JSON (Supabase)
@@ -41,6 +43,7 @@ class UserModel {
       lastLoginAt: data['last_login_at'] != null
           ? DateTime.parse(data['last_login_at'] as String)
           : null,
+      isVerified: data['is_verified'] as bool? ?? false,
     );
   }
 
@@ -53,6 +56,7 @@ class UserModel {
       'role': role.name,
       'phone_number': phoneNumber,
       'created_at': createdAt.toIso8601String(),
+      'is_verified': isVerified,
       if (lastLoginAt != null) 'last_login_at': lastLoginAt!.toIso8601String(),
     };
   }
@@ -66,6 +70,7 @@ class UserModel {
     String? phoneNumber,
     DateTime? createdAt,
     DateTime? lastLoginAt,
+    bool? isVerified,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -75,6 +80,7 @@ class UserModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       createdAt: createdAt ?? this.createdAt,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
+      isVerified: isVerified ?? this.isVerified,
     );
   }
 

@@ -5,7 +5,10 @@ import '../../providers/auth_provider.dart';
 import '../../providers/booking_provider.dart';
 import '../../providers/property_provider.dart';
 import '../booking/owner_bookings_screen.dart';
+import '../owner/edit_property_screen.dart';
 import '../property/create_property_screen.dart';
+import '../../services/listing_service.dart';
+import '../../widgets/common/confirmation_dialog.dart';
 
 class OwnerDashboard extends StatefulWidget {
   const OwnerDashboard({super.key});
@@ -73,9 +76,59 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Manage your boarding house listings and booking requests',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  Row(
+                    children: [
+                      Text(
+                        'Manage your boarding house listings and booking requests',
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      ),
+                      const SizedBox(width: 8),
+                      // Verification Badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: (authProvider.user?.isVerified ?? false)
+                              ? const Color(0xFF10B981).withValues(alpha: 0.1)
+                              : Colors.orange.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: (authProvider.user?.isVerified ?? false)
+                                ? const Color(0xFF10B981).withValues(alpha: 0.2)
+                                : Colors.orange.withValues(alpha: 0.2),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              (authProvider.user?.isVerified ?? false)
+                                  ? Icons.verified_rounded
+                                  : Icons.pending_actions_rounded,
+                              size: 14,
+                              color: (authProvider.user?.isVerified ?? false)
+                                  ? const Color(0xFF10B981)
+                                  : Colors.orange,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              (authProvider.user?.isVerified ?? false)
+                                  ? 'Verified Owner'
+                                  : 'Verification Pending',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: (authProvider.user?.isVerified ?? false)
+                                    ? const Color(0xFF10B981)
+                                    : Colors.orange,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                   // Stats Cards
@@ -322,32 +375,87 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                           ),
                         ),
                 ),
-                // Edit button
                 Positioned(
                   top: 8,
                   left: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 4,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EditPropertyScreen(property: property),
                         ),
-                      ],
-                    ),
-                    child: const Text(
-                      'Edit',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF1D1B16),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
                       ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.edit_outlined, size: 14, color: Color(0xFF1D1B16)),
+                          SizedBox(width: 4),
+                          Text(
+                            'Edit',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1D1B16),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Delete Button
+                Positioned(
+                  top: 8,
+                  left: 70, // Positioned next to Edit
+                  child: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => ConfirmationDialog(
+                          title: 'Delete Listing',
+                          content: 'Are you sure you want to permanently delete "${property.name}"? This action cannot be undone.',
+                          onConfirm: () async {
+                             await ListingService().deletePropertyListing(property.propertyId);
+                             if (context.mounted) {
+                               context.read<PropertyProvider>().loadOwnerProperties(property.ownerId);
+                               ScaffoldMessenger.of(context).showSnackBar(
+                                 const SnackBar(content: Text('Listing deleted')),
+                               );
+                             }
+                          },
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.delete_outline, size: 14, color: Colors.red),
                     ),
                   ),
                 ),

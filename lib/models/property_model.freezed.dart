@@ -34,13 +34,11 @@ mixin _$PropertyModel {
   List<String> get amenities => throw _privateConstructorUsedError;
   @JsonKey(name: 'price_range')
   PriceRange get priceRange => throw _privateConstructorUsedError;
-  @JsonKey(name: 'is_verified')
-  bool get isVerified => throw _privateConstructorUsedError;
+  PropertyStatus get status => throw _privateConstructorUsedError;
   @JsonKey(name: 'last_updated')
   DateTime get lastUpdated => throw _privateConstructorUsedError;
+  List<String> get images => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
-  @JsonKey(name: 'cover_image_url')
-  String? get coverImageUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'has_vacancy')
   bool get hasVacancy => throw _privateConstructorUsedError;
 
@@ -71,10 +69,10 @@ abstract class $PropertyModelCopyWith<$Res> {
     @JsonKey(name: 'gender_orientation') GenderOrientation genderOrientation,
     List<String> amenities,
     @JsonKey(name: 'price_range') PriceRange priceRange,
-    @JsonKey(name: 'is_verified') bool isVerified,
+    PropertyStatus status,
     @JsonKey(name: 'last_updated') DateTime lastUpdated,
+    List<String> images,
     String? description,
-    @JsonKey(name: 'cover_image_url') String? coverImageUrl,
     @JsonKey(name: 'has_vacancy') bool hasVacancy,
   });
 
@@ -105,10 +103,10 @@ class _$PropertyModelCopyWithImpl<$Res, $Val extends PropertyModel>
     Object? genderOrientation = null,
     Object? amenities = null,
     Object? priceRange = null,
-    Object? isVerified = null,
+    Object? status = null,
     Object? lastUpdated = null,
+    Object? images = null,
     Object? description = freezed,
-    Object? coverImageUrl = freezed,
     Object? hasVacancy = null,
   }) {
     return _then(
@@ -149,21 +147,21 @@ class _$PropertyModelCopyWithImpl<$Res, $Val extends PropertyModel>
                 ? _value.priceRange
                 : priceRange // ignore: cast_nullable_to_non_nullable
                       as PriceRange,
-            isVerified: null == isVerified
-                ? _value.isVerified
-                : isVerified // ignore: cast_nullable_to_non_nullable
-                      as bool,
+            status: null == status
+                ? _value.status
+                : status // ignore: cast_nullable_to_non_nullable
+                      as PropertyStatus,
             lastUpdated: null == lastUpdated
                 ? _value.lastUpdated
                 : lastUpdated // ignore: cast_nullable_to_non_nullable
                       as DateTime,
+            images: null == images
+                ? _value.images
+                : images // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
             description: freezed == description
                 ? _value.description
                 : description // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            coverImageUrl: freezed == coverImageUrl
-                ? _value.coverImageUrl
-                : coverImageUrl // ignore: cast_nullable_to_non_nullable
                       as String?,
             hasVacancy: null == hasVacancy
                 ? _value.hasVacancy
@@ -204,10 +202,10 @@ abstract class _$$PropertyModelImplCopyWith<$Res>
     @JsonKey(name: 'gender_orientation') GenderOrientation genderOrientation,
     List<String> amenities,
     @JsonKey(name: 'price_range') PriceRange priceRange,
-    @JsonKey(name: 'is_verified') bool isVerified,
+    PropertyStatus status,
     @JsonKey(name: 'last_updated') DateTime lastUpdated,
+    List<String> images,
     String? description,
-    @JsonKey(name: 'cover_image_url') String? coverImageUrl,
     @JsonKey(name: 'has_vacancy') bool hasVacancy,
   });
 
@@ -238,10 +236,10 @@ class __$$PropertyModelImplCopyWithImpl<$Res>
     Object? genderOrientation = null,
     Object? amenities = null,
     Object? priceRange = null,
-    Object? isVerified = null,
+    Object? status = null,
     Object? lastUpdated = null,
+    Object? images = null,
     Object? description = freezed,
-    Object? coverImageUrl = freezed,
     Object? hasVacancy = null,
   }) {
     return _then(
@@ -282,21 +280,21 @@ class __$$PropertyModelImplCopyWithImpl<$Res>
             ? _value.priceRange
             : priceRange // ignore: cast_nullable_to_non_nullable
                   as PriceRange,
-        isVerified: null == isVerified
-            ? _value.isVerified
-            : isVerified // ignore: cast_nullable_to_non_nullable
-                  as bool,
+        status: null == status
+            ? _value.status
+            : status // ignore: cast_nullable_to_non_nullable
+                  as PropertyStatus,
         lastUpdated: null == lastUpdated
             ? _value.lastUpdated
             : lastUpdated // ignore: cast_nullable_to_non_nullable
                   as DateTime,
+        images: null == images
+            ? _value._images
+            : images // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
         description: freezed == description
             ? _value.description
             : description // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        coverImageUrl: freezed == coverImageUrl
-            ? _value.coverImageUrl
-            : coverImageUrl // ignore: cast_nullable_to_non_nullable
                   as String?,
         hasVacancy: null == hasVacancy
             ? _value.hasVacancy
@@ -309,7 +307,7 @@ class __$$PropertyModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$PropertyModelImpl implements _PropertyModel {
+class _$PropertyModelImpl extends _PropertyModel {
   const _$PropertyModelImpl({
     @JsonKey(name: 'id') required this.propertyId,
     @JsonKey(name: 'owner_id') required this.ownerId,
@@ -320,12 +318,14 @@ class _$PropertyModelImpl implements _PropertyModel {
     @JsonKey(name: 'gender_orientation') required this.genderOrientation,
     final List<String> amenities = const [],
     @JsonKey(name: 'price_range') required this.priceRange,
-    @JsonKey(name: 'is_verified') this.isVerified = false,
+    this.status = PropertyStatus.pending,
     @JsonKey(name: 'last_updated') required this.lastUpdated,
+    final List<String> images = const [],
     this.description,
-    @JsonKey(name: 'cover_image_url') this.coverImageUrl,
     @JsonKey(name: 'has_vacancy') this.hasVacancy = true,
-  }) : _amenities = amenities;
+  }) : _amenities = amenities,
+       _images = images,
+       super._();
 
   factory _$PropertyModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$PropertyModelImplFromJson(json);
@@ -360,23 +360,29 @@ class _$PropertyModelImpl implements _PropertyModel {
   @JsonKey(name: 'price_range')
   final PriceRange priceRange;
   @override
-  @JsonKey(name: 'is_verified')
-  final bool isVerified;
+  @JsonKey()
+  final PropertyStatus status;
   @override
   @JsonKey(name: 'last_updated')
   final DateTime lastUpdated;
+  final List<String> _images;
+  @override
+  @JsonKey()
+  List<String> get images {
+    if (_images is EqualUnmodifiableListView) return _images;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_images);
+  }
+
   @override
   final String? description;
-  @override
-  @JsonKey(name: 'cover_image_url')
-  final String? coverImageUrl;
   @override
   @JsonKey(name: 'has_vacancy')
   final bool hasVacancy;
 
   @override
   String toString() {
-    return 'PropertyModel(propertyId: $propertyId, ownerId: $ownerId, name: $name, address: $address, lat: $lat, lng: $lng, genderOrientation: $genderOrientation, amenities: $amenities, priceRange: $priceRange, isVerified: $isVerified, lastUpdated: $lastUpdated, description: $description, coverImageUrl: $coverImageUrl, hasVacancy: $hasVacancy)';
+    return 'PropertyModel(propertyId: $propertyId, ownerId: $ownerId, name: $name, address: $address, lat: $lat, lng: $lng, genderOrientation: $genderOrientation, amenities: $amenities, priceRange: $priceRange, status: $status, lastUpdated: $lastUpdated, images: $images, description: $description, hasVacancy: $hasVacancy)';
   }
 
   @override
@@ -399,14 +405,12 @@ class _$PropertyModelImpl implements _PropertyModel {
             ) &&
             (identical(other.priceRange, priceRange) ||
                 other.priceRange == priceRange) &&
-            (identical(other.isVerified, isVerified) ||
-                other.isVerified == isVerified) &&
+            (identical(other.status, status) || other.status == status) &&
             (identical(other.lastUpdated, lastUpdated) ||
                 other.lastUpdated == lastUpdated) &&
+            const DeepCollectionEquality().equals(other._images, _images) &&
             (identical(other.description, description) ||
                 other.description == description) &&
-            (identical(other.coverImageUrl, coverImageUrl) ||
-                other.coverImageUrl == coverImageUrl) &&
             (identical(other.hasVacancy, hasVacancy) ||
                 other.hasVacancy == hasVacancy));
   }
@@ -424,10 +428,10 @@ class _$PropertyModelImpl implements _PropertyModel {
     genderOrientation,
     const DeepCollectionEquality().hash(_amenities),
     priceRange,
-    isVerified,
+    status,
     lastUpdated,
+    const DeepCollectionEquality().hash(_images),
     description,
-    coverImageUrl,
     hasVacancy,
   );
 
@@ -445,7 +449,7 @@ class _$PropertyModelImpl implements _PropertyModel {
   }
 }
 
-abstract class _PropertyModel implements PropertyModel {
+abstract class _PropertyModel extends PropertyModel {
   const factory _PropertyModel({
     @JsonKey(name: 'id') required final String propertyId,
     @JsonKey(name: 'owner_id') required final String ownerId,
@@ -457,12 +461,13 @@ abstract class _PropertyModel implements PropertyModel {
     required final GenderOrientation genderOrientation,
     final List<String> amenities,
     @JsonKey(name: 'price_range') required final PriceRange priceRange,
-    @JsonKey(name: 'is_verified') final bool isVerified,
+    final PropertyStatus status,
     @JsonKey(name: 'last_updated') required final DateTime lastUpdated,
+    final List<String> images,
     final String? description,
-    @JsonKey(name: 'cover_image_url') final String? coverImageUrl,
     @JsonKey(name: 'has_vacancy') final bool hasVacancy,
   }) = _$PropertyModelImpl;
+  const _PropertyModel._() : super._();
 
   factory _PropertyModel.fromJson(Map<String, dynamic> json) =
       _$PropertyModelImpl.fromJson;
@@ -490,16 +495,14 @@ abstract class _PropertyModel implements PropertyModel {
   @JsonKey(name: 'price_range')
   PriceRange get priceRange;
   @override
-  @JsonKey(name: 'is_verified')
-  bool get isVerified;
+  PropertyStatus get status;
   @override
   @JsonKey(name: 'last_updated')
   DateTime get lastUpdated;
   @override
-  String? get description;
+  List<String> get images;
   @override
-  @JsonKey(name: 'cover_image_url')
-  String? get coverImageUrl;
+  String? get description;
   @override
   @JsonKey(name: 'has_vacancy')
   bool get hasVacancy;

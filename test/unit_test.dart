@@ -47,7 +47,7 @@ void main() {
         genderOrientation: GenderOrientation.male,
         amenities: ['wifi', 'ac'],
         priceRange: const PriceRange(min: 3000, max: 5000),
-        isVerified: true,
+        status: PropertyStatus.verified,
         lastUpdated: DateTime(2025, 1, 1),
       );
 
