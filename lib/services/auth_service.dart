@@ -140,9 +140,9 @@ class AuthService {
         throw const AppAuthException('Google sign-in failed to initiate.');
       }
 
-      // Note: Because OAuth often involves redirects, the rest of the logic
-      // usually happens in the onAuthStateChange listener in the Provider.
-      return null; 
+      // NOTE: Account linking happens automatically in Supabase if "Link accounts with same email" is enabled.
+      // If enabled, signing in with Google using an existing email will link to the original account.
+      return null;
     } catch (e) {
       if (e is AuthException) {
         throw AppAuthException.fromSupabase(e);

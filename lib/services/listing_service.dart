@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/property_model.dart';
 import '../models/room_model.dart';
@@ -99,23 +100,43 @@ class ListingService {
           .expand((r) => List<String>.from(r['images'] ?? []))
           .toList();
 
-      // 3. Delete from Database (Cascade handles rooms)
+      // 3. Delete from Database (Cascade handles rooms and bookings)
+      // We do this BEFORE storage cleanup to ensure the listing is removed from UI 
+      // even if storage cleanup has issues.
       await _supabase.from('properties').delete().eq('id', propertyId);
 
       // 4. Cleanup Storage
-      final allImages = [...images, ...roomImages];
+      final allImages = [...images, ...roomImages].where((img) => img.isNotEmpty).toSet().toList();
+      
       if (allImages.isNotEmpty) {
-        // Extract paths from URLs
-        final paths = allImages.map((url) {
-          final uri = Uri.parse(url);
-          final segments = uri.pathSegments;
-          final bucketIndex = segments.indexOf('property_images');
-          return segments.sublist(bucketIndex + 1).join('/');
-        }).toList();
+        try {
+          // Extract paths from Supabase storage URLs
+          final paths = allImages.map((url) {
+            try {
+              final uri = Uri.parse(url);
+              final segments = uri.pathSegments;
+              final bucketIndex = segments.indexOf('property_images');
+              
+              if (bucketIndex != -1 && bucketIndex < segments.length - 1) {
+                return segments.sublist(bucketIndex + 1).join('/');
+              }
+            } catch (e) {
+              debugPrint('Error parsing image URL for deletion: $url - $e');
+            }
+            return null;
+          }).whereType<String>().toList();
 
-        await _supabase.storage.from('property_images').remove(paths);
+          if (paths.isNotEmpty) {
+            await _supabase.storage.from('property_images').remove(paths);
+          }
+        } catch (e) {
+          // Log storage cleanup error but don't fail the whole operation
+          // since the DB records are already gone.
+          debugPrint('Non-blocking storage cleanup error: $e');
+        }
       }
     } catch (e) {
+      debugPrint('Delete property listing failed: $e');
       rethrow;
     }
   }

@@ -17,7 +17,7 @@
 
 **Purpose**: Fix repository structural issues blocking git operations.
 
-- [ ] T001 Remove nested git repository metadata in `c:/APPLICATIONS/vacansee/Vacansee/.git` to restore main repo tracking
+- [x] T001 Remove nested git repository metadata in `c:/APPLICATIONS/vacansee/Vacansee/.git` to restore main repo tracking
 
 ---
 
@@ -27,9 +27,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until the code actually compiles.
 
-- [ ] T002 Fix `undefined_named_parameter: coverImageUrl` in `lib/providers/property_provider.dart:259`
-- [ ] T003 Fix `undefined_named_parameter: coverImageUrl` in `lib/providers/property_provider.dart:301`
-- [ ] T004 [P] Make `_lastVacancyUpdate` final in `lib/providers/property_provider.dart:23`
+- [x] T002 Fix `undefined_named_parameter: coverImageUrl` in `lib/providers/property_provider.dart:259`
+- [x] T003 Fix `undefined_named_parameter: coverImageUrl` in `lib/providers/property_provider.dart:301`
+- [x] T004 [P] Make `_lastVacancyUpdate` final in `lib/providers/property_provider.dart:23`
 
 **Checkpoint**: Code foundation compiles - user story implementation can now begin.
 
@@ -43,11 +43,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T005 [P] [US1] Resolve async context violations in `lib/screens/booking/owner_bookings_screen.dart`
-- [ ] T006 [P] [US1] Resolve async context violations in `lib/screens/home/owner_dashboard.dart`
-- [ ] T007 [P] [US1] Resolve async context violations in `lib/screens/profile/profile_screen.dart`
-- [ ] T008 [P] [US1] Resolve async context violations in `lib/screens/property/create_property_screen.dart`
-- [ ] T009 [P] [US1] Fix `deprecated_member_use: withOpacity` in `lib/screens/auth/email_verification_screen.dart`
+- [x] T005 [P] [US1] Resolve async context violations in `lib/screens/booking/owner_bookings_screen.dart`
+- [x] T006 [P] [US1] Resolve async context violations in `lib/screens/home/owner_dashboard.dart`
+- [x] T007 [P] [US1] Resolve async context violations in `lib/screens/profile/profile_screen.dart`
+- [x] T008 [P] [US1] Resolve async context violations in `lib/screens/property/create_property_screen.dart`
+- [x] T009 [P] [US1] Fix `deprecated_member_use: withOpacity` in `lib/screens/auth/email_verification_screen.dart`
 
 **Checkpoint**: At this point, CI analysis gate should pass perfectly.
 
@@ -61,8 +61,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T010 [US2] Stage all previously untracked files from the restored `Vacansee/` directory
-- [ ] T011 [US2] Commit and push the `003-fix-cicd-pipeline` branch to verify GitHub Action triggers
+- [x] T010 [US2] Stage all previously untracked files from the restored `Vacansee/` directory
+- [x] T011 [US2] Commit and push the `003-fix-cicd-pipeline` branch to verify GitHub Action triggers
 
 ---
 
@@ -70,8 +70,8 @@
 
 **Purpose**: Final verification of the deployment pipeline.
 
-- [ ] T012 Monitor [GitHub Actions](https://github.com/khentmoba/Vacansee/actions) for successful Vercel deployment
-- [ ] T013 Verify the generated Vercel Preview URL and site functionality
+- [x] T012 Monitor [GitHub Actions](https://github.com/khentmoba/Vacansee/actions) for successful Vercel deployment
+- [x] T013 Verify the generated Vercel Preview URL and site functionality
 
 ---
 
