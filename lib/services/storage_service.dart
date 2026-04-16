@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Exception for storage operations
@@ -21,7 +21,7 @@ class StorageService {
   /// Returns the public download URL
   Future<String> uploadPropertyImage({
     required String propertyId,
-    required File file,
+    required Uint8List file,
     String? filename,
   }) async {
     try {
@@ -49,7 +49,7 @@ class StorageService {
   /// Returns list of download URLs
   Future<List<String>> uploadPropertyImages({
     required String propertyId,
-    required List<File> files,
+    required List<Uint8List> files,
   }) async {
     final urls = <String>[];
 
@@ -88,7 +88,7 @@ class StorageService {
   Future<String> uploadRoomImage({
     required String propertyId,
     required String roomId,
-    required File file,
+    required Uint8List file,
   }) async {
     try {
       final name = DateTime.now().millisecondsSinceEpoch.toString();

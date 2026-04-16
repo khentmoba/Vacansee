@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -126,10 +126,14 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
       // Upload images if any
       List<String> imageUrls = [];
       if (_selectedImages.isNotEmpty) {
-        final files = _selectedImages.map((xfile) => File(xfile.path)).toList();
+        // Use bytes for cross-platform support (Web and Mobile)
+        final imageBytesList = await Future.wait(
+          _selectedImages.map((xfile) => xfile.readAsBytes()),
+        );
+
         imageUrls = await storageService.uploadPropertyImages(
           propertyId: property.propertyId,
-          files: files,
+          files: imageBytesList,
         );
 
         // Update property with image URLs
@@ -628,8 +632,8 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.file(
-                File(_selectedImages[index].path),
+              child: Image.network(
+                _selectedImages[index].path,
                 fit: BoxFit.cover,
                 width: double.infinity,
                 height: double.infinity,
