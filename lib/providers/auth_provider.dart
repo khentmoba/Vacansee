@@ -160,6 +160,8 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
   /// Sign in with Google
   Future<void> signInWithGoogle() async {
     _isLoading = true;

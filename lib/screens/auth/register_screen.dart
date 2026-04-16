@@ -4,7 +4,6 @@ import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
 import 'login_screen.dart';
 import 'email_verification_screen.dart';
-import '../home/home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
