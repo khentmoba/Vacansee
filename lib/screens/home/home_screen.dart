@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import 'owner_dashboard.dart';
 import '../property/create_property_screen.dart';
 import '../property/property_list_screen.dart';
+import '../profile/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -28,10 +29,25 @@ class OwnerHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Properties'),
+        title: const Text(
+          'My Properties',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF1D1B16),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.account_circle_outlined),
+            color: const Color(0xFF5287B2),
+            tooltip: 'Profile',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: const OwnerDashboard(),
       floatingActionButton: FloatingActionButton.extended(
@@ -55,18 +71,26 @@ class StudentHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Find Your Home'),
+        title: const Text(
+          'Find Your Home',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF1D1B16),
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => authProvider.signOut(),
+            icon: const Icon(Icons.account_circle_outlined),
+            color: const Color(0xFF5287B2),
+            tooltip: 'Profile',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ),
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: const PropertyListScreen(),
