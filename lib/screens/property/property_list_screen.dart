@@ -536,38 +536,41 @@ class _PropertyCardState extends State<_PropertyCard> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => PropertyDetailScreen(property: widget.property),
-            ),
-          );
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          margin: const EdgeInsets.only(bottom: 24),
-          transform: Matrix4.identity()
-            ..translateByDouble(0.0, _isHovered ? -6.0 : 0.0, 0.0, 0.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: _isHovered
-                    ? const Color(0xFF5287B2).withValues(alpha: 0.2)
-                    : Colors.black.withValues(alpha: 0.04),
-                blurRadius: _isHovered ? 24 : 16,
-                offset: Offset(0, _isHovered ? 12 : 4),
+    return RepaintBoundary(
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => PropertyDetailScreen(property: widget.property),
               ),
-            ],
-          ),
+            );
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutCubic,
+            margin: EdgeInsets.only(
+              bottom: 24,
+              top: _isHovered ? 0 : 0,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: _isHovered
+                      ? const Color(0xFF5287B2).withValues(alpha: 0.2)
+                      : Colors.black.withValues(alpha: 0.04),
+                  blurRadius: _isHovered ? 32 : 16,
+                  spreadRadius: _isHovered ? 2 : 0,
+                  offset: Offset(0, _isHovered ? 12 : 4),
+                ),
+              ],
+            ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -830,6 +833,7 @@ class _PropertyCardState extends State<_PropertyCard> {
           ),
         ),
       ),
+    ),
     );
   }
 
