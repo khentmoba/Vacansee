@@ -1,17 +1,21 @@
 #!/bin/bash
+set -e
 
 # 1. Install Flutter (Stable branch)
-echo "Installing Flutter..."
+echo ">>> Installing Flutter..."
 git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter
 export PATH="$PATH:$HOME/flutter/bin"
 
-# 2. Initialize Flutter
-echo "Initializing Flutter..."
-flutter doctor
+# 2. Verify Flutter is accessible
+echo ">>> Flutter version:"
+flutter --version
 
-# 3. Build the project for Web
-echo "Building Flutter Web..."
-flutter build web --release
+# 3. Get dependencies
+echo ">>> Getting dependencies..."
+flutter pub get
 
-# 4. Success message
-echo "Build complete! Vercel will now deploy the build/web folder."
+# 4. Build for Web with the correct base href
+echo ">>> Building Flutter Web..."
+flutter build web --release --base-href /
+
+echo ">>> Build complete!"
