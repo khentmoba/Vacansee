@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - '**'
 
 jobs:
   deploy:
@@ -21,6 +22,9 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Run Analysis
+        run: flutter analyze
+
       - name: Build Web
         run: flutter build web --release --base-href /
 
@@ -28,7 +32,12 @@ jobs:
         run: npm install -g vercel
 
       - name: Deploy to Vercel
-        run: vercel deploy build/web --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            vercel deploy build/web --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+          else
+            vercel deploy build/web --token=${{ secrets.VERCEL_TOKEN }} --yes
+          fi
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
