@@ -1,12 +1,22 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_model.dart';
+
 class AppAuthException implements Exception {
   final String message;
   const AppAuthException(this.message);
 
   factory AppAuthException.fromSupabase(AuthException e) {
-    // Supabase AuthException typically has a message. We could map specific messages if needed.
+    try {
+      // Supabase sometimes returns error messages as raw JSON strings.
+      final decoded = jsonDecode(e.message) as Map<String, dynamic>;
+      if (decoded.containsKey('message')) {
+        return AppAuthException(decoded['message'] as String);
+      }
+    } catch (_) {
+      // Ignore JSON parse errors, fall back to the original raw message.
+    }
     return AppAuthException(e.message);
   }
 
