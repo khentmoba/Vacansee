@@ -22,7 +22,7 @@ class EmailVerificationScreen extends StatelessWidget {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF5287B2).withOpacity(0.1),
+                  color: const Color(0xFF5287B2).withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Center(

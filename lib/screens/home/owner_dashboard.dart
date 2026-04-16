@@ -431,15 +431,21 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                         builder: (ctx) => ConfirmationDialog(
                           title: 'Delete Listing',
                           content: 'Are you sure you want to permanently delete "${property.name}"? This action cannot be undone.',
-                          onConfirm: () async {
-                             await ListingService().deletePropertyListing(property.propertyId);
-                             if (context.mounted) {
-                               context.read<PropertyProvider>().loadOwnerProperties(property.ownerId);
-                               ScaffoldMessenger.of(context).showSnackBar(
-                                 const SnackBar(content: Text('Listing deleted')),
-                               );
-                             }
-                          },
+                            onConfirm: () async {
+                              await ListingService().deletePropertyListing(
+                                property.propertyId,
+                              );
+                              if (mounted) {
+                                context
+                                    .read<PropertyProvider>()
+                                    .loadOwnerProperties(property.ownerId);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Listing deleted'),
+                                  ),
+                                );
+                              }
+                            },
                         ),
                       );
                     },

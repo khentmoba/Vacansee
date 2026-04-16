@@ -348,16 +348,16 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
       ),
     );
 
-    if (confirmed == true && context.mounted) {
+    if (confirmed == true && mounted) {
       final provider = context.read<BookingProvider>();
       final success = await provider.approveBooking(
         booking.bookingId,
         ownerNotes: notesController.text.isEmpty ? null : notesController.text,
       );
-      if (success && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Booking approved')));
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Booking approved')),
+        );
       }
     }
   }
@@ -396,16 +396,16 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
       ),
     );
 
-    if (confirmed == true && context.mounted) {
+    if (confirmed == true && mounted) {
       final provider = context.read<BookingProvider>();
       final success = await provider.rejectBooking(
         booking.bookingId,
         ownerNotes: notesController.text.isEmpty ? null : notesController.text,
       );
-      if (success && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Booking rejected')));
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Booking rejected')),
+        );
       }
     }
   }

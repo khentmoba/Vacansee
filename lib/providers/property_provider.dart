@@ -20,7 +20,7 @@ class PropertyProvider extends ChangeNotifier {
 
   // Real-time vacancy tracking across all properties
   Map<String, bool> _propertyVacancyMap = {};
-  Map<String, DateTime> _lastVacancyUpdate = {};
+  final Map<String, DateTime> _lastVacancyUpdate = {};
   StreamSubscription<List<RoomModel>>? _allRoomsSubscription;
 
   // Filters
@@ -256,7 +256,7 @@ class PropertyProvider extends ChangeNotifier {
         amenities: amenities,
         priceRange: priceRange,
         description: description,
-        coverImageUrl: coverImageUrl,
+        images: coverImageUrl != null ? [coverImageUrl] : null,
       );
       _properties.insert(0, property);
       _isLoading = false;
@@ -298,7 +298,7 @@ class PropertyProvider extends ChangeNotifier {
         amenities: amenities,
         priceRange: priceRange,
         description: description,
-        coverImageUrl: coverImageUrl,
+        images: coverImageUrl != null ? [coverImageUrl] : null,
       );
       _properties.insert(0, property);
       _isLoading = false;

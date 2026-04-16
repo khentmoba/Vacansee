@@ -276,9 +276,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 52,
               child: OutlinedButton.icon(
                 onPressed: () async {
+                  final navigator = Navigator.of(context);
                   await context.read<AuthProvider>().signOut();
                   if (mounted) {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    navigator.popUntil((route) => route.isFirst);
                   }
                 },
                 icon: const Icon(Icons.logout_rounded, size: 20),

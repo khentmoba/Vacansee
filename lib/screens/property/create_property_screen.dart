@@ -80,9 +80,11 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to pick image: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to pick image: $e')),
+        );
+      }
     }
   }
 
@@ -189,10 +191,12 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
         Navigator.pop(context);
       }
     } catch (e) {
-      setState(() => _isUploadingImages = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) {
+        setState(() => _isUploadingImages = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
   }
 
