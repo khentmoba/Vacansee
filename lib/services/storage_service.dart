@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Exception for storage operations
@@ -32,7 +32,7 @@ class StorageService {
           .from(bucketName)
           .upload(
             path,
-            file,
+            file as dynamic, // Support both File and Uint8List
             fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
           );
 
@@ -98,7 +98,7 @@ class StorageService {
           .from(bucketName)
           .upload(
             path,
-            file,
+            file as dynamic, // Support both File and Uint8List
             fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
           );
 

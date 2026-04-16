@@ -49,6 +49,7 @@ class PropertyService {
 
       final json = property.toJson();
       json.remove('id'); // Explicitly remove for insert
+      json.remove('has_vacancy'); // UI-only field not in DB schema
 
       final response = await _supabase
           .from('properties')
@@ -133,9 +134,12 @@ class PropertyService {
   Future<void> updateProperty(PropertyModel property) async {
     try {
       final updated = property.copyWith(lastUpdated: DateTime.now());
+      final json = updated.toJson();
+      json.remove('has_vacancy'); // UI-only field not in DB schema
+
       await _supabase
           .from('properties')
-          .update(updated.toJson())
+          .update(json)
           .eq('id', property.propertyId);
     } catch (e) {
       throw PropertyException('Failed to update property: $e');
@@ -177,6 +181,8 @@ class PropertyService {
 
       final json = room.toJson();
       json.remove('id');
+      json.remove('is_available'); // Virtual field from view
+      json.remove('property_name'); // Virtual field from view
 
       final result = await _supabase
           .from('rooms')
