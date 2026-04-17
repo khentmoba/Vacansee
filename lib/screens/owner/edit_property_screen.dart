@@ -4,6 +4,7 @@ import '../../models/property_model.dart';
 import '../../models/room_model.dart';
 import '../../providers/property_provider.dart';
 import '../../services/listing_service.dart';
+import 'widgets/room_details_dialog.dart';
 
 class EditPropertyScreen extends StatefulWidget {
   final PropertyModel property;
@@ -46,18 +47,26 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
     // Note: We'll listen to the provider's rooms list in build or initState
   }
 
-  void _addRoom() {
-    setState(() {
-      _rooms.add(
-        RoomModel(
-          roomId: 'temp_${DateTime.now().millisecondsSinceEpoch}',
-          propertyId: widget.property.propertyId,
-          status: RoomStatus.vacant,
-          lastUpdated: DateTime.now(),
-          capacity: 1,
-        ),
-      );
-    });
+  Future<void> _addRoom() async {
+    final room = await showDialog<RoomModel>(
+      context: context,
+      builder: (context) => const RoomDetailsDialog(),
+    );
+
+    if (room != null) {
+      setState(() => _rooms.add(room));
+    }
+  }
+
+  Future<void> _editRoom(int index) async {
+    final room = await showDialog<RoomModel>(
+      context: context,
+      builder: (context) => RoomDetailsDialog(initialRoom: _rooms[index]),
+    );
+
+    if (room != null) {
+      setState(() => _rooms[index] = room);
+    }
   }
 
   void _removeRoom(int index) {
@@ -214,21 +223,46 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
                 itemCount: _rooms.length,
                 itemBuilder: (context, index) {
                   final room = _rooms[index];
-                  return Card(
+                   return Card(
                     margin: const EdgeInsets.only(bottom: 12),
+                    clipBehavior: Clip.antiAlias,
                     child: ListTile(
+                      onTap: () => _editRoom(index),
+                      leading: Icon(
+                        room.status == RoomStatus.vacant
+                            ? Icons.check_circle_outline
+                            : Icons.block_flipped,
+                        color: room.status == RoomStatus.vacant
+                            ? Colors.green
+                            : Colors.orange,
+                      ),
                       title: Text(
-                        'Room: ${room.roomId.startsWith('temp_') ? 'New Room' : room.roomId}',
+                        'Room Capacity: ${room.capacity} ${room.capacity == 1 ? 'person' : 'people'}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text(
-                        'Status: ${room.status.name} | Rate: ₱${room.monthlyRate ?? 0}',
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Monthly Rate: ₱${room.monthlyRate}'),
+                          if (room.description != null)
+                            Text(
+                              room.description!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                        ],
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          color: Colors.red,
-                        ),
-                        onPressed: () => _removeRoom(index),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.edit_outlined, size: 20),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline, color: Colors.red),
+                            onPressed: () => _removeRoom(index),
+                          ),
+                        ],
                       ),
                     ),
                   );
