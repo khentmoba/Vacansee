@@ -56,6 +56,26 @@ void main() {
       expect(property.isVerified, true);
     });
 
+    test('toJson includes images array', () {
+      final property = PropertyModel(
+        propertyId: 'prop-1',
+        ownerId: 'owner-1',
+        name: 'Test Property',
+        address: '123 Test St',
+        lat: 8.5,
+        lng: 124.6,
+        genderOrientation: GenderOrientation.male,
+        amenities: [],
+        priceRange: const PriceRange(min: 3000, max: 5000),
+        status: PropertyStatus.verified,
+        lastUpdated: DateTime.now(),
+        images: ['url1', 'url2'],
+      );
+
+      final json = property.toJson();
+      expect(json['images'], ['url1', 'url2']);
+    });
+
     test('price range formats correctly', () {
       const priceRange = PriceRange(min: 3000, max: 5000);
       expect(priceRange.formatted, '₱3000 - ₱5000');
@@ -121,6 +141,29 @@ void main() {
       expect(updated.roomId, 'room-1');
       expect(updated.status, RoomStatus.occupied);
       expect(updated.capacity, 2);
+    });
+  });
+
+  group('BookingModel', () {
+    test('toJson includes student biographical fields', () {
+      final booking = BookingModel(
+        bookingId: 'book-1',
+        studentId: 'student-1',
+        propertyId: 'prop-1',
+        roomId: 'room-1',
+        propertyName: 'Test Prop',
+        roomDescription: 'Test Room',
+        studentName: 'Juan Dela Cruz',
+        studentEmail: 'juan@example.com',
+        studentPhone: '09123456789',
+        status: BookingStatus.pending,
+        requestedAt: DateTime(2025, 1, 1),
+      );
+
+      final json = booking.toJson();
+      expect(json['student_name'], 'Juan Dela Cruz');
+      expect(json['student_email'], 'juan@example.com');
+      expect(json['student_phone'], '09123456789');
     });
   });
 }

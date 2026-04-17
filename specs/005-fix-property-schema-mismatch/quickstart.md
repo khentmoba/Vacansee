@@ -1,41 +1,50 @@
-# Quickstart: fix-property-schema-mismatch
+# Quickstart: Fixed Schema and Models
 
-## 🚀 Setup Instructions
+Follow these steps to apply the fixes and verify functionality.
 
-### 1. Update Supabase Schema
-Run the following SQL in your Supabase SQL Editor:
+## 1. Apply Database Migration
+Run the following SQL in the Supabase SQL Editor:
 
 ```sql
--- 1. Create the new enum type
-CREATE TYPE property_status AS ENUM ('pending', 'verified', 'deleted');
+-- 1. Add missing images column to properties
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}';
 
--- 2. Add the new columns to properties
-ALTER TABLE public.properties 
-ADD COLUMN images TEXT[] DEFAULT '{}',
-ADD COLUMN status property_status DEFAULT 'pending';
+-- 2. Update view to use 'status' enum
+CREATE OR REPLACE VIEW public.room_vacancies AS
+SELECT 
+  r.id,
+  r.property_id,
+  r.status,
+  (r.status = 'vacant') as is_available,
+  r.images as room_images,
+  r.capacity,
+  r.current_occupants,
+  r.monthly_rate,
+  r.description,
+  r.last_updated,
+  p.name as property_name,
+  p.address as property_address,
+  (p.status = 'verified') as property_is_verified
+FROM public.rooms r
+JOIN public.properties p ON r.property_id = p.id;
 
--- 3. Migrate existing data (Optional if empty)
--- Map is_verified to the new status
-UPDATE public.properties 
-SET status = CASE WHEN is_verified THEN 'verified'::property_status ELSE 'pending'::property_status END;
-
--- 4. Clean up redundant columns
-ALTER TABLE public.properties 
-DROP COLUMN is_verified,
-DROP COLUMN cover_image_url;
-
--- 5. Update RLS policies to handle 'deleted' status
--- Example for public SELECT
-DROP POLICY IF EXISTS "Public can view verified properties" ON public.properties;
-CREATE POLICY "Public can view verified properties" 
-ON public.properties FOR SELECT USING (status = 'verified');
+-- 3. Fix RLS policies
+DROP POLICY IF EXISTS "Public can view rooms of verified properties" ON public.rooms;
+CREATE POLICY "Public can view rooms of verified properties" 
+ON public.rooms FOR SELECT USING (
+  EXISTS (
+    SELECT 1 FROM public.properties p 
+    WHERE p.id = rooms.property_id AND p.status = 'verified'
+  )
+);
 ```
 
-### 2. Update Flutter Code
-1. Ensure `property_model.dart` matches the new schema (it already does).
-2. Update `listing_service.dart` to use the `images` column and implement Soft Delete.
-3. Update `property_service.dart` to handle the `status` enum correctly during insert/update.
+## 2. Verify Dart Model Serializers
+Run `flutter test` or manually check that:
+- `BookingModel.toJson()` includes `student_name`, `student_email`.
+- `PropertyModel` correctly parses the `images` list from the database.
 
-### 3. Verify
-1. Create a property with multiple images.
-2. Delete a property and verify it remains in DB with `status = 'deleted'` but disappears from the UI.
+## 3. Verify Functionality
+1. **Property Creation**: Add a new property with images in the owner dashboard.
+2. **Booking**: Submit a booking request as a student.
+3. **Deletion**: Delete a property and ensure it enters `deleted` status and storage is cleaned up.

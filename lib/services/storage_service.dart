@@ -69,26 +69,50 @@ class StorageService {
     return urls;
   }
 
+  /// Delete multiple property images
+  Future<void> deletePropertyImages(List<String> imageUrls) async {
+    if (imageUrls.isEmpty) return;
+    
+    final pathsToDelete = <String>[];
+    
+    for (final imageUrl in imageUrls) {
+      try {
+        final uri = Uri.parse(imageUrl);
+        final pathSegments = uri.pathSegments;
+        final bucketIndex = pathSegments.indexOf(bucketName);
+        if (bucketIndex != -1 && bucketIndex < pathSegments.length - 1) {
+          final path = pathSegments.sublist(bucketIndex + 1).join('/');
+          pathsToDelete.add(path);
+        }
+      } catch (e) {
+        // Log and continue
+        print('Skipping invalid image URL: $imageUrl');
+      }
+    }
+    
+    if (pathsToDelete.isNotEmpty) {
+      try {
+        await _supabase.storage.from(bucketName).remove(pathsToDelete);
+      } catch (e) {
+        throw StorageException('Failed to delete images: $e');
+      }
+    }
+  }
+
   /// Delete property image from storage parsing its public URL
   Future<void> deletePropertyImage(String imageUrl) async {
     try {
-      // imageUrl looks like: https://[projectId].supabase.co/storage/v1/object/public/[bucketName]/[path]
       final uri = Uri.parse(imageUrl);
       final pathSegments = uri.pathSegments;
-      // We expect the path to be after .../public/[bucketName]/[path]
       final bucketIndex = pathSegments.indexOf(bucketName);
       if (bucketIndex != -1 && bucketIndex < pathSegments.length - 1) {
         final path = pathSegments.sublist(bucketIndex + 1).join('/');
         await _supabase.storage.from(bucketName).remove([path]);
-      } else {
-        throw Exception("Could not parse storage path from URL");
       }
     } catch (e) {
       throw StorageException('Failed to delete image: $e');
     }
   }
-
-  /// Upload room image
   Future<String> uploadRoomImage({
     required String propertyId,
     required String roomId,

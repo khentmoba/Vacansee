@@ -2,6 +2,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/property_model.dart';
 import '../models/room_model.dart';
 
+import 'storage_service.dart';
+
 /// Exception for property operations
 class PropertyException implements Exception {
   final String message;
@@ -13,9 +15,11 @@ class PropertyException implements Exception {
 /// Service for property CRUD operations
 class PropertyService {
   final SupabaseClient _supabase;
+  final StorageService _storage;
 
-  PropertyService({SupabaseClient? supabase})
-    : _supabase = supabase ?? Supabase.instance.client;
+  PropertyService({SupabaseClient? supabase, StorageService? storage})
+    : _supabase = supabase ?? Supabase.instance.client,
+      _storage = storage ?? StorageService(supabase: supabase);
 
   /// Create a new property
   Future<PropertyModel> createProperty({
@@ -165,13 +169,33 @@ class PropertyService {
     }
   }
 
-  /// Soft delete a property
+  /// Soft delete a property and clean up associated storage
   Future<void> deleteProperty(String propertyId) async {
     try {
+      // 1. Fetch property to get images and associated data
+      final data = await _supabase
+          .from('properties')
+          .select('images')
+          .eq('id', propertyId)
+          .single();
+      
+      final List<String> images = (data['images'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ?? [];
+
+      // 2. Perform soft delete
       await _supabase
           .from('properties')
           .update({'status': 'deleted'})
           .eq('id', propertyId);
+
+      // 3. Clean up storage in the background
+      if (images.isNotEmpty) {
+        _storage.deletePropertyImages(images).catchError((e) {
+          // Log but don't fail the deletion if storage cleanup fails
+          print('Storage cleanup failed during property deletion: $e');
+        });
+      }
     } catch (e) {
       throw PropertyException('Failed to delete property: $e');
     }

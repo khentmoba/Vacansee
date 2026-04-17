@@ -101,6 +101,9 @@ class BookingModel {
       'room_id': roomId,
       // Joined fields aren't sent back to the bookings table on upserts
       'status': status.name,
+      'student_name': studentName,
+      'student_email': studentEmail,
+      'student_phone': studentPhone,
       'requested_at': requestedAt.toIso8601String(),
       if (respondedAt != null) 'responded_at': respondedAt!.toIso8601String(),
       'owner_notes': ownerNotes,
