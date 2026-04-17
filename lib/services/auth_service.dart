@@ -224,7 +224,12 @@ class AuthService {
       };
       if (role != null) updates['role'] = role.name;
 
-      await _supabase.from('users').update(updates).eq('id', uid);
+      await _supabase
+          .from('users')
+          .update(updates)
+          .eq('id', uid)
+          .select()
+          .single();
     } catch (e) {
       throw AppAuthException('Failed to verify user: ${e.toString()}');
     }
