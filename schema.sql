@@ -4,7 +4,10 @@
 -- 1. Create Custom Types (Enums)
 DO $$ BEGIN
     CREATE TYPE user_role AS ENUM ('student', 'owner', 'admin');
-EXCEPTION WHEN duplicate_object THEN null; END $$;
+EXCEPTION WHEN duplicate_object THEN 
+    -- If it exists, ensure newest values are added
+    ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'admin';
+END $$;
 
 DO $$ BEGIN
     CREATE TYPE gender_orientation AS ENUM ('male', 'female', 'mixed');
@@ -20,7 +23,10 @@ EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 DO $$ BEGIN
     CREATE TYPE property_status AS ENUM ('pending', 'verified', 'rejected', 'deleted');
-EXCEPTION WHEN duplicate_object THEN null; END $$;
+EXCEPTION WHEN duplicate_object THEN 
+    -- If it exists, ensure newest values are added
+    ALTER TYPE property_status ADD VALUE IF NOT EXISTS 'rejected';
+END $$;
 
 -- 2. Create Tables
 
@@ -271,20 +277,31 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+DECLARE
+  default_role public.user_role;
 BEGIN
+  -- Safe role extraction
+  BEGIN
+    default_role := (NEW.raw_user_meta_data->>'role')::public.user_role;
+  EXCEPTION WHEN OTHERS THEN
+    default_role := NULL;
+  END;
+
   INSERT INTO public.users (id, email, display_name, role, phone_number)
   VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'display_name', NEW.email),
-    (NEW.raw_user_meta_data->>'role')::user_role, -- Will be NULL if not provided
+    default_role,
     NEW.raw_user_meta_data->>'phone_number'
   )
   ON CONFLICT (id) DO UPDATE SET
     email = EXCLUDED.email,
     display_name = EXCLUDED.display_name,
-    role = EXCLUDED.role,
-    phone_number = EXCLUDED.phone_number;
+    role = COALESCE(EXCLUDED.role, public.users.role), -- Preserve existing role if metadata is empty
+    phone_number = COALESCE(EXCLUDED.phone_number, public.users.phone_number),
+    last_login_at = NOW();
+    
   RETURN NEW;
 END;
 $$;
