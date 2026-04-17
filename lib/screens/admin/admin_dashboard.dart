@@ -153,18 +153,31 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ],
           ),
         ),
-        body: TabBarView(
+        body: Stack(
           children: [
-            // Tab 1: Pending Properties
-            _buildPropertyQueue(propertyProvider, pendingProperties),
-            
-            // Tab 2: Pending Owners
-            _buildOwnerQueue(authProvider),
+            TabBarView(
+              children: [
+                // Tab 1: Pending Properties
+                _buildPropertyQueue(propertyProvider, pendingProperties),
+                
+                // Tab 2: Pending Owners
+                _buildOwnerQueue(authProvider),
 
-            // Tab 3: Stats Placeholder
-            const Center(
-              child: Text('Ecosystem statistics coming soon...'),
+                // Tab 3: Stats Placeholder
+                const Center(
+                  child: Text('Ecosystem statistics coming soon...'),
+                ),
+              ],
             ),
+            if (propertyProvider.isLoading || authProvider.isLoading)
+              Container(
+                color: Colors.black.withValues(alpha: 0.3),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
