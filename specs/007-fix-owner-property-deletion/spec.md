@@ -1,9 +1,18 @@
 # Feature Specification: Fix Owner Property Deletion
 
-**Feature Branch**: `fix-owner-delete-property-listing`  
+**Feature Branch**: `007-fix-owner-property-deletion`  
 **Created**: 2026-04-17  
 **Status**: Draft  
 **Input**: User description: "the owner still cant delete in owner dashboard"
+
+## Clarifications
+
+### Session 2026-04-17
+- Q: Handling active bookings during deletion → A: **Warning**: Allow deletion but show a specific warning if active bookings exist.
+- Q: Room status synchronization → A: **Yes**: Update all room statuses to 'maintenance' when property is deleted to ensure they are excluded from vacancy counts.
+- Q: Storage cleanup blocking → A: **Non-blocking**: Deletion succeeds even if image cleanup in storage fails.
+- Q: Admin hard-delete → A: **Out of Scope**: This feature focuses only on the owner dashboard soft-delete.
+- Q: Success feedback pattern → A: **SnackBar with "Undo"**: Provide immediate feedback with a short window to revert the soft-delete.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -39,18 +48,19 @@ As a property owner, I want to see clear feedback if a deletion fails so that I 
 
 ### Edge Cases
 
-- **What happens when a property has active bookings?**: The system should allow deletion (soft delete preserves records for historical reference) but might need to warn the owner. *Assumption: Soft delete is preferred to preserve booking history.*
-- **How does system handle storage cleanup?**: Associated images in Supabase Storage should be removed to save space, but failure to clean storage should not block the status update.
+- **What happens when a property has active bookings?**: The system allows deletion (soft delete) but MUST show a warning dialog if any bookings have status 'pending' or 'approved'.
+- **How does system handle storage cleanup?**: Associated images in Supabase Storage are removed. This process is non-blocking; if it fails, the property status change still proceeds.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
 - **FR-001**: System MUST filter out properties with `status = 'deleted'` from the Owner Dashboard grid view.
-- **FR-002**: System MUST catch and handle errors during the deletion process in the `OwnerDashboard` UI.
-- **FR-003**: System MUST update the `PropertyProvider` state or trigger a refresh that excludes deleted properties.
-- **FR-004**: System MUST ensure that `ListingService.deletePropertyListing` correctly updates the status and handles associated room images.
-- **FR-005**: System MUST provide a success/failure SnackBar feedback to the user after the deletion attempt.
+- **FR-002**: System MUST catch and handle errors during the deletion process and display them to the user.
+- **FR-003**: System MUST update all associated rooms to `status = 'maintenance'` when the parent property is deleted.
+- **FR-004**: System MUST verify if active bookings exist before showing the final deletion confirmation.
+- **FR-005**: System MUST provide a "Restore" (Undo) option in the success SnackBar for a limited time (e.g., 5 seconds).
+- **FR-006**: System MUST ensure storage cleanup is attempted but does not block the database status update.
 
 ### Key Entities
 
@@ -61,9 +71,10 @@ As a property owner, I want to see clear feedback if a deletion fails so that I 
 
 ### Measurable Outcomes
 
-- **SC-001**: Owners can delete a property and see it removed from their dashboard in under 2 seconds (excluding network latency).
-- **SC-002**: 100% of successfully deleted properties (status set to 'deleted') are hidden from the owner's dashboard view.
-- **SC-003**: 100% of failed deletion attempts show a user-friendly error message.
+- **SC-001**: Owners can delete a property and see it removed from their dashboard grid in under 2 seconds.
+- **SC-002**: 100% of "deleted" properties are excluded from student-side search results and maps.
+- **SC-003**: "Deleted" listings contribute 0 value to the "Available Rooms" count in the Owner Dashboard.
+- **SC-004**: Users are able to restore a mistakenly deleted property via the Undo SnackBar.
 
 ## Assumptions
 
