@@ -217,11 +217,16 @@ class PropertyService {
     String? reason,
   }) async {
     try {
-      await _supabase.from('properties').update({
-        'status': status.name,
-        'rejection_reason': reason,
-        'last_updated': DateTime.now().toIso8601String(),
-      }).eq('id', propertyId);
+      await _supabase
+          .from('properties')
+          .update({
+            'status': status.name,
+            'rejection_reason': reason,
+            'last_updated': DateTime.now().toIso8601String(),
+          })
+          .eq('id', propertyId)
+          .select()
+          .single();
     } catch (e) {
       throw PropertyException('Failed to moderate property: $e');
     }
