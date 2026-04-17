@@ -81,9 +81,9 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to pick image: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to pick image: $e')));
       }
     }
   }
@@ -168,9 +168,7 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
 
         // Update property with image URLs
         await propertyProvider.updateProperty(
-          property.copyWith(
-            images: imageUrls,
-          ),
+          property.copyWith(images: imageUrls),
         );
       } else if (isEditing) {
         // Just update the base fields if no new images
@@ -193,9 +191,9 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isUploadingImages = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }
@@ -207,7 +205,9 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FBFD),
       appBar: AppBar(
-        title: Text(widget.property != null ? 'Edit Property' : 'Add New Property'),
+        title: Text(
+          widget.property != null ? 'Edit Property' : 'Add New Property',
+        ),
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF1D1B16),
         elevation: 0,
@@ -231,7 +231,9 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF5287B2).withValues(alpha: 0.1),
+                            color: const Color(
+                              0xFF5287B2,
+                            ).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
@@ -376,7 +378,10 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
           Expanded(
             child: Text(
               provider.errorMessage!,
-              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           IconButton(
@@ -470,7 +475,8 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                       error: _errors['minPrice'],
                     ),
                   ),
-                  if (_errors['minPrice'] != null) _buildErrorText(_errors['minPrice']!),
+                  if (_errors['minPrice'] != null)
+                    _buildErrorText(_errors['minPrice']!),
                 ],
               ),
             ),
@@ -488,7 +494,8 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                       error: _errors['maxPrice'],
                     ),
                   ),
-                  if (_errors['maxPrice'] != null) _buildErrorText(_errors['maxPrice']!),
+                  if (_errors['maxPrice'] != null)
+                    _buildErrorText(_errors['maxPrice']!),
                 ],
               ),
             ),
@@ -507,7 +514,8 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
           controller: _descriptionController,
           maxLines: 5,
           decoration: _buildInputDecoration(
-            hintText: 'Tell students about the rooms, local atmosphere, and rules...',
+            hintText:
+                'Tell students about the rooms, local atmosphere, and rules...',
           ),
         ),
       ],
@@ -573,7 +581,10 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                       widget.property != null
                           ? 'Save Changes'
                           : 'Publish Listing Now',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
             ),
           ),
@@ -765,7 +776,9 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: const Color(0xFF5287B2).withValues(alpha: 0.2),
+                            color: const Color(
+                              0xFF5287B2,
+                            ).withValues(alpha: 0.2),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -785,7 +798,9 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: isSelected ? Colors.white : const Color(0xFF5287B2),
+                        color: isSelected
+                            ? Colors.white
+                            : const Color(0xFF5287B2),
                       ),
                     ),
                   ],

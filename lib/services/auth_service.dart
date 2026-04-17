@@ -131,9 +131,7 @@ class AuthService {
       final success = await _supabase.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: kIsWeb ? null : 'io.supabase.vacansee://login-callback',
-        queryParams: {
-          'prompt': 'select_account',
-        },
+        queryParams: {'prompt': 'select_account'},
       );
 
       if (!success) {
@@ -176,11 +174,13 @@ class AuthService {
     required String uid,
     String? displayName,
     String? phoneNumber,
+    UserRole? role,
   }) async {
     try {
       final updates = <String, dynamic>{};
       if (displayName != null) updates['display_name'] = displayName;
       if (phoneNumber != null) updates['phone_number'] = phoneNumber;
+      if (role != null) updates['role'] = role.name;
 
       if (updates.isNotEmpty) {
         await _supabase.from('users').update(updates).eq('id', uid);

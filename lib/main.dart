@@ -85,6 +85,8 @@ class AuthWrapper extends StatelessWidget {
         return const _LoadingScreen();
       case AuthStatus.authenticated:
         return const HomeScreen();
+      case AuthStatus.needsRole:
+        return const RoleSelectionScreen();
       case AuthStatus.recovery:
         return const UpdatePasswordScreen();
       case AuthStatus.unauthenticated:

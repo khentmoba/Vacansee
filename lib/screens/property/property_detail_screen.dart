@@ -70,7 +70,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
               backgroundColor: vacantRooms > 0
                   ? const Color(0xFF5287B2)
                   : Colors.grey[300],
-              foregroundColor: vacantRooms > 0 ? Colors.white : Colors.grey[600],
+              foregroundColor: vacantRooms > 0
+                  ? Colors.white
+                  : Colors.grey[600],
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -78,10 +80,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             ),
             child: Text(
               vacantRooms > 0 ? 'Book Now' : 'No Rooms Available',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
         ),
@@ -147,7 +146,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                                 ),
                               ),
                               child: Text(
-                                widget.property.genderOrientation.name.toUpperCase(),
+                                widget.property.genderOrientation.name
+                                    .toUpperCase(),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
@@ -168,7 +168,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF5287B2).withValues(alpha: 0.85),
+                                color: const Color(
+                                  0xFF5287B2,
+                                ).withValues(alpha: 0.85),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: Colors.white.withValues(alpha: 0.3),
@@ -217,7 +219,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        const Icon(Icons.location_on, color: Color(0xFF5287B2), size: 20),
+                        const Icon(
+                          Icons.location_on,
+                          color: Color(0xFF5287B2),
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -242,8 +248,12 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           boxShadow: [
                             BoxShadow(
                               color: vacantRooms > 0
-                                  ? const Color(0xFF10B981).withValues(alpha: 0.1)
-                                  : const Color(0xFFEF4444).withValues(alpha: 0.1),
+                                  ? const Color(
+                                      0xFF10B981,
+                                    ).withValues(alpha: 0.1)
+                                  : const Color(
+                                      0xFFEF4444,
+                                    ).withValues(alpha: 0.1),
                               blurRadius: 24,
                               offset: const Offset(0, 8),
                             ),
@@ -251,7 +261,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           border: Border.all(
                             color: vacantRooms > 0
                                 ? const Color(0xFF10B981).withValues(alpha: 0.3)
-                                : const Color(0xFFEF4444).withValues(alpha: 0.3),
+                                : const Color(
+                                    0xFFEF4444,
+                                  ).withValues(alpha: 0.3),
                             width: 1,
                           ),
                         ),
@@ -262,12 +274,18 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                               height: 56,
                               decoration: BoxDecoration(
                                 color: vacantRooms > 0
-                                    ? const Color(0xFF10B981).withValues(alpha: 0.1)
-                                    : const Color(0xFFEF4444).withValues(alpha: 0.1),
+                                    ? const Color(
+                                        0xFF10B981,
+                                      ).withValues(alpha: 0.1)
+                                    : const Color(
+                                        0xFFEF4444,
+                                      ).withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
-                                vacantRooms > 0 ? Icons.check_circle : Icons.cancel,
+                                vacantRooms > 0
+                                    ? Icons.check_circle
+                                    : Icons.cancel,
                                 color: vacantRooms > 0
                                     ? const Color(0xFF10B981)
                                     : const Color(0xFFEF4444),
@@ -388,11 +406,10 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      ...rooms.where((r) => r.status == RoomStatus.vacant).map((room) {
-                        return _RoomCard(
-                          room: room,
-                          property: widget.property,
-                        );
+                      ...rooms.where((r) => r.status == RoomStatus.vacant).map((
+                        room,
+                      ) {
+                        return _RoomCard(room: room, property: widget.property);
                       }),
                     ],
                   ],
@@ -417,7 +434,6 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
       ),
     );
   }
-
 }
 
 class _RoomCard extends StatefulWidget {
@@ -465,73 +481,70 @@ class _RoomCardState extends State<_RoomCard> {
               ),
             ],
           ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.bed_rounded,
-                color: Color(0xFF10B981),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.room.description ?? 'Standard Room',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1D1B16),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${widget.room.capacity} slots • ${widget.room.monthlyRate != null ? '₱${widget.room.monthlyRate}/mo' : 'Price varies'}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF666666),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BookingScreen(
-                      property: widget.property,
-                      room: widget.room,
-                    ),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF10B981),
-                foregroundColor: Colors.white,
-                elevation: _isHovered ? 4 : 0,
-                shape: RoundedRectangleBorder(
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
+                child: const Icon(Icons.bed_rounded, color: Color(0xFF10B981)),
               ),
-              child: const Text(
-                'Book',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.room.description ?? 'Standard Room',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1D1B16),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${widget.room.capacity} slots • ${widget.room.monthlyRate != null ? '₱${widget.room.monthlyRate}/mo' : 'Price varies'}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF666666),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => BookingScreen(
+                        property: widget.property,
+                        room: widget.room,
+                      ),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF10B981),
+                  foregroundColor: Colors.white,
+                  elevation: _isHovered ? 4 : 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Book',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }

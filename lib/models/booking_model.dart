@@ -99,7 +99,8 @@ class BookingModel {
       'student_id': studentId,
       'property_id': propertyId,
       'room_id': roomId,
-      // Joined fields aren't sent back to the bookings table on upserts
+      'property_name': propertyName,
+      'room_description': roomDescription,
       'status': status.name,
       'student_name': studentName,
       'student_email': studentEmail,

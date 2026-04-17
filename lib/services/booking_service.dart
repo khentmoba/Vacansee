@@ -25,7 +25,7 @@ class BookingService {
           .select('status')
           .eq('id', roomId)
           .maybeSingle();
-      
+
       if (room == null) return false;
       return room['status'] == 'vacant';
     } catch (e) {

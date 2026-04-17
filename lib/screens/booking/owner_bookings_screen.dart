@@ -169,8 +169,11 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
                       final booking = bookings[index];
                       return _BookingCard(
                         booking: booking,
-                        isSelected: _selectedBookingIds.contains(booking.bookingId),
-                        onToggleSelection: () => _toggleSelection(booking.bookingId),
+                        isSelected: _selectedBookingIds.contains(
+                          booking.bookingId,
+                        ),
+                        onToggleSelection: () =>
+                            _toggleSelection(booking.bookingId),
                         onApprove: () => _handleApprove(booking),
                         onReject: () => _handleReject(booking),
                       );
@@ -355,9 +358,9 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
         ownerNotes: notesController.text.isEmpty ? null : notesController.text,
       );
       if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Booking approved')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Booking approved')));
       }
     }
   }
@@ -403,9 +406,9 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
         ownerNotes: notesController.text.isEmpty ? null : notesController.text,
       );
       if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Booking rejected')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Booking rejected')));
       }
     }
   }
@@ -457,8 +460,8 @@ class _BookingCardState extends State<_BookingCard> {
             color: widget.isSelected
                 ? const Color(0xFF5287B2).withValues(alpha: 0.5)
                 : _isHovered
-                    ? const Color(0xFF5287B2).withValues(alpha: 0.3)
-                    : Colors.transparent,
+                ? const Color(0xFF5287B2).withValues(alpha: 0.3)
+                : Colors.transparent,
             width: widget.isSelected ? 2 : 1.5,
           ),
         ),
@@ -501,7 +504,9 @@ class _BookingCardState extends State<_BookingCard> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        widget.isSelected ? 'Selected' : 'Select for batch action',
+                        widget.isSelected
+                            ? 'Selected'
+                            : 'Select for batch action',
                         style: TextStyle(
                           fontSize: 12,
                           color: widget.isSelected
@@ -528,7 +533,10 @@ class _BookingCardState extends State<_BookingCard> {
                           color: const Color(0xFF5287B2).withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.person, color: Color(0xFF5287B2)),
+                        child: const Icon(
+                          Icons.person,
+                          color: Color(0xFF5287B2),
+                        ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -563,7 +571,9 @@ class _BookingCardState extends State<_BookingCard> {
                         decoration: BoxDecoration(
                           color: isPending
                               ? const Color(0xFFFEF3C7)
-                              : widget.booking.statusColor.withValues(alpha: 0.1),
+                              : widget.booking.statusColor.withValues(
+                                  alpha: 0.1,
+                                ),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -578,7 +588,9 @@ class _BookingCardState extends State<_BookingCard> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              isPending ? 'Pending Review' : widget.booking.statusLabel,
+                              isPending
+                                  ? 'Pending Review'
+                                  : widget.booking.statusLabel,
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -707,8 +719,19 @@ class _BookingCardState extends State<_BookingCard> {
 
   String _getMonthName(int month) {
     const months = [
-      '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      '',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return months[month];
   }

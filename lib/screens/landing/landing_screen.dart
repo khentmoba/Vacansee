@@ -239,12 +239,14 @@ class LandingScreen extends StatelessWidget {
                       width: isMobile ? double.infinity : null,
                       child: OutlinedButton(
                         onPressed: () {
-                           if (isMobile) {
+                          if (isMobile) {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const LoginScreen()),
+                              MaterialPageRoute(
+                                builder: (_) => const LoginScreen(),
+                              ),
                             );
-                           }
+                          }
                         },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFF5287B2),
@@ -314,7 +316,10 @@ class LandingScreen extends StatelessWidget {
   Widget _buildFeatures(BuildContext context, bool isMobile, double padding) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: padding, vertical: isMobile ? 40 : 80),
+      padding: EdgeInsets.symmetric(
+        horizontal: padding,
+        vertical: isMobile ? 40 : 80,
+      ),
       color: const Color(0xFFF8FBFD),
       child: Column(
         children: [
@@ -368,7 +373,11 @@ class LandingScreen extends StatelessWidget {
   }
 
   Widget _buildFeatureCard(
-      IconData icon, String title, String description, bool isMobile) {
+    IconData icon,
+    String title,
+    String description,
+    bool isMobile,
+  ) {
     return Container(
       width: isMobile ? double.infinity : 320,
       padding: const EdgeInsets.all(32),
@@ -421,7 +430,10 @@ class LandingScreen extends StatelessWidget {
   Widget _buildRoles(BuildContext context, bool isMobile, double padding) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: padding, vertical: isMobile ? 40 : 80),
+      padding: EdgeInsets.symmetric(
+        horizontal: padding,
+        vertical: isMobile ? 40 : 80,
+      ),
       color: Colors.white,
       child: Wrap(
         alignment: WrapAlignment.center,
@@ -540,7 +552,10 @@ class LandingScreen extends StatelessWidget {
                 foregroundColor: isTenant
                     ? const Color(0xFF5287B2)
                     : const Color(0xFF1D1B16),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -548,7 +563,10 @@ class LandingScreen extends StatelessWidget {
               ),
               child: Text(
                 buttonText,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -560,7 +578,10 @@ class LandingScreen extends StatelessWidget {
   Widget _buildCTA(BuildContext context, bool isMobile, double padding) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: padding, vertical: isMobile ? 60 : 80),
+      padding: EdgeInsets.symmetric(
+        horizontal: padding,
+        vertical: isMobile ? 60 : 80,
+      ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -624,7 +645,9 @@ class LandingScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const RegisterScreen(),
+                        ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -647,12 +670,9 @@ class LandingScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  SizedBox(height: isMobile ? 12 : 0, width: isMobile ? 0 : 16),
                   SizedBox(
-                    height: isMobile ? 12 : 0,
-                    width: isMobile ? 0 : 16,
-                  ),
-                  SizedBox(
-                     width: isMobile ? double.infinity : null,
+                    width: isMobile ? double.infinity : null,
                     child: OutlinedButton(
                       onPressed: () => Navigator.push(
                         context,
@@ -691,7 +711,10 @@ class LandingScreen extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: const Color(0xFF1D1B16),
-      padding: EdgeInsets.symmetric(horizontal: padding, vertical: isMobile ? 40 : 60),
+      padding: EdgeInsets.symmetric(
+        horizontal: padding,
+        vertical: isMobile ? 40 : 60,
+      ),
       child: Column(
         children: [
           Wrap(

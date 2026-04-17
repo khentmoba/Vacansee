@@ -14,7 +14,7 @@ class RoomRepository {
   final SupabaseClient _supabase;
 
   RoomRepository({SupabaseClient? supabase})
-      : _supabase = supabase ?? Supabase.instance.client;
+    : _supabase = supabase ?? Supabase.instance.client;
 
   /// Stream of rooms with vacancy status, joined with property data
   /// Uses the public.room_vacancies view for real-time relational streaming
@@ -37,9 +37,9 @@ class RoomRepository {
           .select('status')
           .eq('id', roomId)
           .maybeSingle();
-      
+
       if (response == null) return false;
-      
+
       final String status = response['status'] as String;
       return status == 'vacant';
     } catch (e) {
@@ -50,10 +50,13 @@ class RoomRepository {
   /// Toggle room vacancy status
   Future<void> updateRoomStatus(String roomId, RoomStatus status) async {
     try {
-      await _supabase.from('rooms').update({
-        'status': status.name,
-        'last_updated': DateTime.now().toIso8601String(),
-      }).eq('id', roomId);
+      await _supabase
+          .from('rooms')
+          .update({
+            'status': status.name,
+            'last_updated': DateTime.now().toIso8601String(),
+          })
+          .eq('id', roomId);
     } catch (e) {
       throw RoomException('Failed to update room status: $e');
     }

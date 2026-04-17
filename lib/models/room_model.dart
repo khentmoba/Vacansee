@@ -5,9 +5,11 @@ part 'room_model.freezed.dart';
 part 'room_model.g.dart';
 
 /// Room vacancy status - the core feature of VacanSee
-enum RoomStatus { 
-  @JsonValue('vacant') vacant, 
-  @JsonValue('occupied') occupied 
+enum RoomStatus {
+  @JsonValue('vacant')
+  vacant,
+  @JsonValue('occupied')
+  occupied,
 }
 
 /// Room model representing individual rooms within a property
@@ -31,7 +33,8 @@ class RoomModel with _$RoomModel {
     @JsonKey(name: 'property_name') String? propertyName,
   }) = _RoomModel;
 
-  factory RoomModel.fromJson(Map<String, dynamic> json) => _$RoomModelFromJson(json);
+  factory RoomModel.fromJson(Map<String, dynamic> json) =>
+      _$RoomModelFromJson(json);
 
   /// Check if room has available slots
   bool get hasVacancy {

@@ -8,7 +8,7 @@ class RoomProvider extends ChangeNotifier {
   final RoomRepository _roomRepository;
 
   RoomProvider({RoomRepository? roomRepository})
-      : _roomRepository = roomRepository ?? RoomRepository();
+    : _roomRepository = roomRepository ?? RoomRepository();
 
   List<RoomModel> _vacantRooms = [];
   bool _isLoading = false;

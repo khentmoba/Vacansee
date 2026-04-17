@@ -79,7 +79,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (success && mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => EmailVerificationScreen(email: _emailController.text.trim()),
+          builder: (_) =>
+              EmailVerificationScreen(email: _emailController.text.trim()),
         ),
       );
     }
@@ -640,7 +641,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           width: double.infinity,
           height: 52,
           child: OutlinedButton(
-            onPressed: authProvider.isLoading ? null : authProvider.signInWithGoogle,
+            onPressed: authProvider.isLoading
+                ? null
+                : authProvider.signInWithGoogle,
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: Colors.grey[300]!, width: 1.5),
               shape: RoundedRectangleBorder(

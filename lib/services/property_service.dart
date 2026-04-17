@@ -144,9 +144,9 @@ class PropertyService {
           .select('address')
           .eq('id', property.propertyId)
           .single();
-      
+
       final currentAddress = currentData['address'] as String;
-      
+
       // 2. Determine if status should be reset to pending
       var status = property.status;
       if (property.address != currentAddress) {
@@ -157,7 +157,7 @@ class PropertyService {
         status: status,
         lastUpdated: DateTime.now(),
       );
-      
+
       final json = updated.toJson();
       json.remove('has_vacancy'); // UI-only field not in DB schema
 
@@ -179,10 +179,12 @@ class PropertyService {
           .select('images')
           .eq('id', propertyId)
           .single();
-      
-      final List<String> images = (data['images'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList() ?? [];
+
+      final List<String> images =
+          (data['images'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [];
 
       // 2. Perform soft delete
       await _supabase

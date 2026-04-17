@@ -123,11 +123,7 @@ class _AnimatedNavItemState extends State<_AnimatedNavItem> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                widget.icon,
-                color: iconColor,
-                size: 24,
-              ),
+              Icon(widget.icon, color: iconColor, size: 24),
               if (widget.isSelected) ...[
                 const SizedBox(width: 8),
                 Text(
@@ -138,7 +134,7 @@ class _AnimatedNavItemState extends State<_AnimatedNavItem> {
                     color: Colors.white,
                   ),
                 ),
-              ]
+              ],
             ],
           ),
         ),
@@ -154,7 +150,9 @@ class _HomeTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final displayName = authProvider.user?.displayName ?? '';
-    final userName = displayName.isNotEmpty ? displayName.split(' ').first : 'Student';
+    final userName = displayName.isNotEmpty
+        ? displayName.split(' ').first
+        : 'Student';
 
     return SafeArea(
       bottom: false,
@@ -175,11 +173,7 @@ class _HomeTab extends StatelessWidget {
             child: Stack(
               children: [
                 // Background pattern
-                Positioned(
-                  top: -20,
-                  right: -20,
-                  child: _HeroPattern(),
-                ),
+                Positioned(top: -20, right: -20, child: _HeroPattern()),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -257,7 +251,12 @@ class _ProfileTabState extends State<_ProfileTab>
     return SafeArea(
       bottom: false,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 24, right: 24, top: 32, bottom: 100),
+        padding: const EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 32,
+          bottom: 100,
+        ),
         child: Column(
           children: [
             AnimatedBuilder(
@@ -420,10 +419,7 @@ class _ProfileTabState extends State<_ProfileTab>
 class _HeroPattern extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(180, 180),
-      painter: _PatternPainter(),
-    );
+    return CustomPaint(size: const Size(180, 180), painter: _PatternPainter());
   }
 }
 

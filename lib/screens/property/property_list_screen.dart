@@ -111,13 +111,15 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                     itemBuilder: (context, index) {
                       final property = propertyProvider.properties[index];
                       // Use the new RoomProvider for 'Live' vacancy data
-                      final isLiveVacant = roomProvider.hasVacancyForProperty(property.propertyId);
-                      
+                      final isLiveVacant = roomProvider.hasVacancyForProperty(
+                        property.propertyId,
+                      );
+
                       return _PropertyCard(
                         property: property,
                         liveVacancy: isLiveVacant,
                         // For the summary time, we can still use the property-level last_updated or add more logic
-                        lastUpdate: 'Live', 
+                        lastUpdate: 'Live',
                       );
                     },
                   ),
@@ -237,17 +239,25 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                       const SizedBox(height: 16),
                       StatefulBuilder(
                         builder: (context, setSliderState) {
-                          final minPrice = propertyProvider.minPrice?.toDouble() ?? 0;
-                          final maxPrice = propertyProvider.maxPrice?.toDouble() ?? 50000;
+                          final minPrice =
+                              propertyProvider.minPrice?.toDouble() ?? 0;
+                          final maxPrice =
+                              propertyProvider.maxPrice?.toDouble() ?? 50000;
                           return Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF5287B2).withValues(alpha: 0.1),
+                                      color: const Color(
+                                        0xFF5287B2,
+                                      ).withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
@@ -260,9 +270,14 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                                     ),
                                   ),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF5287B2).withValues(alpha: 0.1),
+                                      color: const Color(
+                                        0xFF5287B2,
+                                      ).withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
@@ -282,13 +297,17 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                                   activeTrackColor: const Color(0xFF5287B2),
                                   inactiveTrackColor: Colors.grey[300],
                                   thumbColor: const Color(0xFF5287B2),
-                                  overlayColor: const Color(0xFF5287B2).withValues(alpha: 0.2),
+                                  overlayColor: const Color(
+                                    0xFF5287B2,
+                                  ).withValues(alpha: 0.2),
                                   trackHeight: 6,
-                                  rangeThumbShape: const RoundRangeSliderThumbShape(
-                                    enabledThumbRadius: 10,
-                                    elevation: 4,
-                                  ),
-                                  rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
+                                  rangeThumbShape:
+                                      const RoundRangeSliderThumbShape(
+                                        enabledThumbRadius: 10,
+                                        elevation: 4,
+                                      ),
+                                  rangeTrackShape:
+                                      const RoundedRectRangeSliderTrackShape(),
                                   showValueIndicator: ShowValueIndicator.never,
                                 ),
                                 child: RangeSlider(
@@ -307,11 +326,30 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                                 ),
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('₱0', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-                                  Text('₱25k', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-                                  Text('₱50k', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                                  Text(
+                                    '₱0',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                                  Text(
+                                    '₱25k',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                                  Text(
+                                    '₱50k',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
@@ -494,7 +532,9 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                 boxShadow: isSelected || isHovered
                     ? [
                         BoxShadow(
-                          color: const Color(0xFF5287B2).withValues(alpha: isSelected ? 0.3 : 0.15),
+                          color: const Color(
+                            0xFF5287B2,
+                          ).withValues(alpha: isSelected ? 0.3 : 0.15),
                           blurRadius: isSelected ? 8 : 4,
                           offset: const Offset(0, 2),
                         ),
@@ -553,10 +593,7 @@ class _PropertyCardState extends State<_PropertyCard> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOutCubic,
-            margin: EdgeInsets.only(
-              bottom: 24,
-              top: _isHovered ? 0 : 0,
-            ),
+            margin: EdgeInsets.only(bottom: 24, top: _isHovered ? 0 : 0),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(24),
@@ -571,104 +608,46 @@ class _PropertyCardState extends State<_PropertyCard> {
                 ),
               ],
             ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image with gradient overlay
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(24),
-                ),
-                child: Stack(
-                  children: [
-                    Container(
-                      height: 220,
-                      width: double.infinity,
-                      color: Colors.grey[200],
-                      child: widget.property.coverImageUrl != null
-                          ? Image.network(
-                              widget.property.coverImageUrl!,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              errorBuilder: (_, _, _) =>
-                                  _buildGradientPlaceholder(),
-                            )
-                          : _buildGradientPlaceholder(),
-                    ),
-                    // Gradient overlay at bottom
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        height: 100,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Colors.black.withValues(alpha: 0.6),
-                            ],
-                          ),
-                        ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image with gradient overlay
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                  child: Stack(
+                    children: [
+                      Container(
+                        height: 220,
+                        width: double.infinity,
+                        color: Colors.grey[200],
+                        child: widget.property.coverImageUrl != null
+                            ? Image.network(
+                                widget.property.coverImageUrl!,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                errorBuilder: (_, _, _) =>
+                                    _buildGradientPlaceholder(),
+                              )
+                            : _buildGradientPlaceholder(),
                       ),
-                    ),
-                    // Available/Full badge on image (top right) - LIVE
-                    Positioned(
-                      top: 16,
-                      right: 16,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          // Live indicator
-                          if (widget.lastUpdate != null)
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 6),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 3,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.5),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 5,
-                                    height: 5,
-                                    decoration: BoxDecoration(
-                                      color: widget.liveVacancy
-                                          ? const Color(0xFF10B981)
-                                          : const Color(0xFFEF4444),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'Live',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white.withValues(alpha: 0.9),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          // Vacancy badge
-                          Container(
+                      // New Listing Badge
+                      if (DateTime.now()
+                              .difference(widget.property.lastUpdated)
+                              .inHours <
+                          1)
+                        Positioned(
+                          top: 16,
+                          left: 16,
+                          child: Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 6,
+                              horizontal: 10,
+                              vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: widget.liveVacancy
-                                  ? const Color(0xFF10B981)
-                                  : const Color(0xFFEF4444),
-                              borderRadius: BorderRadius.circular(30),
+                              color: const Color(0xFFF59E0B), // Amber 500
+                              borderRadius: BorderRadius.circular(8),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withValues(alpha: 0.1),
@@ -676,164 +655,256 @@ class _PropertyCardState extends State<_PropertyCard> {
                                 ),
                               ],
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 6,
-                                  height: 6,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  widget.liveVacancy ? 'Available' : 'Full',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title and tag row
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            widget.property.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF1D1B16),
-                              height: 1.3,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF5287B2).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            widget.property.genderOrientation.name.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF5287B2),
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    // Address with icon
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on_outlined,
-                          size: 16,
-                          color: Colors.grey[500],
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            widget.property.address,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Divider(height: 1),
-                    const SizedBox(height: 16),
-                    // Price and View Details row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Monthly Rate',
+                            child: const Text(
+                              'NEW',
                               style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[500],
-                                letterSpacing: 0.5,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                letterSpacing: 1,
                               ),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              widget.property.priceRange.formatted,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFF5287B2),
+                          ),
+                        ),
+                      // Available/Full badge on image (top right) - LIVE
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            // Live indicator
+                            if (widget.lastUpdate != null)
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.5),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      width: 5,
+                                      height: 5,
+                                      decoration: BoxDecoration(
+                                        color: widget.liveVacancy
+                                            ? const Color(0xFF10B981)
+                                            : const Color(0xFFEF4444),
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          if (widget.liveVacancy)
+                                            BoxShadow(
+                                              color: const Color(
+                                                0xFF10B981,
+                                              ).withValues(alpha: 0.5),
+                                              blurRadius: 4,
+                                              spreadRadius: 2,
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Live',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white.withValues(
+                                          alpha: 0.9,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            // Vacancy badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: widget.liveVacancy
+                                    ? const Color(0xFF10B981)
+                                    : const Color(0xFFEF4444),
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.1),
+                                    blurRadius: 4,
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 6,
+                                    height: 6,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    widget.liveVacancy ? 'Available' : 'Full',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _isHovered
-                                ? const Color(0xFF5287B2)
-                                : const Color(0xFF5287B2).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            'View Details',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: _isHovered ? Colors.white : const Color(0xFF5287B2),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title and tag row
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              widget.property.name,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1D1B16),
+                                height: 1.3,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFF5287B2,
+                              ).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              widget.property.genderOrientation.name
+                                  .toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF5287B2),
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      // Address with icon
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: 16,
+                            color: Colors.grey[500],
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              widget.property.address,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(height: 1),
+                      const SizedBox(height: 16),
+                      // Price and View Details row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Monthly Rate',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[500],
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                widget.property.priceRange.formatted,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF5287B2),
+                                ),
+                              ),
+                            ],
+                          ),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _isHovered
+                                  ? const Color(0xFF5287B2)
+                                  : const Color(
+                                      0xFF5287B2,
+                                    ).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'View Details',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: _isHovered
+                                    ? Colors.white
+                                    : const Color(0xFF5287B2),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 
@@ -871,7 +942,6 @@ class _PropertyCardState extends State<_PropertyCard> {
       ),
     );
   }
-
 }
 
 extension StringExtension on String {

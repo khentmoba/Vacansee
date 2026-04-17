@@ -95,11 +95,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         const SizedBox(height: 12),
         Text(
           "No worries! Enter your account email and we'll send you a link to reset your password.",
-          style: TextStyle(
-            fontSize: 15,
-            color: Colors.grey[600],
-            height: 1.5,
-          ),
+          style: TextStyle(fontSize: 15, color: Colors.grey[600], height: 1.5),
         ),
         const SizedBox(height: 40),
 
@@ -125,28 +121,41 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           decoration: InputDecoration(
             hintText: 'you@example.com',
             hintStyle: const TextStyle(color: Color(0xFF999999)),
-            prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF5287B2)),
+            prefixIcon: const Icon(
+              Icons.email_outlined,
+              color: Color(0xFF5287B2),
+            ),
             filled: true,
             fillColor: _emailError != null ? Colors.red[50] : Colors.white,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: _emailError != null ? Colors.red : const Color(0xFFE0E0E0),
+                color: _emailError != null
+                    ? Colors.red
+                    : const Color(0xFFE0E0E0),
                 width: 1.5,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: _emailError != null ? Colors.red : const Color(0xFFE0E0E0),
+                color: _emailError != null
+                    ? Colors.red
+                    : const Color(0xFFE0E0E0),
                 width: 1.5,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
+              borderSide: const BorderSide(
+                color: Color(0xFF5287B2),
+                width: 1.5,
+              ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
           ),
         ),
         if (_emailError != null)
@@ -277,22 +286,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Text(
           'We sent a password reset link to\n${_emailController.text.trim()}',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 15,
-            color: Colors.grey[600],
-            height: 1.6,
-          ),
+          style: TextStyle(fontSize: 15, color: Colors.grey[600], height: 1.6),
         ),
 
         const SizedBox(height: 12),
         Text(
           'Click the link in the email to set a new password. It may take a minute to arrive.',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey[500],
-            height: 1.5,
-          ),
+          style: TextStyle(fontSize: 13, color: Colors.grey[500], height: 1.5),
         ),
 
         const SizedBox(height: 48),

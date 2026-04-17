@@ -111,7 +111,8 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
                   hintText: 'At least 6 characters',
                   error: _passwordError,
                   obscure: _obscurePassword,
-                  onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
+                  onToggle: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
                 if (_passwordError != null) _buildErrorText(_passwordError!),
 
@@ -124,7 +125,8 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
                   hintText: 'Repeat your password',
                   error: _confirmError,
                   obscure: _obscureConfirm,
-                  onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                  onToggle: () =>
+                      setState(() => _obscureConfirm = !_obscureConfirm),
                 ),
                 if (_confirmError != null) _buildErrorText(_confirmError!),
 
@@ -137,16 +139,25 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
                       decoration: BoxDecoration(
                         color: Colors.red[50],
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
+                        border: Border.all(
+                          color: Colors.red.withValues(alpha: 0.2),
+                        ),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                          const Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 20,
+                          ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               authProvider.errorMessage!,
-                              style: const TextStyle(color: Colors.red, fontSize: 13),
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
                         ],
@@ -224,7 +235,10 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
       obscureText: obscure,
       decoration: InputDecoration(
         hintText: hintText,
-        prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF5287B2)),
+        prefixIcon: const Icon(
+          Icons.lock_outline_rounded,
+          color: Color(0xFF5287B2),
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -253,7 +267,10 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
       ),
     );
   }

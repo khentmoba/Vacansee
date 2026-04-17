@@ -34,7 +34,7 @@ class EmailVerificationScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 40),
-              
+
               // Title
               const Text(
                 'Verify your email',
@@ -45,7 +45,7 @@ class EmailVerificationScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // Description
               Text.rich(
                 TextSpan(
@@ -55,7 +55,9 @@ class EmailVerificationScreen extends StatelessWidget {
                     height: 1.6,
                   ),
                   children: [
-                    const TextSpan(text: 'We have sent a verification link to\n'),
+                    const TextSpan(
+                      text: 'We have sent a verification link to\n',
+                    ),
                     TextSpan(
                       text: email,
                       style: const TextStyle(
@@ -63,13 +65,15 @@ class EmailVerificationScreen extends StatelessWidget {
                         color: Color(0xFF1D1B16),
                       ),
                     ),
-                    const TextSpan(text: '.\nPlease check your inbox to continue.'),
+                    const TextSpan(
+                      text: '.\nPlease check your inbox to continue.',
+                    ),
                   ],
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 60),
-              
+
               // Action Button
               SizedBox(
                 width: double.infinity,
@@ -98,7 +102,7 @@ class EmailVerificationScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // Resend Option
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -111,7 +115,9 @@ class EmailVerificationScreen extends StatelessWidget {
                     onPressed: () {
                       // We could implement resend logic here if needed
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Verification email resent!')),
+                        const SnackBar(
+                          content: Text('Verification email resent!'),
+                        ),
                       );
                     },
                     style: TextButton.styleFrom(

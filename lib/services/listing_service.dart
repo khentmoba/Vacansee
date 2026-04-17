@@ -4,16 +4,16 @@ import '../models/property_model.dart';
 import '../models/room_model.dart';
 
 /// Service for managing property listings and associated assets.
-/// 
+///
 /// Follows the Listing Management contract for complex mutations.
 class ListingService {
   final SupabaseClient _supabase;
 
   ListingService({SupabaseClient? supabase})
-      : _supabase = supabase ?? Supabase.instance.client;
+    : _supabase = supabase ?? Supabase.instance.client;
 
   /// Updates an existing property and its associated rooms.
-  /// 
+  ///
   /// Triggers re-verification if the address changes.
   Future<void> updatePropertyListing({
     required PropertyModel property,
@@ -30,7 +30,7 @@ class ListingService {
           .single();
 
       final currentAddress = currentData['address'] as String;
-      
+
       // 2. Determine if re-verification is needed
       var status = property.status;
       if (property.address != currentAddress) {
@@ -46,7 +46,7 @@ class ListingService {
       final propertyJson = updatedProperty.toJson();
       propertyJson.remove('id');
       propertyJson.remove('has_vacancy');
-      
+
       await _supabase
           .from('properties')
           .update(propertyJson)
@@ -65,13 +65,15 @@ class ListingService {
         }
         roomJson.remove('is_available');
         roomJson.remove('property_name');
-        
+
         await _supabase.from('rooms').upsert(roomJson);
       }
 
       // 6. Delete images from Storage
       if (deletedImagePaths.isNotEmpty) {
-        await _supabase.storage.from('property_images').remove(deletedImagePaths);
+        await _supabase.storage
+            .from('property_images')
+            .remove(deletedImagePaths);
       }
     } catch (e) {
       rethrow;
@@ -87,7 +89,7 @@ class ListingService {
           .select('images')
           .eq('id', propertyId)
           .single();
-      
+
       final List<String> images = List<String>.from(data['images'] ?? []);
 
       // 2. Fetch all rooms to get their images
@@ -95,13 +97,13 @@ class ListingService {
           .from('rooms')
           .select('images')
           .eq('property_id', propertyId);
-      
+
       final List<String> roomImages = (roomsData as List)
           .expand((r) => List<String>.from(r['images'] ?? []))
           .toList();
 
       // 3. Soft Delete from Database
-      // We update the status to 'deleted' to hide it from students while 
+      // We update the status to 'deleted' to hide it from students while
       // preserving records for owners.
       await _supabase
           .from('properties')
@@ -109,25 +111,31 @@ class ListingService {
           .eq('id', propertyId);
 
       // 4. Cleanup Storage
-      final allImages = [...images, ...roomImages].where((img) => img.isNotEmpty).toSet().toList();
-      
+      final allImages = [
+        ...images,
+        ...roomImages,
+      ].where((img) => img.isNotEmpty).toSet().toList();
+
       if (allImages.isNotEmpty) {
         try {
           // Extract paths from Supabase storage URLs
-          final paths = allImages.map((url) {
-            try {
-              final uri = Uri.parse(url);
-              final segments = uri.pathSegments;
-              final bucketIndex = segments.indexOf('property_images');
-              
-              if (bucketIndex != -1 && bucketIndex < segments.length - 1) {
-                return segments.sublist(bucketIndex + 1).join('/');
-              }
-            } catch (e) {
-              debugPrint('Error parsing image URL for deletion: $url - $e');
-            }
-            return null;
-          }).whereType<String>().toList();
+          final paths = allImages
+              .map((url) {
+                try {
+                  final uri = Uri.parse(url);
+                  final segments = uri.pathSegments;
+                  final bucketIndex = segments.indexOf('property_images');
+
+                  if (bucketIndex != -1 && bucketIndex < segments.length - 1) {
+                    return segments.sublist(bucketIndex + 1).join('/');
+                  }
+                } catch (e) {
+                  debugPrint('Error parsing image URL for deletion: $url - $e');
+                }
+                return null;
+              })
+              .whereType<String>()
+              .toList();
 
           if (paths.isNotEmpty) {
             await _supabase.storage.from('property_images').remove(paths);

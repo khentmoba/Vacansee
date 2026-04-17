@@ -22,6 +22,8 @@ class PropertyProvider extends ChangeNotifier {
   Map<String, bool> _propertyVacancyMap = {};
   final Map<String, DateTime> _lastVacancyUpdate = {};
   StreamSubscription<List<RoomModel>>? _allRoomsSubscription;
+  StreamSubscription<List<PropertyModel>>? _propertiesSubscription;
+  StreamSubscription<List<RoomModel>>? _propertyRoomsSubscription;
 
   // Filters
   String? _searchQuery;
@@ -112,11 +114,11 @@ class PropertyProvider extends ChangeNotifier {
   /// Update vacancy map from room data
   void _updateVacancyMap(List<RoomModel> allRooms) {
     final newVacancyMap = <String, bool>{};
-    
+
     for (final room in allRooms) {
       final propertyId = room.propertyId;
       final currentHasVacancy = newVacancyMap[propertyId] ?? false;
-      
+
       if (!currentHasVacancy && room.status == RoomStatus.vacant) {
         newVacancyMap[propertyId] = true;
       } else if (!newVacancyMap.containsKey(propertyId)) {
@@ -128,7 +130,7 @@ class PropertyProvider extends ChangeNotifier {
     for (final propertyId in newVacancyMap.keys) {
       final oldVacancy = _propertyVacancyMap[propertyId];
       final newVacancy = newVacancyMap[propertyId];
-      
+
       if (oldVacancy != newVacancy) {
         _lastVacancyUpdate[propertyId] = DateTime.now();
       }
@@ -147,7 +149,7 @@ class PropertyProvider extends ChangeNotifier {
   String? getTimeSinceLastUpdate(String propertyId) {
     final lastUpdate = _lastVacancyUpdate[propertyId];
     if (lastUpdate == null) return null;
-    
+
     final diff = DateTime.now().difference(lastUpdate);
     if (diff.inSeconds < 60) return 'Just now';
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
@@ -158,6 +160,8 @@ class PropertyProvider extends ChangeNotifier {
   @override
   void dispose() {
     _allRoomsSubscription?.cancel();
+    _propertiesSubscription?.cancel();
+    _propertyRoomsSubscription?.cancel();
     super.dispose();
   }
 
@@ -167,7 +171,8 @@ class PropertyProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    _propertyService
+    _propertiesSubscription?.cancel();
+    _propertiesSubscription = _propertyService
         .getProperties(
           searchQuery: _searchQuery,
           genderOrientation: _genderFilter,
@@ -195,7 +200,8 @@ class PropertyProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    _propertyService
+    _propertiesSubscription?.cancel();
+    _propertiesSubscription = _propertyService
         .getOwnerProperties(ownerId)
         .listen(
           (properties) {

@@ -19,7 +19,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     final user = context.read<AuthProvider>().user;
-    _displayNameController = TextEditingController(text: user?.displayName ?? '');
+    _displayNameController = TextEditingController(
+      text: user?.displayName ?? '',
+    );
     _phoneController = TextEditingController(text: user?.phoneNumber ?? '');
   }
 
@@ -89,12 +91,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 : Icon(
                     _isSaved ? Icons.check_circle : Icons.save_outlined,
                     size: 18,
-                    color: _isSaved ? const Color(0xFF10B981) : const Color(0xFF5287B2),
+                    color: _isSaved
+                        ? const Color(0xFF10B981)
+                        : const Color(0xFF5287B2),
                   ),
             label: Text(
               _isSaved ? 'Saved!' : 'Save',
               style: TextStyle(
-                color: _isSaved ? const Color(0xFF10B981) : const Color(0xFF5287B2),
+                color: _isSaved
+                    ? const Color(0xFF10B981)
+                    : const Color(0xFF5287B2),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -150,13 +156,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF5287B2).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      user?.role.name.toUpperCase() ?? '',
+                      user?.role?.name.toUpperCase() ?? 'PENDING',
                       style: const TextStyle(
                         color: Color(0xFF5287B2),
                         fontSize: 11,
@@ -174,7 +183,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             if (authProvider.errorMessage != null)
               Container(
                 margin: const EdgeInsets.only(bottom: 20),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.red[50],
                   borderRadius: BorderRadius.circular(12),
@@ -182,7 +194,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: Colors.red, size: 18),
+                    const Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 18,
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -256,14 +272,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   TextField(
                     enabled: false,
                     controller: TextEditingController(text: user?.email ?? ''),
-                    decoration: _inputDecoration(
-                      hint: '',
-                      icon: Icons.email_outlined,
-                    ).copyWith(
-                      fillColor: Colors.grey[50],
-                      helperText: 'Email cannot be changed',
-                      helperStyle: const TextStyle(fontSize: 11),
-                    ),
+                    decoration:
+                        _inputDecoration(
+                          hint: '',
+                          icon: Icons.email_outlined,
+                        ).copyWith(
+                          fillColor: Colors.grey[50],
+                          helperText: 'Email cannot be changed',
+                          helperStyle: const TextStyle(fontSize: 11),
+                        ),
                   ),
                 ],
               ),

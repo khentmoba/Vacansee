@@ -4,7 +4,13 @@ import '../models/user_model.dart';
 import '../services/auth_service.dart';
 
 /// Authentication state for the app
-enum AuthStatus { uninitialized, authenticated, unauthenticated, recovery }
+enum AuthStatus {
+  uninitialized,
+  authenticated,
+  unauthenticated,
+  recovery,
+  needsRole,
+}
 
 /// Provider for authentication state management
 class AuthProvider extends ChangeNotifier {
@@ -41,7 +47,13 @@ class AuthProvider extends ChangeNotifier {
         _user = null;
       } else {
         _user = await _authService.getUserModel(user.id);
-        _status = _user != null ? AuthStatus.authenticated : AuthStatus.unauthenticated;
+        if (_user == null) {
+          _status = AuthStatus.unauthenticated;
+        } else if (_user!.role == null) {
+          _status = AuthStatus.needsRole;
+        } else {
+          _status = AuthStatus.authenticated;
+        }
       }
       notifyListeners();
     });
@@ -174,7 +186,8 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       await _authService.updatePassword(newPassword);
-      _status = AuthStatus.authenticated; // Switch to authenticated after update
+      _status =
+          AuthStatus.authenticated; // Switch to authenticated after update
       _isLoading = false;
       notifyListeners();
       return true;
@@ -200,6 +213,29 @@ class AuthProvider extends ChangeNotifier {
       _errorMessage = e.message;
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  /// Set the user role (used during initial role selection)
+  Future<bool> setUserRole(UserRole role) async {
+    if (_user == null) return false;
+
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _authService.updateProfile(uid: _user!.uid, role: role);
+      _user = _user!.copyWith(role: role);
+      _status = AuthStatus.authenticated;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on AppAuthException catch (e) {
+      _errorMessage = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 }

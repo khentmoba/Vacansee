@@ -72,9 +72,9 @@ class StorageService {
   /// Delete multiple property images
   Future<void> deletePropertyImages(List<String> imageUrls) async {
     if (imageUrls.isEmpty) return;
-    
+
     final pathsToDelete = <String>[];
-    
+
     for (final imageUrl in imageUrls) {
       try {
         final uri = Uri.parse(imageUrl);
@@ -89,7 +89,7 @@ class StorageService {
         debugPrint('Skipping invalid image URL: $imageUrl');
       }
     }
-    
+
     if (pathsToDelete.isNotEmpty) {
       try {
         await _supabase.storage.from(bucketName).remove(pathsToDelete);
@@ -113,6 +113,7 @@ class StorageService {
       throw StorageException('Failed to delete image: $e');
     }
   }
+
   Future<String> uploadRoomImage({
     required String propertyId,
     required String roomId,

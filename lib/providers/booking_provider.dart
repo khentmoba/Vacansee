@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/booking_model.dart';
 import '../services/booking_service.dart';
@@ -15,6 +16,8 @@ class BookingProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   int _pendingCount = 0;
+  StreamSubscription<List<BookingModel>>? _bookingsSubscription;
+  StreamSubscription<int>? _pendingCountSubscription;
 
   // Getters
   List<BookingModel> get bookings => _bookings;
@@ -31,11 +34,11 @@ class BookingProvider extends ChangeNotifier {
 
   /// Load student bookings
   void loadStudentBookings(String studentId) {
-    _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
-    _bookingService
+    _bookingsSubscription?.cancel();
+    _bookingsSubscription = _bookingService
         .getStudentBookings(studentId)
         .listen(
           (bookings) {
@@ -53,11 +56,11 @@ class BookingProvider extends ChangeNotifier {
 
   /// Load owner bookings
   void loadOwnerBookings(List<String> propertyIds) {
-    _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
-    _bookingService
+    _bookingsSubscription?.cancel();
+    _bookingsSubscription = _bookingService
         .getOwnerBookings(propertyIds)
         .listen(
           (bookings) {
@@ -75,7 +78,8 @@ class BookingProvider extends ChangeNotifier {
 
   /// Load pending bookings count for owner
   void loadPendingCount(List<String> propertyIds) {
-    _bookingService
+    _pendingCountSubscription?.cancel();
+    _pendingCountSubscription = _bookingService
         .getPendingBookingsCount(propertyIds)
         .listen(
           (count) {
@@ -218,6 +222,13 @@ class BookingProvider extends ChangeNotifier {
   void selectBooking(BookingModel? booking) {
     _selectedBooking = booking;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _bookingsSubscription?.cancel();
+    _pendingCountSubscription?.cancel();
+    super.dispose();
   }
 }
 

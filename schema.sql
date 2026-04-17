@@ -2,27 +2,41 @@
 -- Run this in the Supabase SQL Editor
 
 -- 1. Create Custom Types (Enums)
-CREATE TYPE user_role AS ENUM ('student', 'owner', 'admin');
-CREATE TYPE gender_orientation AS ENUM ('male', 'female', 'mixed');
-CREATE TYPE room_status AS ENUM ('vacant', 'occupied', 'maintenance');
-CREATE TYPE booking_status AS ENUM ('pending', 'approved', 'rejected', 'cancelled', 'completed');
-CREATE TYPE property_status AS ENUM ('pending', 'verified', 'deleted');
+DO $$ BEGIN
+    CREATE TYPE user_role AS ENUM ('student', 'owner', 'admin');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+    CREATE TYPE gender_orientation AS ENUM ('male', 'female', 'mixed');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+    CREATE TYPE room_status AS ENUM ('vacant', 'occupied', 'maintenance');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+    CREATE TYPE booking_status AS ENUM ('pending', 'approved', 'rejected', 'cancelled', 'completed');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+    CREATE TYPE property_status AS ENUM ('pending', 'verified', 'deleted');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 -- 2. Create Tables
 
 -- Users Table (Extends auth.users)
-CREATE TABLE public.users (
+CREATE TABLE IF NOT EXISTS public.users (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT NOT NULL,
   display_name TEXT NOT NULL,
-  role user_role NOT NULL DEFAULT 'student',
+  role user_role, -- Nullable initially for role selection flow
   phone_number TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_login_at TIMESTAMPTZ
 );
 
 -- Properties Table
-CREATE TABLE public.properties (
+CREATE TABLE IF NOT EXISTS public.properties (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   owner_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
@@ -39,7 +53,7 @@ CREATE TABLE public.properties (
 );
 
 -- Rooms Table
-CREATE TABLE public.rooms (
+CREATE TABLE IF NOT EXISTS public.rooms (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   property_id UUID NOT NULL REFERENCES public.properties(id) ON DELETE CASCADE,
   status room_status NOT NULL DEFAULT 'vacant',
@@ -52,11 +66,13 @@ CREATE TABLE public.rooms (
 );
 
 -- Bookings Table
-CREATE TABLE public.bookings (
+CREATE TABLE IF NOT EXISTS public.bookings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   student_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   property_id UUID NOT NULL REFERENCES public.properties(id) ON DELETE CASCADE,
   room_id UUID NOT NULL REFERENCES public.rooms(id) ON DELETE CASCADE,
+  property_name TEXT NOT NULL,
+  room_description TEXT NOT NULL,
   student_name TEXT NOT NULL,
   student_email TEXT NOT NULL,
   student_phone TEXT,
@@ -69,6 +85,13 @@ CREATE TABLE public.bookings (
   duration_months INTEGER NOT NULL DEFAULT 1
 );
 
+-- Ensure new columns exist for existing tables
+ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS property_name TEXT;
+ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS room_description TEXT;
+-- Ensure property_name and room_description are NOT NULL if table existed
+ALTER TABLE public.bookings ALTER COLUMN property_name SET NOT NULL;
+ALTER TABLE public.bookings ALTER COLUMN room_description SET NOT NULL;
+
 -- 3. Enable extensions required
 -- (None specific for now, pgcrypto is usually enabled by default for uuid)
 
@@ -80,35 +103,45 @@ ALTER TABLE public.rooms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
 
 -- Users RLS
+DROP POLICY IF EXISTS "Users can view their own profile" ON public.users;
 CREATE POLICY "Users can view their own profile" 
 ON public.users FOR SELECT USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Public profiles are viewable by anyone" ON public.users;
 CREATE POLICY "Public profiles are viewable by anyone" 
 ON public.users FOR SELECT USING (true); -- needed for owner details, etc.
 
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.users;
 CREATE POLICY "Users can update their own profile" 
 ON public.users FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.users;
 CREATE POLICY "Enable insert for authenticated users only"
 ON public.users FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- Properties RLS
+DROP POLICY IF EXISTS "Public can view verified properties" ON public.properties;
 CREATE POLICY "Public can view verified properties" 
 ON public.properties FOR SELECT USING (status = 'verified');
 
+DROP POLICY IF EXISTS "Owners can view their own properties" ON public.properties;
 CREATE POLICY "Owners can view their own properties" 
 ON public.properties FOR SELECT USING (auth.uid() = owner_id);
 
+DROP POLICY IF EXISTS "Owners can insert their own properties" ON public.properties;
 CREATE POLICY "Owners can insert their own properties" 
 ON public.properties FOR INSERT WITH CHECK (auth.uid() = owner_id);
 
+DROP POLICY IF EXISTS "Owners can update their own properties" ON public.properties;
 CREATE POLICY "Owners can update their own properties" 
 ON public.properties FOR UPDATE USING (auth.uid() = owner_id);
 
+DROP POLICY IF EXISTS "Owners can delete their own properties" ON public.properties;
 CREATE POLICY "Owners can delete their own properties" 
 ON public.properties FOR DELETE USING (auth.uid() = owner_id);
 
 -- Rooms RLS
+DROP POLICY IF EXISTS "Public can view rooms of verified properties" ON public.rooms;
 CREATE POLICY "Public can view rooms of verified properties" 
 ON public.rooms FOR SELECT USING (
   EXISTS (
@@ -117,6 +150,7 @@ ON public.rooms FOR SELECT USING (
   )
 );
 
+DROP POLICY IF EXISTS "Owners can view all their rooms" ON public.rooms;
 CREATE POLICY "Owners can view all their rooms" 
 ON public.rooms FOR SELECT USING (
   EXISTS (
@@ -125,6 +159,7 @@ ON public.rooms FOR SELECT USING (
   )
 );
 
+DROP POLICY IF EXISTS "Owners can insert rooms for their properties" ON public.rooms;
 CREATE POLICY "Owners can insert rooms for their properties" 
 ON public.rooms FOR INSERT WITH CHECK (
   EXISTS (
@@ -133,6 +168,7 @@ ON public.rooms FOR INSERT WITH CHECK (
   )
 );
 
+DROP POLICY IF EXISTS "Owners can update rooms for their properties" ON public.rooms;
 CREATE POLICY "Owners can update rooms for their properties" 
 ON public.rooms FOR UPDATE USING (
   EXISTS (
@@ -141,6 +177,7 @@ ON public.rooms FOR UPDATE USING (
   )
 );
 
+DROP POLICY IF EXISTS "Owners can delete rooms for their properties" ON public.rooms;
 CREATE POLICY "Owners can delete rooms for their properties" 
 ON public.rooms FOR DELETE USING (
   EXISTS (
@@ -150,9 +187,11 @@ ON public.rooms FOR DELETE USING (
 );
 
 -- Bookings RLS
+DROP POLICY IF EXISTS "Students can view their own bookings" ON public.bookings;
 CREATE POLICY "Students can view their own bookings" 
 ON public.bookings FOR SELECT USING (auth.uid() = student_id);
 
+DROP POLICY IF EXISTS "Owners can view bookings for their properties" ON public.bookings;
 CREATE POLICY "Owners can view bookings for their properties" 
 ON public.bookings FOR SELECT USING (
   EXISTS (
@@ -161,13 +200,16 @@ ON public.bookings FOR SELECT USING (
   )
 );
 
+DROP POLICY IF EXISTS "Students can insert their own bookings" ON public.bookings;
 CREATE POLICY "Students can insert their own bookings" 
 ON public.bookings FOR INSERT WITH CHECK (auth.uid() = student_id);
 
+DROP POLICY IF EXISTS "Students can update their own bookings to cancel" ON public.bookings;
 CREATE POLICY "Students can update their own bookings to cancel" 
 ON public.bookings FOR UPDATE USING (auth.uid() = student_id)
 WITH CHECK (status = 'cancelled');
 
+DROP POLICY IF EXISTS "Owners can update bookings for their properties" ON public.bookings;
 CREATE POLICY "Owners can update bookings for their properties" 
 ON public.bookings FOR UPDATE USING (
   EXISTS (
@@ -176,24 +218,31 @@ ON public.bookings FOR UPDATE USING (
   )
 );
 
+DROP POLICY IF EXISTS "Students can delete their own bookings if pending" ON public.bookings;
 CREATE POLICY "Students can delete their own bookings if pending"
 ON public.bookings FOR DELETE USING (auth.uid() = student_id AND status = 'pending');
 
 -- 5. Storage Buckets (Optional, configure separately in dash but here is standard)
-INSERT INTO storage.buckets (id, name, public) VALUES ('property_images', 'property_images', true);
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('property_images', 'property_images', true)
+ON CONFLICT (id) DO NOTHING;
 
+DROP POLICY IF EXISTS "Public Access" ON storage.objects;
 CREATE POLICY "Public Access" 
 ON storage.objects FOR SELECT 
 USING ( bucket_id = 'property_images' );
 
+DROP POLICY IF EXISTS "Owners can upload images" ON storage.objects;
 CREATE POLICY "Owners can upload images" 
 ON storage.objects FOR INSERT 
 WITH CHECK ( bucket_id = 'property_images' AND auth.role() = 'authenticated' );
 
+DROP POLICY IF EXISTS "Owners can update their images" ON storage.objects;
 CREATE POLICY "Owners can update their images"
 ON storage.objects FOR UPDATE
 USING ( bucket_id = 'property_images' AND auth.role() = 'authenticated' );
 
+DROP POLICY IF EXISTS "Owners can delete their images" ON storage.objects;
 CREATE POLICY "Owners can delete their images"
 ON storage.objects FOR DELETE
 USING ( bucket_id = 'property_images' AND auth.role() = 'authenticated' );
@@ -201,7 +250,6 @@ USING ( bucket_id = 'property_images' AND auth.role() = 'authenticated' );
 -- 6. Views
 -- Real-time vacancy view with property join
 -- 7. Triggers for automatic profile creation
--- This handles the creation of a 'public.users' row whenever a new user signs up via Supabase Auth
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -213,12 +261,8 @@ BEGIN
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'display_name', 'User'),
-    CASE 
-      WHEN NEW.raw_user_meta_data->>'role' = 'owner' THEN 'owner'::user_role
-      WHEN NEW.raw_user_meta_data->>'role' = 'admin' THEN 'admin'::user_role
-      ELSE 'student'::user_role
-    END,
+    COALESCE(NEW.raw_user_meta_data->>'display_name', NEW.email),
+    (NEW.raw_user_meta_data->>'role')::user_role, -- Will be NULL if not provided
     NEW.raw_user_meta_data->>'phone_number'
   )
   ON CONFLICT (id) DO UPDATE SET
@@ -229,6 +273,21 @@ BEGIN
   RETURN NEW;
 END;
 $$;
+
+-- 8. Enable Realtime Publications
+-- Using DO block to safely add tables to publication if they aren't already there
+DO $$ 
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'properties') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.properties;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'bookings') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.bookings;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'rooms') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.rooms;
+  END IF;
+END $$;
 
 -- Trigger to call the function on every user creation
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;

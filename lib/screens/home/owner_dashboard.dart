@@ -136,7 +136,10 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     children: [
                       _buildStatCard(
                         Icons.home_outlined,
-                        properties.where((p) => p.status != PropertyStatus.deleted).length.toString(),
+                        properties
+                            .where((p) => p.status != PropertyStatus.deleted)
+                            .length
+                            .toString(),
                         'Total Listings',
                         const Color(0xFF3B82F6),
                       ),
@@ -383,7 +386,8 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => EditPropertyScreen(property: property),
+                          builder: (_) =>
+                              EditPropertyScreen(property: property),
                         ),
                       );
                     },
@@ -405,7 +409,11 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.edit_outlined, size: 14, color: Color(0xFF1D1B16)),
+                          Icon(
+                            Icons.edit_outlined,
+                            size: 14,
+                            color: Color(0xFF1D1B16),
+                          ),
                           SizedBox(width: 4),
                           Text(
                             'Edit',
@@ -430,22 +438,23 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                         context: context,
                         builder: (ctx) => ConfirmationDialog(
                           title: 'Delete Listing',
-                          content: 'Are you sure you want to permanently delete "${property.name}"? This action cannot be undone.',
-                            onConfirm: () async {
-                              await ListingService().deletePropertyListing(
-                                property.propertyId,
+                          content:
+                              'Are you sure you want to permanently delete "${property.name}"? This action cannot be undone.',
+                          onConfirm: () async {
+                            await ListingService().deletePropertyListing(
+                              property.propertyId,
+                            );
+                            if (mounted) {
+                              context
+                                  .read<PropertyProvider>()
+                                  .loadOwnerProperties(property.ownerId);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Listing deleted'),
+                                ),
                               );
-                              if (mounted) {
-                                context
-                                    .read<PropertyProvider>()
-                                    .loadOwnerProperties(property.ownerId);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Listing deleted'),
-                                  ),
-                                );
-                              }
-                            },
+                            }
+                          },
                         ),
                       );
                     },
@@ -461,7 +470,11 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                           ),
                         ],
                       ),
-                      child: const Icon(Icons.delete_outline, size: 14, color: Colors.red),
+                      child: const Icon(
+                        Icons.delete_outline,
+                        size: 14,
+                        color: Colors.red,
+                      ),
                     ),
                   ),
                 ),
@@ -500,7 +513,9 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(property.status).withValues(alpha: 0.9),
+                      color: _getStatusColor(
+                        property.status,
+                      ).withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(

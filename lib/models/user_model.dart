@@ -6,7 +6,7 @@ class UserModel {
   final String uid;
   final String email;
   final String displayName;
-  final UserRole role;
+  final UserRole? role;
   final String? phoneNumber;
   final DateTime createdAt;
   final DateTime? lastLoginAt;
@@ -16,7 +16,7 @@ class UserModel {
     required this.uid,
     required this.email,
     required this.displayName,
-    required this.role,
+    this.role,
     this.phoneNumber,
     required this.createdAt,
     this.lastLoginAt,
@@ -32,10 +32,12 @@ class UserModel {
           '', // fallback for legacy
       email: data['email'] as String? ?? '',
       displayName: data['display_name'] as String? ?? '',
-      role: UserRole.values.firstWhere(
-        (r) => r.name == (data['role'] as String? ?? 'student'),
-        orElse: () => UserRole.student,
-      ),
+      role: data['role'] == null
+          ? null
+          : UserRole.values.firstWhere(
+              (r) => r.name == (data['role'] as String),
+              orElse: () => UserRole.student,
+            ),
       phoneNumber: data['phone_number'] as String?,
       createdAt: data['created_at'] != null
           ? DateTime.parse(data['created_at'] as String)
@@ -53,7 +55,7 @@ class UserModel {
       'id': uid,
       'email': email,
       'display_name': displayName,
-      'role': role.name,
+      'role': role?.name,
       'phone_number': phoneNumber,
       'created_at': createdAt.toIso8601String(),
       'is_verified': isVerified,
@@ -67,6 +69,7 @@ class UserModel {
     String? email,
     String? displayName,
     UserRole? role,
+    bool clearRole = false,
     String? phoneNumber,
     DateTime? createdAt,
     DateTime? lastLoginAt,
@@ -76,7 +79,7 @@ class UserModel {
       uid: uid ?? this.uid,
       email: email ?? this.email,
       displayName: displayName ?? this.displayName,
-      role: role ?? this.role,
+      role: clearRole ? null : (role ?? this.role),
       phoneNumber: phoneNumber ?? this.phoneNumber,
       createdAt: createdAt ?? this.createdAt,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,

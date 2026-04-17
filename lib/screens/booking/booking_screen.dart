@@ -113,7 +113,9 @@ class _BookingScreenState extends State<BookingScreen> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF5287B2).withValues(alpha: 0.15),
+                              color: const Color(
+                                0xFF5287B2,
+                              ).withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
@@ -138,7 +140,10 @@ class _BookingScreenState extends State<BookingScreen> {
                                 const SizedBox(height: 4),
                                 Text(
                                   widget.property.address,
-                                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                               ],
                             ),
@@ -456,7 +461,7 @@ class _BookingScreenState extends State<BookingScreen> {
 
   Widget _buildDurationSelector() {
     final durationOptions = [1, 3, 6, 9, 12];
-    
+
     return Wrap(
       spacing: 10,
       runSpacing: 10,
@@ -470,7 +475,10 @@ class _BookingScreenState extends State<BookingScreen> {
               onTap: () => setState(() => _durationMonths = months),
               borderRadius: BorderRadius.circular(25),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? const Color(0xFF5287B2)
@@ -501,14 +509,34 @@ class _BookingScreenState extends State<BookingScreen> {
 
   String _getMonthName(int month) {
     const months = [
-      '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      '',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return months[month];
   }
 
   String _getDayOfWeek(int weekday) {
-    const days = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const days = [
+      '',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
     return days[weekday];
   }
 }

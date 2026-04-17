@@ -19,12 +19,12 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
   late TextEditingController _nameController;
   late TextEditingController _addressController;
   late TextEditingController _descriptionController;
-  
+
   late List<String> _images;
   late List<RoomModel> _rooms;
   final List<String> _deletedRoomIds = [];
   final List<String> _deletedImagePaths = [];
-  
+
   bool _isSaving = false;
 
   @override
@@ -32,7 +32,9 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
     super.initState();
     _nameController = TextEditingController(text: widget.property.name);
     _addressController = TextEditingController(text: widget.property.address);
-    _descriptionController = TextEditingController(text: widget.property.description);
+    _descriptionController = TextEditingController(
+      text: widget.property.description,
+    );
     _images = List.from(widget.property.images);
     _rooms = []; // Will fetch dynamically or pass in
     _loadRooms();
@@ -46,13 +48,15 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
 
   void _addRoom() {
     setState(() {
-      _rooms.add(RoomModel(
-        roomId: 'temp_${DateTime.now().millisecondsSinceEpoch}',
-        propertyId: widget.property.propertyId,
-        status: RoomStatus.vacant,
-        lastUpdated: DateTime.now(),
-        capacity: 1,
-      ));
+      _rooms.add(
+        RoomModel(
+          roomId: 'temp_${DateTime.now().millisecondsSinceEpoch}',
+          propertyId: widget.property.propertyId,
+          status: RoomStatus.vacant,
+          lastUpdated: DateTime.now(),
+          capacity: 1,
+        ),
+      );
     });
   }
 
@@ -78,7 +82,7 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSaving = true);
-    
+
     try {
       final listingService = ListingService();
       final updatedProperty = widget.property.copyWith(
@@ -103,9 +107,9 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -121,10 +125,16 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
         elevation: 0,
         actions: [
           if (_isSaving)
-            const Center(child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
-            ))
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            )
           else
             TextButton.icon(
               onPressed: _handleSave,
@@ -140,39 +150,63 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Basic Details', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const Text(
+                'Basic Details',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Property Name', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Property Name',
+                  border: OutlineInputBorder(),
+                ),
                 validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _addressController,
-                decoration: const InputDecoration(labelText: 'Address', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Address',
+                  border: OutlineInputBorder(),
+                ),
                 validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
                 maxLines: 3,
               ),
-              
+
               const SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Rooms', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  TextButton.icon(onPressed: _addRoom, icon: const Icon(Icons.add), label: const Text('Add Room')),
+                  const Text(
+                    'Rooms',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  TextButton.icon(
+                    onPressed: _addRoom,
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add Room'),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
               if (_rooms.isEmpty)
                 const Padding(
                   padding: EdgeInsets.all(20),
-                  child: Center(child: Text('No rooms added. Please add at least one room.', style: TextStyle(color: Colors.grey))),
+                  child: Center(
+                    child: Text(
+                      'No rooms added. Please add at least one room.',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
                 ),
               ListView.builder(
                 shrinkWrap: true,
@@ -183,19 +217,29 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
                   return Card(
                     margin: const EdgeInsets.only(bottom: 12),
                     child: ListTile(
-                      title: Text('Room: ${room.roomId.startsWith('temp_') ? 'New Room' : room.roomId}'),
-                      subtitle: Text('Status: ${room.status.name} | Rate: ₱${room.monthlyRate ?? 0}'),
+                      title: Text(
+                        'Room: ${room.roomId.startsWith('temp_') ? 'New Room' : room.roomId}',
+                      ),
+                      subtitle: Text(
+                        'Status: ${room.status.name} | Rate: ₱${room.monthlyRate ?? 0}',
+                      ),
                       trailing: IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.red),
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                        ),
                         onPressed: () => _removeRoom(index),
                       ),
                     ),
                   );
                 },
               ),
-              
+
               const SizedBox(height: 40),
-              const Text('Images', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const Text(
+                'Images',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 16),
               GridView.builder(
                 shrinkWrap: true,
@@ -212,7 +256,12 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(url, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                        child: Image.network(
+                          url,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
                       ),
                       Positioned(
                         top: 4,
@@ -225,9 +274,13 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
                             });
                           },
                           child: CircleAvatar(
-                            radius: 12, 
-                            backgroundColor: Colors.red.withValues(alpha: 0.8), 
-                            child: const Icon(Icons.close, size: 16, color: Colors.white)
+                            radius: 12,
+                            backgroundColor: Colors.red.withValues(alpha: 0.8),
+                            child: const Icon(
+                              Icons.close,
+                              size: 16,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),

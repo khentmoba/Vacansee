@@ -4,7 +4,7 @@
 // Note: Firebase-dependent tests require mocking. These are basic UI tests.
 
 void main() {
-/*
+  /*
   group('LoginScreen UI', () {
     testWidgets('displays login form elements', (WidgetTester tester) async {
       await tester.pumpWidget(
@@ -26,7 +26,7 @@ void main() {
   });
 */
 
-/*
+  /*
   group('RegisterScreen UI', () {
     testWidgets('displays registration form elements', (
       WidgetTester tester,

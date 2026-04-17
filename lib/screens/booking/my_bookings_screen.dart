@@ -234,7 +234,7 @@ class _BookingCardState extends State<_BookingCard> {
                   ),
                 ],
               ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
               // Info row
               Row(
                 children: [
@@ -350,8 +350,19 @@ class _BookingCardState extends State<_BookingCard> {
 
   String _getMonthName(int month) {
     const months = [
-      '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      '',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return months[month];
   }

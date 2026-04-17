@@ -16,10 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  final Map<String, String?> _errors = {
-    'email': null,
-    'password': null,
-  };
+  final Map<String, String?> _errors = {'email': null, 'password': null};
 
   @override
   void dispose() {
@@ -400,9 +397,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: TextButton(
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const ForgotPasswordScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
             ),
             style: TextButton.styleFrom(
               foregroundColor: const Color(0xFF5287B2),
@@ -474,7 +469,9 @@ class _LoginScreenState extends State<LoginScreen> {
           width: double.infinity,
           height: 52,
           child: OutlinedButton(
-            onPressed: authProvider.isLoading ? null : authProvider.signInWithGoogle,
+            onPressed: authProvider.isLoading
+                ? null
+                : authProvider.signInWithGoogle,
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: Colors.grey[300]!, width: 1.5),
               shape: RoundedRectangleBorder(
