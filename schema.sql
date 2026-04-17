@@ -156,6 +156,12 @@ DROP POLICY IF EXISTS "Users can update their own profile" ON public.users;
 CREATE POLICY "Users can update their own profile" 
 ON public.users FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Admins can update all profiles" ON public.users;
+CREATE POLICY "Admins can update all profiles"
+ON public.users FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+);
+
 
 DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.users;
 CREATE POLICY "Enable insert for authenticated users only"
@@ -308,28 +314,33 @@ AS $$
 DECLARE
   default_role public.user_role;
 BEGIN
-  -- Safe role extraction
+  -- Safe role extraction from metadata
   BEGIN
     default_role := (NEW.raw_user_meta_data->>'role')::public.user_role;
   EXCEPTION WHEN OTHERS THEN
     default_role := NULL;
   END;
 
-  INSERT INTO public.users (id, email, display_name, role, phone_number)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'display_name', NEW.email),
-    default_role,
-    NEW.raw_user_meta_data->>'phone_number'
-  )
-  ON CONFLICT (id) DO UPDATE SET
-    email = EXCLUDED.email,
-    display_name = EXCLUDED.display_name,
-    role = COALESCE(EXCLUDED.role, public.users.role), -- Preserve existing role if metadata is empty
-    phone_number = COALESCE(EXCLUDED.phone_number, public.users.phone_number),
-    last_login_at = NOW();
-    
+  -- Wrap profile upsert so any error is logged but NEVER blocks the auth flow
+  BEGIN
+    INSERT INTO public.users (id, email, display_name, role, phone_number)
+    VALUES (
+      NEW.id,
+      NEW.email,
+      COALESCE(NULLIF(NEW.raw_user_meta_data->>'display_name', ''), NEW.email),
+      default_role,
+      NEW.raw_user_meta_data->>'phone_number'
+    )
+    ON CONFLICT (id) DO UPDATE SET
+      email         = EXCLUDED.email,
+      display_name  = COALESCE(NULLIF(EXCLUDED.display_name, ''), public.users.display_name),
+      role          = COALESCE(EXCLUDED.role, public.users.role),
+      phone_number  = COALESCE(EXCLUDED.phone_number, public.users.phone_number),
+      last_login_at = NOW();
+  EXCEPTION WHEN OTHERS THEN
+    RAISE WARNING 'handle_new_user: profile upsert failed for % – %', NEW.email, SQLERRM;
+  END;
+
   RETURN NEW;
 END;
 $$;

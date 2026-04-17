@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/property_provider.dart';
 import '../../models/property_model.dart';
+import '../../models/user_model.dart';
 import 'widgets/pending_property_card.dart';
+import 'widgets/pending_owner_card.dart';
 import 'widgets/rejection_dialog.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -17,13 +19,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   void initState() {
     super.initState();
-    // Load all properties for moderation
+    // Load all pending items for moderation
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PropertyProvider>().loadProperties();
+      context.read<AuthProvider>().loadPendingOwners();
     });
   }
 
-  Future<void> _handleVerification(PropertyModel property) async {
+  Future<void> _handlePropertyVerification(PropertyModel property) async {
     final success = await context.read<PropertyProvider>().moderateProperty(
       propertyId: property.propertyId,
       status: PropertyStatus.verified,
@@ -35,7 +38,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     }
   }
 
-  Future<void> _handleRejection(PropertyModel property) async {
+  Future<void> _handlePropertyRejection(PropertyModel property) async {
     final reason = await showDialog<String>(
       context: context,
       builder: (context) => const RejectionDialog(),
@@ -55,6 +58,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
     }
   }
 
+  Future<void> _handleOwnerVerification(UserModel user) async {
+    final success = await context.read<AuthProvider>().verifyOwner(user.uid);
+    if (mounted && success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Owner ${user.displayName} verified!')),
+      );
+    }
+  }
+
+  Future<void> _handleOwnerRejection(UserModel user) async {
+    final success = await context.read<AuthProvider>().rejectOwner(user.uid);
+    if (mounted && success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Owner ${user.displayName} reset to Student.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
@@ -68,13 +89,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
     }
 
     // Filter for pending listings
-    // Note: In an real app, we'd add an admin-specific stream for efficiency
     final pendingProperties = propertyProvider.properties
         .where((p) => p.status == PropertyStatus.pending)
         .toList();
 
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         backgroundColor: const Color(0xFFF8FBFD),
         appBar: AppBar(
@@ -87,17 +107,21 @@ class _AdminDashboardState extends State<AdminDashboard> {
           bottom: const TabBar(
             indicatorColor: Color(0xFF5287B2),
             tabs: [
-              Tab(text: 'Pending Verification'),
-              Tab(text: 'Ecosystem Stats'),
+              Tab(text: 'Properties'),
+              Tab(text: 'Owners'),
+              Tab(text: 'Ecosystem'),
             ],
           ),
         ),
         body: TabBarView(
           children: [
-            // Tab 1: Pending Queue
-            _buildPendingQueue(propertyProvider, pendingProperties),
+            // Tab 1: Pending Properties
+            _buildPropertyQueue(propertyProvider, pendingProperties),
             
-            // Tab 2: Stats Placeholder
+            // Tab 2: Pending Owners
+            _buildOwnerQueue(authProvider),
+
+            // Tab 3: Stats Placeholder
             const Center(
               child: Text('Ecosystem statistics coming soon...'),
             ),
@@ -107,26 +131,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Widget _buildPendingQueue(PropertyProvider provider, List<PropertyModel> pending) {
+  Widget _buildPropertyQueue(PropertyProvider provider, List<PropertyModel> pending) {
     if (provider.isLoading && pending.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (pending.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.check_circle_outline, size: 64, color: Colors.green[200]),
-            const SizedBox(height: 16),
-            const Text(
-              'All caught up!',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            const Text('No properties pending verification.'),
-          ],
-        ),
+      return _buildEmptyState(
+        icon: Icons.check_circle_outline,
+        title: 'All Properties Verified',
+        subtitle: 'No properties pending verification.',
       );
     }
 
@@ -135,25 +149,81 @@ class _AdminDashboardState extends State<AdminDashboard> {
       child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${pending.length} listings awaiting review',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF666666),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ...pending.map((p) => PendingPropertyCard(
-                property: p,
-                onVerify: () => _handleVerification(p),
-                onReject: () => _handleRejection(p),
-              )),
-            ],
+          Text(
+            '${pending.length} listings awaiting review',
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF666666),
+              fontWeight: FontWeight.w600,
+            ),
           ),
+          const SizedBox(height: 16),
+          ...pending.map((p) => PendingPropertyCard(
+            property: p,
+            onVerify: () => _handlePropertyVerification(p),
+            onReject: () => _handlePropertyRejection(p),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOwnerQueue(AuthProvider provider) {
+    final pending = provider.pendingOwners;
+
+    if (provider.isLoading && pending.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (pending.isEmpty) {
+      return _buildEmptyState(
+        icon: Icons.people_outline,
+        title: 'No Pending Owners',
+        subtitle: 'All owner registrations are processed.',
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async => provider.loadPendingOwners(),
+      child: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          Text(
+            '${pending.length} owner registrations awaiting review',
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF666666),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ...pending.map((u) => PendingOwnerCard(
+            user: u,
+            onApprove: () => _handleOwnerVerification(u),
+            onReject: () => _handleOwnerRejection(u),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 64, color: Colors.grey[300]),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+          ),
+          const SizedBox(height: 8),
+          Text(subtitle, style: const TextStyle(color: Colors.grey)),
         ],
       ),
     );

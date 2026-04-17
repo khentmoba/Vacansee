@@ -18,6 +18,7 @@ class AuthProvider extends ChangeNotifier {
 
   AuthStatus _status = AuthStatus.uninitialized;
   UserModel? _user;
+  List<UserModel> _pendingOwners = [];
   String? _errorMessage;
   bool _isLoading = false;
 
@@ -27,6 +28,7 @@ class AuthProvider extends ChangeNotifier {
   // Getters
   AuthStatus get status => _status;
   UserModel? get user => _user;
+  List<UserModel> get pendingOwners => _pendingOwners;
   String? get errorMessage => _errorMessage;
   bool get isLoading => _isLoading;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
@@ -264,6 +266,71 @@ class AuthProvider extends ChangeNotifier {
       return true;
     } on AppAuthException catch (e) {
       _errorMessage = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Load pending owners for verification (Admin only)
+  Future<void> loadPendingOwners() async {
+    if (!isAdmin) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _pendingOwners = await _authService.getPendingOwners();
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Verify a new owner (Admin only)
+  Future<bool> verifyOwner(String userId) async {
+    if (!isAdmin) return false;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _authService.updateUserVerification(uid: userId, isVerified: true);
+      _pendingOwners.removeWhere((u) => u.uid == userId);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Reject a new owner by resetting their role to student (Admin only)
+  Future<bool> rejectOwner(String userId) async {
+    if (!isAdmin) return false;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // Reset role back to student and set is_verified to true (students don't need verification)
+      await _authService.updateUserVerification(
+        uid: userId,
+        isVerified: true,
+        role: UserRole.student,
+      );
+      _pendingOwners.removeWhere((u) => u.uid == userId);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
       _isLoading = false;
       notifyListeners();
       return false;

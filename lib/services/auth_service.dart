@@ -212,6 +212,40 @@ class AuthService {
     }
   }
 
+  /// Update user verification status (Admin only)
+  Future<void> updateUserVerification({
+    required String uid,
+    required bool isVerified,
+    UserRole? role,
+  }) async {
+    try {
+      final updates = <String, dynamic>{
+        'is_verified': isVerified,
+      };
+      if (role != null) updates['role'] = role.name;
+
+      await _supabase.from('users').update(updates).eq('id', uid);
+    } catch (e) {
+      throw AppAuthException('Failed to verify user: ${e.toString()}');
+    }
+  }
+
+  /// Get pending owners for verification (Admin only)
+  Future<List<UserModel>> getPendingOwners() async {
+    try {
+      final data = await _supabase
+          .from('users')
+          .select()
+          .eq('role', 'owner')
+          .eq('is_verified', false)
+          .order('created_at', ascending: false);
+      
+      return (data as List).map((json) => UserModel.fromJson(json)).toList();
+    } catch (e) {
+      throw AppAuthException('Failed to fetch pending owners: ${e.toString()}');
+    }
+  }
+
   /// Send password reset email
   Future<void> sendPasswordResetEmail(String email) async {
     try {
