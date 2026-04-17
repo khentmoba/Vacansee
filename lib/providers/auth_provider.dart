@@ -50,7 +50,8 @@ class AuthProvider extends ChangeNotifier {
         _user = await _authService.getUserModel(user.id);
         if (_user == null) {
           _status = AuthStatus.unauthenticated;
-        } else if (_user!.role == null) {
+        } else if (_user!.role == null || _user!.phoneNumber == null || _user!.phoneNumber!.isEmpty) {
+          // Block access until BOTH role AND phone number are set
           _status = AuthStatus.needsRole;
         } else {
           _status = AuthStatus.authenticated;
@@ -218,7 +219,22 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Set the user role (used during initial role selection)
+  /// Deprecated: use [completeOnboarding] which collects role + full profile atomically.
   Future<bool> setUserRole(UserRole role) async {
+    return completeOnboarding(
+      role: role,
+      displayName: _user?.displayName ?? '',
+      phoneNumber: _user?.phoneNumber ?? '',
+    );
+  }
+
+  /// Complete the onboarding flow by setting role, display name, and phone number atomically.
+  /// On success, transitions status to [AuthStatus.authenticated].
+  Future<bool> completeOnboarding({
+    required UserRole role,
+    required String displayName,
+    required String phoneNumber,
+  }) async {
     if (_user == null) return false;
 
     _isLoading = true;
@@ -226,8 +242,19 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _authService.updateProfile(uid: _user!.uid, role: role);
-      _user = _user!.copyWith(role: role);
+      await _authService.updateProfile(
+        uid: _user!.uid,
+        role: role,
+        displayName: displayName,
+        phoneNumber: phoneNumber,
+      );
+      _user = _user!.copyWith(
+        role: role,
+        displayName: displayName,
+        phoneNumber: phoneNumber,
+        // Owners are not verified until admin approves; students are auto-verified
+        isVerified: role != UserRole.owner,
+      );
       _status = AuthStatus.authenticated;
       _isLoading = false;
       notifyListeners();

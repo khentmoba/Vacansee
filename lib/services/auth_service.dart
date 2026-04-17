@@ -8,16 +8,32 @@ class AppAuthException implements Exception {
   const AppAuthException(this.message);
 
   factory AppAuthException.fromSupabase(AuthException e) {
+    String message = e.message;
     try {
       // Supabase sometimes returns error messages as raw JSON strings.
       final decoded = jsonDecode(e.message) as Map<String, dynamic>;
       if (decoded.containsKey('message')) {
-        return AppAuthException(decoded['message'] as String);
+        message = decoded['message'] as String;
+      } else if (decoded.containsKey('msg')) {
+        message = decoded['msg'] as String;
       }
     } catch (_) {
-      // Ignore JSON parse errors, fall back to the original raw message.
+      // Ignore JSON parse errors, fall back to the original message.
     }
-    return AppAuthException(e.message);
+
+    // Map common Supabase errors to user-friendly messages
+    final lowerMessage = message.toLowerCase();
+    if (lowerMessage.contains('user already registered') ||
+        lowerMessage.contains('email already in use') ||
+        lowerMessage.contains('email already exists')) {
+      return const AppAuthException('This email is already in use.');
+    }
+
+    if (lowerMessage.contains('invalid login credentials')) {
+      return const AppAuthException('Invalid email or password.');
+    }
+
+    return AppAuthException(message);
   }
 
   @override
@@ -169,7 +185,9 @@ class AuthService {
     }
   }
 
-  /// Update user profile
+  /// Update user profile in Supabase.
+  /// When role is set to [UserRole.owner], [is_verified] is set to false.
+  /// When role is [UserRole.student] or [UserRole.admin], [is_verified] is set to true.
   Future<void> updateProfile({
     required String uid,
     String? displayName,
@@ -180,7 +198,11 @@ class AuthService {
       final updates = <String, dynamic>{};
       if (displayName != null) updates['display_name'] = displayName;
       if (phoneNumber != null) updates['phone_number'] = phoneNumber;
-      if (role != null) updates['role'] = role.name;
+      if (role != null) {
+        updates['role'] = role.name;
+        // Owners require admin verification; students and admins are auto-verified.
+        updates['is_verified'] = role != UserRole.owner;
+      }
 
       if (updates.isNotEmpty) {
         await _supabase.from('users').update(updates).eq('id', uid);

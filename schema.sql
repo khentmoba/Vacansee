@@ -37,8 +37,22 @@ CREATE TABLE IF NOT EXISTS public.users (
   display_name TEXT NOT NULL,
   role user_role, -- Nullable initially for role selection flow
   phone_number TEXT,
+  is_verified BOOLEAN NOT NULL DEFAULT false, -- true for verified owners; always true for students/admin
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_login_at TIMESTAMPTZ
+);
+
+-- Ensure is_verified column exists on existing tables
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS is_verified BOOLEAN NOT NULL DEFAULT false;
+
+-- Admin Notifications Table (for owner verification alerts)
+CREATE TABLE IF NOT EXISTS public.admin_notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+  type TEXT NOT NULL,
+  content TEXT NOT NULL,
+  is_read BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Properties Table
@@ -109,6 +123,25 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.properties ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.rooms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.admin_notifications ENABLE ROW LEVEL SECURITY;
+
+-- Admin Notifications RLS
+DROP POLICY IF EXISTS "Admins can view all notifications" ON public.admin_notifications;
+CREATE POLICY "Admins can view all notifications"
+ON public.admin_notifications FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+);
+
+DROP POLICY IF EXISTS "Admins can update notifications" ON public.admin_notifications;
+CREATE POLICY "Admins can update notifications"
+ON public.admin_notifications FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+);
+
+DROP POLICY IF EXISTS "Service role can insert notifications" ON public.admin_notifications;
+CREATE POLICY "Service role can insert notifications"
+ON public.admin_notifications FOR INSERT WITH CHECK (true); -- Triggered by server-side function
+
 
 -- Users RLS
 DROP POLICY IF EXISTS "Users can view their own profile" ON public.users;
@@ -306,7 +339,36 @@ BEGIN
 END;
 $$;
 
--- 8. Enable Realtime Publications
+-- 8. Owner Registration Notification Trigger
+-- Fires when a user's role is set to 'owner', creating a notification for admins.
+CREATE OR REPLACE FUNCTION public.notify_admin_on_owner_registration()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  -- Only fire when a role is being set to 'owner' for the first time
+  IF NEW.role = 'owner' AND (OLD.role IS NULL OR OLD.role != 'owner') THEN
+    INSERT INTO public.admin_notifications (user_id, type, content)
+    VALUES (
+      NEW.id,
+      'new_owner_registration',
+      'New owner registered and requires verification: ' || NEW.display_name || ' (' || NEW.email || ')'
+    );
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_owner_registration ON public.users;
+CREATE TRIGGER on_owner_registration
+  AFTER UPDATE OF role ON public.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.notify_admin_on_owner_registration();
+
+-- 9. Enable Realtime Publications
+
 -- Using DO block to safely add tables to publication if they aren't already there
 DO $$ 
 BEGIN

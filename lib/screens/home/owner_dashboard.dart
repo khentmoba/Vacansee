@@ -130,6 +130,52 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     ],
                   ),
                   const SizedBox(height: 24),
+                  // Owner Verification Alert Banner
+                  if (!(authProvider.user?.isVerified ?? false))
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Colors.orange[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.orange[200]!),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.pending_actions_rounded,
+                            color: Colors.orange[700],
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Account Verification Pending',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange[800],
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'An admin will review your account shortly. You can browse the dashboard, but publishing listings is locked until verified.',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.orange[700],
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   // Stats Cards
                   Row(
                     children: [
@@ -239,24 +285,33 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                         ),
                       ),
                       ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const CreatePropertyScreen(),
-                            ),
-                          );
-                        },
+                        onPressed: (authProvider.user?.isVerified ?? false)
+                            ? () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const CreatePropertyScreen(),
+                                  ),
+                                );
+                              }
+                            : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF5287B2),
                           foregroundColor: Colors.white,
+                          disabledBackgroundColor:
+                              const Color(0xFF5287B2).withValues(alpha: 0.4),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         icon: const Icon(Icons.add, size: 18),
-                        label: const Text('Add New Listing'),
+                        label: Text(
+                          (authProvider.user?.isVerified ?? false)
+                              ? 'Add New Listing'
+                              : 'Verification Required',
+                        ),
                       ),
                     ],
                   ),
@@ -683,28 +738,40 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Start by adding your first boarding house listing',
+            (context.read<AuthProvider>().user?.isVerified ?? false)
+                ? 'Start by adding your first boarding house listing'
+                : 'Your account is pending verification. Once approved, you can add listings.',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: Colors.grey[600]),
           ),
           const SizedBox(height: 32),
           ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const CreatePropertyScreen()),
-              );
-            },
+            onPressed: (context.read<AuthProvider>().user?.isVerified ?? false)
+                ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CreatePropertyScreen(),
+                      ),
+                    );
+                  }
+                : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF5287B2),
               foregroundColor: Colors.white,
+              disabledBackgroundColor:
+                  const Color(0xFF5287B2).withValues(alpha: 0.4),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
             icon: const Icon(Icons.add),
-            label: const Text('Add Your First Property'),
+            label: Text(
+              (context.read<AuthProvider>().user?.isVerified ?? false)
+                  ? 'Add Your First Property'
+                  : 'Verification Required',
+            ),
           ),
         ],
       ),

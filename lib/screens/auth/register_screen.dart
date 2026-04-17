@@ -83,6 +83,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               EmailVerificationScreen(email: _emailController.text.trim()),
         ),
       );
+    } else if (!success && mounted) {
+      final error = authProvider.errorMessage;
+      if (error != null && error.toLowerCase().contains('already in use')) {
+        setState(() {
+          _errors['email'] = 'This email is already in use.';
+        });
+      }
     }
   }
 
@@ -682,7 +689,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 style: TextStyle(fontSize: 14, color: Color(0xFF666666)),
               ),
               TextButton(
-                onPressed: () => Navigator.push(
+                onPressed: () => Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const LoginScreen()),
                 ),

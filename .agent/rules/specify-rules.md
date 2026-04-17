@@ -32,9 +32,9 @@ cd src; pytest; ruff check .
 [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]: Follow standard conventions
 
 ## Recent Changes
+- 010-duplicate-email-error: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
 - 008-stealth-admin-access: Added Dart 3.x / Flutter 3.x + `supabase_flutter`, `provider`, `freezed`
 - 007-fix-owner-property-deletion: Added Dart 3.x / Flutter 3.x + `supabase_flutter`, `provider`, `freezed`
-- 003-fix-cicd-pipeline: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
 
 
 <!-- MANUAL ADDITIONS START -->
