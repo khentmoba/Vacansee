@@ -110,7 +110,13 @@ class ListingService {
           .update({'status': 'deleted'})
           .eq('id', propertyId);
 
-      // 4. Cleanup Storage
+      // 4. Update rooms to 'maintenance'
+      await _supabase
+          .from('rooms')
+          .update({'status': 'maintenance'})
+          .eq('property_id', propertyId);
+
+      // 5. Cleanup Storage
       final allImages = [
         ...images,
         ...roomImages,
@@ -148,6 +154,42 @@ class ListingService {
       }
     } catch (e) {
       debugPrint('Delete property listing failed: $e');
+      rethrow;
+    }
+  }
+
+  /// Checks if a property has any bookings in 'pending' or 'approved' status.
+  Future<bool> hasActiveBookings(String propertyId) async {
+    try {
+      final response = await _supabase
+          .from('bookings')
+          .select('id')
+          .eq('property_id', propertyId)
+          .inFilter('status', ['pending', 'approved']);
+
+      return (response as List).isNotEmpty;
+    } catch (e) {
+      debugPrint('Error checking active bookings: $e');
+      return false;
+    }
+  }
+
+  /// Restores a soft-deleted property and its rooms.
+  Future<void> restorePropertyListing(String propertyId) async {
+    try {
+      // 1. Restore property status
+      await _supabase
+          .from('properties')
+          .update({'status': 'verified'})
+          .eq('id', propertyId);
+
+      // 2. Restore rooms to 'vacant'
+      await _supabase
+          .from('rooms')
+          .update({'status': 'vacant'})
+          .eq('property_id', propertyId);
+    } catch (e) {
+      debugPrint('Restore property listing failed: $e');
       rethrow;
     }
   }

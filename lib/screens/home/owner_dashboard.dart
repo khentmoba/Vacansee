@@ -7,7 +7,6 @@ import '../../providers/property_provider.dart';
 import '../booking/owner_bookings_screen.dart';
 import '../owner/edit_property_screen.dart';
 import '../property/create_property_screen.dart';
-import '../../services/listing_service.dart';
 import '../../widgets/common/confirmation_dialog.dart';
 
 class OwnerDashboard extends StatefulWidget {
@@ -433,24 +432,48 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   top: 8,
                   left: 70, // Positioned next to Edit
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
+                      final provider = context.read<PropertyProvider>();
+                      final hasBookings =
+                          await provider.hasActiveBookings(property.propertyId);
+
+                      if (!mounted) return;
+
                       showDialog(
                         context: context,
                         builder: (ctx) => ConfirmationDialog(
                           title: 'Delete Listing',
-                          content:
-                              'Are you sure you want to permanently delete "${property.name}"? This action cannot be undone.',
+                          content: hasBookings
+                              ? 'WARNING: This property has active or pending bookings. Deleting it will hide it from new students, but existing bookings will remain in the system. Are you sure you want to proceed?'
+                              : 'Are you sure you want to delete "${property.name}"? This listing will no longer be visible to students.',
                           onConfirm: () async {
-                            await ListingService().deletePropertyListing(
+                            final success = await provider.deleteProperty(
                               property.propertyId,
                             );
-                            if (mounted) {
-                              context
-                                  .read<PropertyProvider>()
-                                  .loadOwnerProperties(property.ownerId);
+
+                            if (mounted && success) {
+                              ScaffoldMessenger.of(context).clearSnackBars();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Listing deleted'),
+                                SnackBar(
+                                  content: const Text('Listing deleted'),
+                                  duration: const Duration(seconds: 5),
+                                  action: SnackBarAction(
+                                    label: 'UNDO',
+                                    onPressed: () {
+                                      provider.restoreProperty(
+                                        property.propertyId,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            } else if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    provider.errorMessage ?? 'Deletion failed',
+                                  ),
+                                  backgroundColor: Colors.red,
                                 ),
                               );
                             }

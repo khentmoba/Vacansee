@@ -3,13 +3,18 @@ import 'package:flutter/foundation.dart';
 import '../models/property_model.dart';
 import '../models/room_model.dart';
 import '../services/property_service.dart';
+import '../services/listing_service.dart';
 
 /// Provider for property state management
 class PropertyProvider extends ChangeNotifier {
   final PropertyService _propertyService;
+  final ListingService _listingService;
 
-  PropertyProvider({PropertyService? propertyService})
-    : _propertyService = propertyService ?? PropertyService();
+  PropertyProvider({
+    PropertyService? propertyService,
+    ListingService? listingService,
+  }) : _propertyService = propertyService ?? PropertyService(),
+       _listingService = listingService ?? ListingService();
 
   // State
   List<PropertyModel> _properties = [];
@@ -33,7 +38,8 @@ class PropertyProvider extends ChangeNotifier {
   List<String> _selectedAmenities = [];
 
   // Getters
-  List<PropertyModel> get properties => _properties;
+  List<PropertyModel> get properties =>
+      _properties.where((p) => p.status != PropertyStatus.deleted).toList();
   PropertyModel? get selectedProperty => _selectedProperty;
   List<RoomModel> get rooms => _rooms;
   bool get isLoading => _isLoading;
@@ -346,15 +352,21 @@ class PropertyProvider extends ChangeNotifier {
     }
   }
 
-  /// Delete a property
+  /// Delete a property (soft-delete)
   Future<bool> deleteProperty(String propertyId) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await _propertyService.deleteProperty(propertyId);
-      _properties.removeWhere((p) => p.propertyId == propertyId);
+      await _listingService.deletePropertyListing(propertyId);
+      final index = _properties.indexWhere((p) => p.propertyId == propertyId);
+      if (index != -1) {
+        // Update local state to 'deleted' status
+        _properties[index] = _properties[index].copyWith(
+          status: PropertyStatus.deleted,
+        );
+      }
       if (_selectedProperty?.propertyId == propertyId) {
         _selectedProperty = null;
       }
@@ -367,6 +379,38 @@ class PropertyProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  /// Restore a soft-deleted property
+  Future<bool> restoreProperty(String propertyId) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _listingService.restorePropertyListing(propertyId);
+      final index = _properties.indexWhere((p) => p.propertyId == propertyId);
+      if (index != -1) {
+        // Revert status to verified
+        // Note: In a production app, we'd fetch the latest state from DB
+        _properties[index] = _properties[index].copyWith(
+          status: PropertyStatus.verified,
+        );
+      }
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to restore property: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Check if property has active bookings
+  Future<bool> hasActiveBookings(String propertyId) async {
+    return await _listingService.hasActiveBookings(propertyId);
   }
 
   /// Load rooms for a property
