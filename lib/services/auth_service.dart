@@ -205,7 +205,11 @@ class AuthService {
       }
 
       if (updates.isNotEmpty) {
-        await _supabase.from('users').update(updates).eq('id', uid);
+        await _supabase.from('users').upsert({
+          'id': uid,
+          ...updates,
+          'email': _supabase.auth.currentUser?.email, // Ensure email is present on upsert
+        });
       }
     } catch (e) {
       throw AppAuthException('Failed to update profile: ${e.toString()}');

@@ -312,35 +312,52 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
-  default_role public.user_role;
+  extracted_role public.user_role;
 BEGIN
-  -- Safe role extraction from metadata
+  -- 1. Extract role with extreme safety
   BEGIN
-    default_role := (NEW.raw_user_meta_data->>'role')::public.user_role;
+    extracted_role := (NEW.raw_user_meta_data->>'role')::public.user_role;
   EXCEPTION WHEN OTHERS THEN
-    default_role := NULL;
+    extracted_role := NULL; -- Ensure we don't crash on invalid enum values
   END;
 
-  -- Wrap profile upsert so any error is logged but NEVER blocks the auth flow
-  BEGIN
-    INSERT INTO public.users (id, email, display_name, role, phone_number)
-    VALUES (
-      NEW.id,
-      NEW.email,
-      COALESCE(NULLIF(NEW.raw_user_meta_data->>'display_name', ''), NEW.email),
-      default_role,
-      NEW.raw_user_meta_data->>'phone_number'
-    )
-    ON CONFLICT (id) DO UPDATE SET
-      email         = EXCLUDED.email,
-      display_name  = COALESCE(NULLIF(EXCLUDED.display_name, ''), public.users.display_name),
-      role          = COALESCE(EXCLUDED.role, public.users.role),
-      phone_number  = COALESCE(EXCLUDED.phone_number, public.users.phone_number),
-      last_login_at = NOW();
-  EXCEPTION WHEN OTHERS THEN
-    RAISE WARNING 'handle_new_user: profile upsert failed for % – %', NEW.email, SQLERRM;
-  END;
+  -- 2. Perform Upsert with safe defaults
+  -- We use COALESCE and NULLIF to ensure required columns like display_name are NEVER null.
+  INSERT INTO public.users (
+    id, 
+    email, 
+    display_name, 
+    role, 
+    phone_number,
+    is_verified
+  )
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(
+      NULLIF(NEW.raw_user_meta_data->>'display_name', ''), 
+      NULLIF(NEW.raw_user_meta_data->>'full_name', ''),
+      SPLIT_PART(NEW.email, '@', 1) -- Extreme fallback: use email prefix
+    ),
+    extracted_role,
+    NEW.raw_user_meta_data->>'phone_number',
+    CASE 
+      WHEN extracted_role = 'admin' THEN true 
+      WHEN extracted_role = 'student' THEN true
+      ELSE false -- Owners default to unverified
+    END
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    email         = EXCLUDED.email,
+    display_name  = COALESCE(NULLIF(EXCLUDED.display_name, ''), public.users.display_name),
+    role          = COALESCE(public.users.role, EXCLUDED.role), -- Don't overwrite existing role with NULL
+    phone_number  = COALESCE(EXCLUDED.phone_number, public.users.phone_number),
+    last_login_at = NOW();
 
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+  -- Last ditch effort: Log warning but MUST return NEW to let the user login
+  RAISE WARNING 'handle_new_user critical failure for %: %', NEW.email, SQLERRM;
   RETURN NEW;
 END;
 $$;

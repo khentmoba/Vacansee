@@ -51,7 +51,9 @@ class AuthProvider extends ChangeNotifier {
       } else {
         _user = await _authService.getUserModel(user.id);
         if (_user == null) {
-          _status = AuthStatus.unauthenticated;
+          // Profile row missing in public.users - common for new Google users 
+          // before trigger finishes or if it fails.
+          _status = AuthStatus.needsRole;
         } else if (_user!.role == UserRole.admin) {
           // Admins bypass onboarding entirely — their account is managed in the DB
           _status = AuthStatus.authenticated;
@@ -240,26 +242,24 @@ class AuthProvider extends ChangeNotifier {
     required String displayName,
     required String phoneNumber,
   }) async {
-    if (_user == null) return false;
+    final currentUser = _authService.currentSupabaseUser;
+    if (currentUser == null) return false;
 
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
+      // updateProfile will upsert the record if it doesn't exist
       await _authService.updateProfile(
-        uid: _user!.uid,
-        role: role,
+        uid: currentUser.id,
         displayName: displayName,
         phoneNumber: phoneNumber,
-      );
-      _user = _user!.copyWith(
         role: role,
-        displayName: displayName,
-        phoneNumber: phoneNumber,
-        // Owners are not verified until admin approves; students are auto-verified
-        isVerified: role != UserRole.owner,
       );
+
+      // Refresh user after update
+      _user = await _authService.getUserModel(currentUser.id);
       _status = AuthStatus.authenticated;
       _isLoading = false;
       notifyListeners();
@@ -271,6 +271,7 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
   }
+
 
   /// Load pending owners for verification (Admin only)
   Future<void> loadPendingOwners() async {
