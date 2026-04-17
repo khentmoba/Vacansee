@@ -31,10 +31,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
       propertyId: property.propertyId,
       status: PropertyStatus.verified,
     );
-    if (mounted && success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${property.name} verified!')),
-      );
+    if (mounted) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${property.name} verified!')),
+        );
+      } else {
+        final error = context.read<PropertyProvider>().errorMessage;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to verify: $error'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -50,29 +60,59 @@ class _AdminDashboardState extends State<AdminDashboard> {
         status: PropertyStatus.rejected,
         reason: reason,
       );
-      if (mounted && success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${property.name} rejected.')),
-        );
+      if (mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${property.name} rejected.')),
+          );
+        } else {
+          final error = context.read<PropertyProvider>().errorMessage;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to reject: $error'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }
 
   Future<void> _handleOwnerVerification(UserModel user) async {
     final success = await context.read<AuthProvider>().verifyOwner(user.uid);
-    if (mounted && success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Owner ${user.displayName} verified!')),
-      );
+    if (mounted) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Owner ${user.displayName} verified!')),
+        );
+      } else {
+        final error = context.read<AuthProvider>().errorMessage;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to verify owner: $error'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
   Future<void> _handleOwnerRejection(UserModel user) async {
     final success = await context.read<AuthProvider>().rejectOwner(user.uid);
-    if (mounted && success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Owner ${user.displayName} reset to Student.')),
-      );
+    if (mounted) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Owner ${user.displayName} reset to Student.')),
+        );
+      } else {
+        final error = context.read<AuthProvider>().errorMessage;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to reset owner: $error'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
