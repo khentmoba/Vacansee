@@ -31,8 +31,8 @@ cd src; pytest; ruff check .
 
 ## Recent Changes
 - 003-fix-cicd-pipeline: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+- 003-fix-cicd-pipeline: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
 - 003-fix-cicd-pipeline: Added Dart 3.x / Flutter 3.x + `supabase_flutter`, `freezed`
-- 003-fix-cicd-pipeline: Added Dart 3.10+ / Flutter 3.13+ (Web) + Vercel CLI (v30+), Subosito Flutter Action (v2)
 
 
 <!-- MANUAL ADDITIONS START -->

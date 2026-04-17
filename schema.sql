@@ -113,7 +113,7 @@ CREATE POLICY "Public can view rooms of verified properties"
 ON public.rooms FOR SELECT USING (
   EXISTS (
     SELECT 1 FROM public.properties p 
-    WHERE p.id = rooms.property_id AND p.is_verified = true
+    WHERE p.id = rooms.property_id AND p.status = 'verified'
   )
 );
 
@@ -251,7 +251,7 @@ SELECT
   r.last_updated,
   p.name as property_name,
   p.address as property_address,
-  p.is_verified as property_is_verified
+  (p.status = 'verified') as property_is_verified
 FROM public.rooms r
 JOIN public.properties p ON r.property_id = p.id;
 

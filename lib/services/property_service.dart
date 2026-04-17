@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/property_model.dart';
 import '../models/room_model.dart';
@@ -193,7 +194,7 @@ class PropertyService {
       if (images.isNotEmpty) {
         _storage.deletePropertyImages(images).catchError((e) {
           // Log but don't fail the deletion if storage cleanup fails
-          print('Storage cleanup failed during property deletion: $e');
+          debugPrint('Storage cleanup failed during property deletion: $e');
         });
       }
     } catch (e) {

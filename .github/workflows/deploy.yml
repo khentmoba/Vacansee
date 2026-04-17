@@ -33,6 +33,7 @@ jobs:
 
       - name: Deploy to Vercel
         run: |
+          cp vercel.json build/web/
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
             vercel deploy build/web --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
           else

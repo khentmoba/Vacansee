@@ -3,7 +3,7 @@
 ## Project Overview & Stack
 **App:** VacanSee
 **Overview:** A real-time boarding house vacancy tracker for university students in Cagayan de Oro City. Students can filter verified listings by budget, location, and gender orientation while property owners update room availability in real-time.
-**Stack:** Flutter Web + Firebase (Auth, Firestore, Storage, Hosting)
+**Stack:** Flutter Web + Supabase (Auth, Postgres, Storage) + Vercel (Hosting)
 **Critical Constraints:** 
 - Mobile-first design required (university students are mobile-first users)
 - Real-time vacancy status is the core value proposition
@@ -20,9 +20,9 @@ Execute these commands for standard development workflows. Do not invent new pac
 
 ## Protected Areas
 Do NOT modify these areas without explicit human approval:
-- **Infrastructure:** Firebase project configuration, security rules
-- **Database Schema:** Existing Firestore collections and sub-collections
-- **Third-Party Integrations:** Firebase Auth configurations, Gemini API keys
+- **Infrastructure:** Supabase project configuration, security rules
+- **Database Schema:** Existing Supabase tables and RLS policies
+- **Third-Party Integrations:** Supabase Auth configurations, Gemini API keys
 
 ## Coding Conventions
 - **Formatting:** Follow Dart/Flutter style guide. Use `dart format` before commits.
@@ -63,7 +63,7 @@ These rules apply across all AI coding assistants (Cursor, Copilot, Claude, Gemi
 ### Architectural Sovereignty
 - Widgets handle UI ONLY
 - All business logic goes in `providers/` or `services/`
-- No direct Firestore calls from widgets—use repositories
+- No direct Supabase calls from widgets—use repositories
 
 ### The "No Apologies" Rule
 - Do NOT apologize for errors—fix them immediately

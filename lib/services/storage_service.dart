@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Exception for storage operations
@@ -86,7 +86,7 @@ class StorageService {
         }
       } catch (e) {
         // Log and continue
-        print('Skipping invalid image URL: $imageUrl');
+        debugPrint('Skipping invalid image URL: $imageUrl');
       }
     }
     
