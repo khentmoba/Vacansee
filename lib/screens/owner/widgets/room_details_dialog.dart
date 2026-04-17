@@ -4,9 +4,14 @@ import '../../../models/room_model.dart';
 
 /// Dialog for adding or editing room details.
 class RoomDetailsDialog extends StatefulWidget {
+  final String propertyId;
   final RoomModel? initialRoom;
 
-  const RoomDetailsDialog({super.key, this.initialRoom});
+  const RoomDetailsDialog({
+    super.key,
+    required this.propertyId,
+    this.initialRoom,
+  });
 
   @override
   State<RoomDetailsDialog> createState() => _RoomDetailsDialogState();
@@ -47,7 +52,7 @@ class _RoomDetailsDialogState extends State<RoomDetailsDialog> {
 
     final room = RoomModel(
       roomId: widget.initialRoom?.roomId ?? 'temp_${DateTime.now().millisecondsSinceEpoch}',
-      propertyId: widget.initialRoom?.propertyId ?? '',
+      propertyId: widget.propertyId,
       status: _status,
       capacity: int.parse(_capacityController.text.trim()),
       monthlyRate: int.parse(_rateController.text.trim()),

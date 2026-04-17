@@ -60,11 +60,22 @@ class ListingService {
       // 5. Upsert Rooms
       for (final room in rooms) {
         final roomJson = room.toJson();
+        
+        // Debug & Validation
+        if (roomJson['monthly_rate'] == null) {
+          debugPrint('WARNING: Room ${room.roomId} has NULL monthly_rate in JSON');
+          // Fallback to 0 only if absolutely necessary, but better to let it fail or throw
+        }
+        
         if (room.roomId.isEmpty || room.roomId.startsWith('temp_')) {
           roomJson.remove('id');
         }
         roomJson.remove('is_available');
         roomJson.remove('property_name');
+
+        if (roomJson['property_id'] == null || roomJson['property_id'] == '') {
+           roomJson['property_id'] = property.propertyId; // Safety fallback
+        }
 
         await _supabase.from('rooms').upsert(roomJson);
       }

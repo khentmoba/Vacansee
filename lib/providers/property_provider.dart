@@ -457,19 +457,30 @@ class PropertyProvider extends ChangeNotifier {
   }
 
   /// Load rooms for a property
-  void loadRooms(String propertyId) {
-    _propertyService
-        .getRooms(propertyId)
-        .listen(
-          (rooms) {
-            _rooms = rooms;
-            notifyListeners();
-          },
-          onError: (error) {
-            _errorMessage = 'Failed to load rooms: $error';
-            notifyListeners();
-          },
-        );
+  Future<void> loadRooms(String propertyId) async {
+    final stream = _propertyService.getRooms(propertyId);
+    
+    // Subscribe for real-time updates
+    _propertyRoomsSubscription?.cancel();
+    _propertyRoomsSubscription = stream.listen(
+      (rooms) {
+        _rooms = rooms;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Failed to load rooms: $error';
+        notifyListeners();
+      },
+    );
+
+    // Wait for the first result so we can return a Future to the caller
+    try {
+      final initialRooms = await stream.first;
+      _rooms = initialRooms;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading initial rooms: $e');
+    }
   }
 
   /// Add a room to a property

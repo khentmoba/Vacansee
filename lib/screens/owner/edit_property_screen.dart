@@ -43,14 +43,21 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
 
   void _loadRooms() {
     final propertyProvider = context.read<PropertyProvider>();
-    propertyProvider.loadRooms(widget.property.propertyId);
-    // Note: We'll listen to the provider's rooms list in build or initState
+    propertyProvider.loadRooms(widget.property.propertyId).then((_) {
+      if (mounted) {
+        setState(() {
+          _rooms = List.from(propertyProvider.rooms);
+        });
+      }
+    });
   }
 
   Future<void> _addRoom() async {
     final room = await showDialog<RoomModel>(
       context: context,
-      builder: (context) => const RoomDetailsDialog(),
+      builder: (context) => RoomDetailsDialog(
+        propertyId: widget.property.propertyId,
+      ),
     );
 
     if (room != null) {
@@ -61,7 +68,10 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
   Future<void> _editRoom(int index) async {
     final room = await showDialog<RoomModel>(
       context: context,
-      builder: (context) => RoomDetailsDialog(initialRoom: _rooms[index]),
+      builder: (context) => RoomDetailsDialog(
+        propertyId: widget.property.propertyId,
+        initialRoom: _rooms[index],
+      ),
     );
 
     if (room != null) {
