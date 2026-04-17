@@ -156,11 +156,6 @@ DROP POLICY IF EXISTS "Users can update their own profile" ON public.users;
 CREATE POLICY "Users can update their own profile" 
 ON public.users FOR UPDATE USING (auth.uid() = id);
 
-DROP POLICY IF EXISTS "Admins can view all profiles" ON public.users;
-CREATE POLICY "Admins can view all profiles"
-ON public.users FOR SELECT USING (
-  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-);
 
 DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.users;
 CREATE POLICY "Enable insert for authenticated users only"

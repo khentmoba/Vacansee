@@ -50,6 +50,9 @@ class AuthProvider extends ChangeNotifier {
         _user = await _authService.getUserModel(user.id);
         if (_user == null) {
           _status = AuthStatus.unauthenticated;
+        } else if (_user!.role == UserRole.admin) {
+          // Admins bypass onboarding entirely — their account is managed in the DB
+          _status = AuthStatus.authenticated;
         } else if (_user!.role == null || _user!.phoneNumber == null || _user!.phoneNumber!.isEmpty) {
           // Block access until BOTH role AND phone number are set
           _status = AuthStatus.needsRole;
