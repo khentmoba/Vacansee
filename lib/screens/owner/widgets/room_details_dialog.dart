@@ -111,6 +111,7 @@ class _RoomDetailsDialogState extends State<RoomDetailsDialog> {
 
               // Status
               DropdownButtonFormField<RoomStatus>(
+                // ignore: deprecated_member_use
                 value: _status,
                 decoration: const InputDecoration(
                   labelText: 'Current Status',
