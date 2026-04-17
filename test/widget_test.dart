@@ -3,12 +3,6 @@
 // Basic smoke tests for the VacanSee app
 // Note: Firebase-dependent tests require mocking. These are basic UI tests.
 
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
-import 'package:vacansee/providers/providers.dart';
-import 'package:vacansee/screens/screens.dart';
-
 void main() {
 /*
   group('LoginScreen UI', () {
