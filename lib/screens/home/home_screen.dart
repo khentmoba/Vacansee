@@ -16,6 +16,9 @@ class HomeScreen extends StatelessWidget {
     final authProvider = context.watch<AuthProvider>();
 
     // Route to appropriate dashboard based on role
+    if (authProvider.isAdmin) {
+      return const AdminDashboard();
+    }
     if (authProvider.isOwner) {
       return const OwnerHome();
     }
