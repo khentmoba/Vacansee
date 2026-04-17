@@ -408,6 +408,49 @@ class PropertyProvider extends ChangeNotifier {
     }
   }
 
+  /// Moderate a property (Admin Only)
+  Future<bool> moderateProperty({
+    required String propertyId,
+    required PropertyStatus status,
+    String? reason,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _propertyService.moderateProperty(
+        propertyId: propertyId,
+        status: status,
+        reason: reason,
+      );
+
+      // Update local state if present
+      final index = _properties.indexWhere((p) => p.propertyId == propertyId);
+      if (index != -1) {
+        _properties[index] = _properties[index].copyWith(
+          status: status,
+          rejectionReason: reason,
+        );
+      }
+      if (_selectedProperty?.propertyId == propertyId) {
+        _selectedProperty = _selectedProperty?.copyWith(
+          status: status,
+          rejectionReason: reason,
+        );
+      }
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to moderate property: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   /// Check if property has active bookings
   Future<bool> hasActiveBookings(String propertyId) async {
     return await _listingService.hasActiveBookings(propertyId);

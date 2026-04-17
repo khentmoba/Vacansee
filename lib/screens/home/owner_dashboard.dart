@@ -562,6 +562,52 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     ),
                   ),
                 ),
+                // Rejection Reason Banner
+                if (property.status == PropertyStatus.rejected && property.rejectionReason != null)
+                  Container(
+                    margin: const EdgeInsets.only(top: 32, left: 8, right: 8),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.red[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red[100]!),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.info_outline, size: 14, color: Colors.red),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Rejection Reason',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red[900],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          property.rejectionReason!,
+                          style: TextStyle(fontSize: 11, color: Colors.red[800]),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Tip: Edit and save to re-submit for verification.',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.red[700],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),
@@ -671,8 +717,10 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
         return const Color(0xFF10B981);
       case PropertyStatus.pending:
         return Colors.orange;
-      case PropertyStatus.deleted:
+      case PropertyStatus.rejected:
         return Colors.red;
+      case PropertyStatus.deleted:
+        return Colors.red[900]!;
     }
   }
 
@@ -682,6 +730,8 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
         return Icons.verified_rounded;
       case PropertyStatus.pending:
         return Icons.pending_actions_rounded;
+      case PropertyStatus.rejected:
+        return Icons.error_outline_rounded;
       case PropertyStatus.deleted:
         return Icons.delete_forever_rounded;
     }

@@ -20,6 +20,8 @@ enum PropertyStatus {
   pending,
   @JsonValue('verified')
   verified,
+  @JsonValue('rejected')
+  rejected,
   @JsonValue('deleted')
   deleted,
 }
@@ -43,6 +45,7 @@ class PropertyModel with _$PropertyModel {
     @JsonKey(name: 'last_updated') required DateTime lastUpdated,
     @Default([]) List<String> images,
     String? description,
+    @JsonKey(name: 'rejection_reason') String? rejectionReason,
     @JsonKey(name: 'has_vacancy') @Default(true) bool hasVacancy,
   }) = _PropertyModel;
 

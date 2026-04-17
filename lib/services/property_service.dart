@@ -148,13 +148,19 @@ class PropertyService {
       final currentAddress = currentData['address'] as String;
 
       // 2. Determine if status should be reset to pending
+      // Resubmit if address changed OR if it was previously rejected
       var status = property.status;
-      if (property.address != currentAddress) {
+      String? rejectionReason = property.rejectionReason;
+
+      if (property.address != currentAddress ||
+          property.status == PropertyStatus.rejected) {
         status = PropertyStatus.pending;
+        rejectionReason = null; // Clear reason on resubmission
       }
 
       final updated = property.copyWith(
         status: status,
+        rejectionReason: rejectionReason,
         lastUpdated: DateTime.now(),
       );
 
@@ -201,6 +207,23 @@ class PropertyService {
       }
     } catch (e) {
       throw PropertyException('Failed to delete property: $e');
+    }
+  }
+
+  /// Moderate a property (Verify/Reject)
+  Future<void> moderateProperty({
+    required String propertyId,
+    required PropertyStatus status,
+    String? reason,
+  }) async {
+    try {
+      await _supabase.from('properties').update({
+        'status': status.name,
+        'rejection_reason': reason,
+        'last_updated': DateTime.now().toIso8601String(),
+      }).eq('id', propertyId);
+    } catch (e) {
+      throw PropertyException('Failed to moderate property: $e');
     }
   }
 

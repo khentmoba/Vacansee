@@ -39,6 +39,8 @@ mixin _$PropertyModel {
   DateTime get lastUpdated => throw _privateConstructorUsedError;
   List<String> get images => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
+  @JsonKey(name: 'rejection_reason')
+  String? get rejectionReason => throw _privateConstructorUsedError;
   @JsonKey(name: 'has_vacancy')
   bool get hasVacancy => throw _privateConstructorUsedError;
 
@@ -73,6 +75,7 @@ abstract class $PropertyModelCopyWith<$Res> {
     @JsonKey(name: 'last_updated') DateTime lastUpdated,
     List<String> images,
     String? description,
+    @JsonKey(name: 'rejection_reason') String? rejectionReason,
     @JsonKey(name: 'has_vacancy') bool hasVacancy,
   });
 
@@ -107,6 +110,7 @@ class _$PropertyModelCopyWithImpl<$Res, $Val extends PropertyModel>
     Object? lastUpdated = null,
     Object? images = null,
     Object? description = freezed,
+    Object? rejectionReason = freezed,
     Object? hasVacancy = null,
   }) {
     return _then(
@@ -163,6 +167,10 @@ class _$PropertyModelCopyWithImpl<$Res, $Val extends PropertyModel>
                 ? _value.description
                 : description // ignore: cast_nullable_to_non_nullable
                       as String?,
+            rejectionReason: freezed == rejectionReason
+                ? _value.rejectionReason
+                : rejectionReason // ignore: cast_nullable_to_non_nullable
+                      as String?,
             hasVacancy: null == hasVacancy
                 ? _value.hasVacancy
                 : hasVacancy // ignore: cast_nullable_to_non_nullable
@@ -206,6 +214,7 @@ abstract class _$$PropertyModelImplCopyWith<$Res>
     @JsonKey(name: 'last_updated') DateTime lastUpdated,
     List<String> images,
     String? description,
+    @JsonKey(name: 'rejection_reason') String? rejectionReason,
     @JsonKey(name: 'has_vacancy') bool hasVacancy,
   });
 
@@ -240,6 +249,7 @@ class __$$PropertyModelImplCopyWithImpl<$Res>
     Object? lastUpdated = null,
     Object? images = null,
     Object? description = freezed,
+    Object? rejectionReason = freezed,
     Object? hasVacancy = null,
   }) {
     return _then(
@@ -296,6 +306,10 @@ class __$$PropertyModelImplCopyWithImpl<$Res>
             ? _value.description
             : description // ignore: cast_nullable_to_non_nullable
                   as String?,
+        rejectionReason: freezed == rejectionReason
+            ? _value.rejectionReason
+            : rejectionReason // ignore: cast_nullable_to_non_nullable
+                  as String?,
         hasVacancy: null == hasVacancy
             ? _value.hasVacancy
             : hasVacancy // ignore: cast_nullable_to_non_nullable
@@ -322,6 +336,7 @@ class _$PropertyModelImpl extends _PropertyModel {
     @JsonKey(name: 'last_updated') required this.lastUpdated,
     final List<String> images = const [],
     this.description,
+    @JsonKey(name: 'rejection_reason') this.rejectionReason,
     @JsonKey(name: 'has_vacancy') this.hasVacancy = true,
   }) : _amenities = amenities,
        _images = images,
@@ -377,12 +392,15 @@ class _$PropertyModelImpl extends _PropertyModel {
   @override
   final String? description;
   @override
+  @JsonKey(name: 'rejection_reason')
+  final String? rejectionReason;
+  @override
   @JsonKey(name: 'has_vacancy')
   final bool hasVacancy;
 
   @override
   String toString() {
-    return 'PropertyModel(propertyId: $propertyId, ownerId: $ownerId, name: $name, address: $address, lat: $lat, lng: $lng, genderOrientation: $genderOrientation, amenities: $amenities, priceRange: $priceRange, status: $status, lastUpdated: $lastUpdated, images: $images, description: $description, hasVacancy: $hasVacancy)';
+    return 'PropertyModel(propertyId: $propertyId, ownerId: $ownerId, name: $name, address: $address, lat: $lat, lng: $lng, genderOrientation: $genderOrientation, amenities: $amenities, priceRange: $priceRange, status: $status, lastUpdated: $lastUpdated, images: $images, description: $description, rejectionReason: $rejectionReason, hasVacancy: $hasVacancy)';
   }
 
   @override
@@ -411,6 +429,8 @@ class _$PropertyModelImpl extends _PropertyModel {
             const DeepCollectionEquality().equals(other._images, _images) &&
             (identical(other.description, description) ||
                 other.description == description) &&
+            (identical(other.rejectionReason, rejectionReason) ||
+                other.rejectionReason == rejectionReason) &&
             (identical(other.hasVacancy, hasVacancy) ||
                 other.hasVacancy == hasVacancy));
   }
@@ -432,6 +452,7 @@ class _$PropertyModelImpl extends _PropertyModel {
     lastUpdated,
     const DeepCollectionEquality().hash(_images),
     description,
+    rejectionReason,
     hasVacancy,
   );
 
@@ -465,6 +486,7 @@ abstract class _PropertyModel extends PropertyModel {
     @JsonKey(name: 'last_updated') required final DateTime lastUpdated,
     final List<String> images,
     final String? description,
+    @JsonKey(name: 'rejection_reason') final String? rejectionReason,
     @JsonKey(name: 'has_vacancy') final bool hasVacancy,
   }) = _$PropertyModelImpl;
   const _PropertyModel._() : super._();
@@ -503,6 +525,9 @@ abstract class _PropertyModel extends PropertyModel {
   List<String> get images;
   @override
   String? get description;
+  @override
+  @JsonKey(name: 'rejection_reason')
+  String? get rejectionReason;
   @override
   @JsonKey(name: 'has_vacancy')
   bool get hasVacancy;

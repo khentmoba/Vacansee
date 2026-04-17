@@ -19,7 +19,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 DO $$ BEGIN
-    CREATE TYPE property_status AS ENUM ('pending', 'verified', 'deleted');
+    CREATE TYPE property_status AS ENUM ('pending', 'verified', 'rejected', 'deleted');
 EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 -- 2. Create Tables
@@ -49,6 +49,8 @@ CREATE TABLE IF NOT EXISTS public.properties (
   status property_status NOT NULL DEFAULT 'pending',
   images TEXT[] DEFAULT '{}',
   description TEXT,
+  rejection_reason TEXT,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_updated TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -115,6 +117,12 @@ DROP POLICY IF EXISTS "Users can update their own profile" ON public.users;
 CREATE POLICY "Users can update their own profile" 
 ON public.users FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Admins can view all profiles" ON public.users;
+CREATE POLICY "Admins can view all profiles"
+ON public.users FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+);
+
 DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.users;
 CREATE POLICY "Enable insert for authenticated users only"
 ON public.users FOR INSERT WITH CHECK (auth.uid() = id);
@@ -139,6 +147,13 @@ ON public.properties FOR UPDATE USING (auth.uid() = owner_id);
 DROP POLICY IF EXISTS "Owners can delete their own properties" ON public.properties;
 CREATE POLICY "Owners can delete their own properties" 
 ON public.properties FOR DELETE USING (auth.uid() = owner_id);
+
+-- Admin Global Access
+DROP POLICY IF EXISTS "Admins have full access to all properties" ON public.properties;
+CREATE POLICY "Admins have full access to all properties" 
+ON public.properties FOR ALL USING (
+  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+);
 
 -- Rooms RLS
 DROP POLICY IF EXISTS "Public can view rooms of verified properties" ON public.rooms;

@@ -31,6 +31,7 @@ _$PropertyModelImpl _$$PropertyModelImplFromJson(
       (json['images'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
   description: json['description'] as String?,
+  rejectionReason: json['rejection_reason'] as String?,
   hasVacancy: json['has_vacancy'] as bool? ?? true,
 );
 
@@ -50,6 +51,7 @@ Map<String, dynamic> _$$PropertyModelImplToJson(
   'last_updated': instance.lastUpdated.toIso8601String(),
   'images': instance.images,
   'description': instance.description,
+  'rejection_reason': instance.rejectionReason,
   'has_vacancy': instance.hasVacancy,
 };
 
@@ -62,6 +64,7 @@ const _$GenderOrientationEnumMap = {
 const _$PropertyStatusEnumMap = {
   PropertyStatus.pending: 'pending',
   PropertyStatus.verified: 'verified',
+  PropertyStatus.rejected: 'rejected',
   PropertyStatus.deleted: 'deleted',
 };
 

@@ -5,6 +5,8 @@ import 'owner_dashboard.dart';
 import '../property/create_property_screen.dart';
 import '../property/property_list_screen.dart';
 import '../profile/profile_screen.dart';
+import '../admin/admin_dashboard.dart';
+import '../../widgets/common/secret_interaction_wrapper.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -29,9 +31,19 @@ class OwnerHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'My Properties',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: SecretInteractionWrapper(
+          onTrigger: () {
+            if (context.read<AuthProvider>().isAdmin) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AdminDashboard()),
+              );
+            }
+          },
+          child: const Text(
+            'My Properties',
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
         ),
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF1D1B16),
@@ -73,9 +85,19 @@ class StudentHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Find Your Home',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: SecretInteractionWrapper(
+          onTrigger: () {
+            if (context.read<AuthProvider>().isAdmin) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AdminDashboard()),
+              );
+            }
+          },
+          child: const Text(
+            'Find Your Home',
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
         ),
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF1D1B16),

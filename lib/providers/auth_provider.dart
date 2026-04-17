@@ -32,6 +32,7 @@ class AuthProvider extends ChangeNotifier {
   bool get isAuthenticated => _status == AuthStatus.authenticated;
   bool get isStudent => _user?.role == UserRole.student;
   bool get isOwner => _user?.role == UserRole.owner;
+  bool get isAdmin => _user?.role == UserRole.admin;
 
   /// Initialize auth state listener
   Future<void> initialize() async {
