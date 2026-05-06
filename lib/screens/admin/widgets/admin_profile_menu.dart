@@ -23,8 +23,8 @@ class AdminProfileMenu extends StatelessWidget {
         radius: 16,
         backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         child: Text(
-          user?.displayName != null && user!.displayName.isNotEmpty
-              ? user.displayName[0].toUpperCase()
+          (user?.displayName.isNotEmpty ?? false)
+              ? user!.displayName[0].toUpperCase()
               : 'A',
           style: TextStyle(
             fontSize: 14,

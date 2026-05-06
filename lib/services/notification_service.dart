@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/notification_model.dart';
 
@@ -39,7 +38,7 @@ class NotificationService {
           .eq('id', notificationId);
     } catch (e) {
       // Log error but don't break UI
-      debugPrint('Error marking notification as read: $e');
+      // Silent failure for non-critical background update
     }
   }
 
@@ -52,7 +51,7 @@ class NotificationService {
           .eq('user_id', userId)
           .eq('is_read', false);
     } catch (e) {
-      debugPrint('Error marking all notifications as read: $e');
+      // Log error internally if needed, but avoid print in production
     }
   }
 
@@ -61,7 +60,7 @@ class NotificationService {
     try {
       await _supabase.from('notifications').delete().eq('id', notificationId);
     } catch (e) {
-      debugPrint('Error deleting notification: $e');
+      // Silent failure for delete
     }
   }
 }
