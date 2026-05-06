@@ -34,6 +34,9 @@ class BookingProvider extends ChangeNotifier {
 
   /// Load student bookings
   void loadStudentBookings(String studentId) {
+    if (_bookings.isEmpty) {
+      _isLoading = true;
+    }
     _errorMessage = null;
     notifyListeners();
 
@@ -56,6 +59,9 @@ class BookingProvider extends ChangeNotifier {
 
   /// Load owner bookings
   void loadOwnerBookings(List<String> propertyIds) {
+    if (_bookings.isEmpty) {
+      _isLoading = true;
+    }
     _errorMessage = null;
     notifyListeners();
 

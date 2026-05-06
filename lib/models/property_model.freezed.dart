@@ -43,6 +43,10 @@ mixin _$PropertyModel {
   String? get rejectionReason => throw _privateConstructorUsedError;
   @JsonKey(name: 'has_vacancy')
   bool get hasVacancy => throw _privateConstructorUsedError;
+  @JsonKey(name: 'average_rating')
+  double get averageRating => throw _privateConstructorUsedError;
+  @JsonKey(name: 'reviews_count')
+  int get reviewsCount => throw _privateConstructorUsedError;
 
   /// Serializes this PropertyModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -77,6 +81,8 @@ abstract class $PropertyModelCopyWith<$Res> {
     String? description,
     @JsonKey(name: 'rejection_reason') String? rejectionReason,
     @JsonKey(name: 'has_vacancy') bool hasVacancy,
+    @JsonKey(name: 'average_rating') double averageRating,
+    @JsonKey(name: 'reviews_count') int reviewsCount,
   });
 
   $PriceRangeCopyWith<$Res> get priceRange;
@@ -112,6 +118,8 @@ class _$PropertyModelCopyWithImpl<$Res, $Val extends PropertyModel>
     Object? description = freezed,
     Object? rejectionReason = freezed,
     Object? hasVacancy = null,
+    Object? averageRating = null,
+    Object? reviewsCount = null,
   }) {
     return _then(
       _value.copyWith(
@@ -175,6 +183,14 @@ class _$PropertyModelCopyWithImpl<$Res, $Val extends PropertyModel>
                 ? _value.hasVacancy
                 : hasVacancy // ignore: cast_nullable_to_non_nullable
                       as bool,
+            averageRating: null == averageRating
+                ? _value.averageRating
+                : averageRating // ignore: cast_nullable_to_non_nullable
+                      as double,
+            reviewsCount: null == reviewsCount
+                ? _value.reviewsCount
+                : reviewsCount // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -216,6 +232,8 @@ abstract class _$$PropertyModelImplCopyWith<$Res>
     String? description,
     @JsonKey(name: 'rejection_reason') String? rejectionReason,
     @JsonKey(name: 'has_vacancy') bool hasVacancy,
+    @JsonKey(name: 'average_rating') double averageRating,
+    @JsonKey(name: 'reviews_count') int reviewsCount,
   });
 
   @override
@@ -251,6 +269,8 @@ class __$$PropertyModelImplCopyWithImpl<$Res>
     Object? description = freezed,
     Object? rejectionReason = freezed,
     Object? hasVacancy = null,
+    Object? averageRating = null,
+    Object? reviewsCount = null,
   }) {
     return _then(
       _$PropertyModelImpl(
@@ -314,6 +334,14 @@ class __$$PropertyModelImplCopyWithImpl<$Res>
             ? _value.hasVacancy
             : hasVacancy // ignore: cast_nullable_to_non_nullable
                   as bool,
+        averageRating: null == averageRating
+            ? _value.averageRating
+            : averageRating // ignore: cast_nullable_to_non_nullable
+                  as double,
+        reviewsCount: null == reviewsCount
+            ? _value.reviewsCount
+            : reviewsCount // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -338,6 +366,8 @@ class _$PropertyModelImpl extends _PropertyModel {
     this.description,
     @JsonKey(name: 'rejection_reason') this.rejectionReason,
     @JsonKey(name: 'has_vacancy') this.hasVacancy = true,
+    @JsonKey(name: 'average_rating') this.averageRating = 0.0,
+    @JsonKey(name: 'reviews_count') this.reviewsCount = 0,
   }) : _amenities = amenities,
        _images = images,
        super._();
@@ -397,10 +427,16 @@ class _$PropertyModelImpl extends _PropertyModel {
   @override
   @JsonKey(name: 'has_vacancy')
   final bool hasVacancy;
+  @override
+  @JsonKey(name: 'average_rating')
+  final double averageRating;
+  @override
+  @JsonKey(name: 'reviews_count')
+  final int reviewsCount;
 
   @override
   String toString() {
-    return 'PropertyModel(propertyId: $propertyId, ownerId: $ownerId, name: $name, address: $address, lat: $lat, lng: $lng, genderOrientation: $genderOrientation, amenities: $amenities, priceRange: $priceRange, status: $status, lastUpdated: $lastUpdated, images: $images, description: $description, rejectionReason: $rejectionReason, hasVacancy: $hasVacancy)';
+    return 'PropertyModel(propertyId: $propertyId, ownerId: $ownerId, name: $name, address: $address, lat: $lat, lng: $lng, genderOrientation: $genderOrientation, amenities: $amenities, priceRange: $priceRange, status: $status, lastUpdated: $lastUpdated, images: $images, description: $description, rejectionReason: $rejectionReason, hasVacancy: $hasVacancy, averageRating: $averageRating, reviewsCount: $reviewsCount)';
   }
 
   @override
@@ -432,7 +468,11 @@ class _$PropertyModelImpl extends _PropertyModel {
             (identical(other.rejectionReason, rejectionReason) ||
                 other.rejectionReason == rejectionReason) &&
             (identical(other.hasVacancy, hasVacancy) ||
-                other.hasVacancy == hasVacancy));
+                other.hasVacancy == hasVacancy) &&
+            (identical(other.averageRating, averageRating) ||
+                other.averageRating == averageRating) &&
+            (identical(other.reviewsCount, reviewsCount) ||
+                other.reviewsCount == reviewsCount));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -454,6 +494,8 @@ class _$PropertyModelImpl extends _PropertyModel {
     description,
     rejectionReason,
     hasVacancy,
+    averageRating,
+    reviewsCount,
   );
 
   /// Create a copy of PropertyModel
@@ -488,6 +530,8 @@ abstract class _PropertyModel extends PropertyModel {
     final String? description,
     @JsonKey(name: 'rejection_reason') final String? rejectionReason,
     @JsonKey(name: 'has_vacancy') final bool hasVacancy,
+    @JsonKey(name: 'average_rating') final double averageRating,
+    @JsonKey(name: 'reviews_count') final int reviewsCount,
   }) = _$PropertyModelImpl;
   const _PropertyModel._() : super._();
 
@@ -531,6 +575,12 @@ abstract class _PropertyModel extends PropertyModel {
   @override
   @JsonKey(name: 'has_vacancy')
   bool get hasVacancy;
+  @override
+  @JsonKey(name: 'average_rating')
+  double get averageRating;
+  @override
+  @JsonKey(name: 'reviews_count')
+  int get reviewsCount;
 
   /// Create a copy of PropertyModel
   /// with the given fields replaced by the non-null parameter values.

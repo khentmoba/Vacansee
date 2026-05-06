@@ -47,6 +47,8 @@ class PropertyModel with _$PropertyModel {
     String? description,
     @JsonKey(name: 'rejection_reason') String? rejectionReason,
     @JsonKey(name: 'has_vacancy') @Default(true) bool hasVacancy,
+    @JsonKey(name: 'average_rating') @Default(0.0) double averageRating,
+    @JsonKey(name: 'reviews_count') @Default(0) int reviewsCount,
   }) = _PropertyModel;
 
   factory PropertyModel.fromJson(Map<String, dynamic> json) =>

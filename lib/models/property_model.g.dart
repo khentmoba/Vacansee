@@ -33,6 +33,8 @@ _$PropertyModelImpl _$$PropertyModelImplFromJson(
   description: json['description'] as String?,
   rejectionReason: json['rejection_reason'] as String?,
   hasVacancy: json['has_vacancy'] as bool? ?? true,
+  averageRating: (json['average_rating'] as num?)?.toDouble() ?? 0.0,
+  reviewsCount: (json['reviews_count'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$$PropertyModelImplToJson(
@@ -53,6 +55,8 @@ Map<String, dynamic> _$$PropertyModelImplToJson(
   'description': instance.description,
   'rejection_reason': instance.rejectionReason,
   'has_vacancy': instance.hasVacancy,
+  'average_rating': instance.averageRating,
+  'reviews_count': instance.reviewsCount,
 };
 
 const _$GenderOrientationEnumMap = {

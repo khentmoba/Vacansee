@@ -20,6 +20,7 @@ class PropertyProvider extends ChangeNotifier {
   List<PropertyModel> _properties = [];
   PropertyModel? _selectedProperty;
   List<RoomModel> _rooms = [];
+  final Map<String, List<RoomModel>> _propertyRoomsMap = {}; // Cache rooms per property
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -52,6 +53,23 @@ class PropertyProvider extends ChangeNotifier {
   Map<String, bool> get propertyVacancyMap => _propertyVacancyMap;
   Map<String, DateTime> get lastVacancyUpdate => _lastVacancyUpdate;
 
+  // Stats getters
+  int get totalOccupiedRooms {
+    int count = 0;
+    for (final rooms in _propertyRoomsMap.values) {
+      count += rooms.where((r) => r.status == RoomStatus.occupied).length;
+    }
+    return count;
+  }
+
+  int get totalAvailableRooms {
+    int count = 0;
+    for (final rooms in _propertyRoomsMap.values) {
+      count += rooms.where((r) => r.hasVacancy).length;
+    }
+    return count;
+  }
+
   /// Clear error message
   void clearError() {
     _errorMessage = null;
@@ -73,6 +91,18 @@ class PropertyProvider extends ChangeNotifier {
   /// Set price range
   void setPriceRange(int? min, int? max) {
     _minPrice = min;
+    _maxPrice = max;
+    notifyListeners();
+  }
+
+  /// Set min price
+  void setMinPrice(int? min) {
+    _minPrice = min;
+    notifyListeners();
+  }
+
+  /// Set max price
+  void setMaxPrice(int? max) {
     _maxPrice = max;
     notifyListeners();
   }
@@ -237,8 +267,26 @@ class PropertyProvider extends ChangeNotifier {
       _properties = initialProperties;
       _isLoading = false;
       notifyListeners();
+
+      // Load rooms for all properties to calculate occupancy stats
+      for (final property in initialProperties) {
+        _loadPropertyRoomsQuietly(property.propertyId);
+      }
     } catch (e) {
       debugPrint('Error loading initial properties: $e');
+    }
+  }
+
+  /// Load rooms for a property without showing full loading state
+  Future<void> _loadPropertyRoomsQuietly(String propertyId) async {
+    try {
+      // Use getRooms but we only need one snapshot for stats
+      final stream = _propertyService.getRooms(propertyId);
+      final rooms = await stream.first;
+      _propertyRoomsMap[propertyId] = rooms;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading rooms for property $propertyId: $e');
     }
   }
 
@@ -580,6 +628,37 @@ class PropertyProvider extends ChangeNotifier {
       _rooms = [];
     }
     notifyListeners();
+  }
+
+  /// Submit a rating for a property
+  Future<bool> submitRating({
+    required String bookingId,
+    required String propertyId,
+    required String studentId,
+    required int rating,
+    String? review,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _propertyService.submitRating(
+        bookingId: bookingId,
+        propertyId: propertyId,
+        studentId: studentId,
+        rating: rating,
+        review: review,
+      );
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to submit rating: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
   }
 }
 

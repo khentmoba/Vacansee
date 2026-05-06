@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import '../../models/booking_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/booking_service.dart';
+import '../../widgets/ratings/rate_property_dialog.dart';
+import '../notifications/notifications_screen.dart';
+import '../../widgets/notifications/notification_badge.dart';
 
 class MyBookingsScreen extends StatelessWidget {
   const MyBookingsScreen({super.key});
@@ -28,6 +31,22 @@ class MyBookingsScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF1D1B16),
         elevation: 0,
+        actions: [
+          NotificationBadge(
+            child: IconButton(
+              icon: const Icon(Icons.notifications_none_rounded),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const NotificationsScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: StreamBuilder<List<BookingModel>>(
         stream: bookingService.getStudentBookings(student.uid),
@@ -139,8 +158,8 @@ class _BookingListItem extends StatelessWidget {
                   fontSize: 12,
                 ),
               ),
+              ),
             ),
-          ),
           if (booking.status == BookingStatus.pending)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -157,6 +176,27 @@ class _BookingListItem extends StatelessWidget {
                         ),
                       ),
                       child: const Text('Cancel Request'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (booking.status == BookingStatus.approved || booking.status == BookingStatus.completed)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => _showRatingDialog(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF5287B2),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text('Rate Property'),
                     ),
                   ),
                 ],
@@ -237,5 +277,12 @@ class _BookingListItem extends StatelessWidget {
         }
       }
     }
+  }
+
+  void _showRatingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => RatePropertyDialog(booking: booking),
+    );
   }
 }

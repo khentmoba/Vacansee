@@ -7,6 +7,14 @@ CREATE EXTENSION IF NOT EXISTS pg_cron;
 -- 2. Schedule the hourly cleanup job
 -- This job runs at the start of every hour (minute 0)
 -- It updates all 'pending' bookings to 'expired' if their expiration date has passed
+DO $$
+BEGIN
+    PERFORM cron.unschedule('expire-bookings-hourly');
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
+END $$;
+
 SELECT cron.schedule(
   'expire-bookings-hourly',
   '0 * * * *',

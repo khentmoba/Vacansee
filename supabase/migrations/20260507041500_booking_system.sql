@@ -14,10 +14,12 @@ CREATE TABLE IF NOT EXISTS public.notifications (
 -- Enable RLS for notifications
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own notifications" ON public.notifications;
 CREATE POLICY "Users can view their own notifications"
 ON public.notifications FOR SELECT
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "System can insert notifications" ON public.notifications;
 CREATE POLICY "System can insert notifications"
 ON public.notifications FOR INSERT
 WITH CHECK (true); -- Usually restricted to service role or specific triggers
@@ -57,6 +59,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS on_booking_status_change ON public.bookings;
 CREATE TRIGGER on_booking_status_change
     AFTER UPDATE ON public.bookings
     FOR EACH ROW
@@ -79,6 +82,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS on_booking_created ON public.bookings;
 CREATE TRIGGER on_booking_created
     AFTER INSERT ON public.bookings
     FOR EACH ROW

@@ -326,4 +326,25 @@ class PropertyService {
         .order('last_updated', ascending: false)
         .map((data) => data.map((doc) => PropertyModel.fromJson(doc)).toList());
   }
+
+  /// Submit a rating for a property
+  Future<void> submitRating({
+    required String bookingId,
+    required String propertyId,
+    required String studentId,
+    required int rating,
+    String? review,
+  }) async {
+    try {
+      await _supabase.from('ratings').insert({
+        'booking_id': bookingId,
+        'property_id': propertyId,
+        'student_id': studentId,
+        'rating': rating,
+        'review': review,
+      });
+    } catch (e) {
+      throw PropertyException('Failed to submit rating: $e');
+    }
+  }
 }

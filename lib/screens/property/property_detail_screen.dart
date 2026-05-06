@@ -234,6 +234,35 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                         ),
                       ],
                     ),
+                    if (widget.property.reviewsCount > 0) ...[
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.star_rounded,
+                            color: Color(0xFFFFB800),
+                            size: 24,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            widget.property.averageRating.toStringAsFixed(1),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1D1B16),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '(${widget.property.reviewsCount} reviews)',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 32),
 
                     // Real-time vacancy card

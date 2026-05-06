@@ -4,8 +4,6 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../booking/my_bookings_screen.dart';
 import '../property/property_list_screen.dart';
-import '../notifications/notifications_screen.dart';
-import '../../widgets/notifications/notification_badge.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -20,43 +18,71 @@ class _StudentDashboardState extends State<StudentDashboard> {
   final List<Widget> _screens = [
     const _HomeTab(),
     const _MyBookingsTab(),
+    const Center(child: Text('Ratings Screen (Coming Soon)')),
     const _ProfileTab(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      backgroundColor: const Color(0xFFF8FBFD),
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1D1B16).withValues(alpha: 0.95),
-              borderRadius: BorderRadius.circular(32),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildNavItem(Icons.home_rounded, 'Home', 0),
-                _buildNavItem(Icons.calendar_today_rounded, 'Bookings', 1),
-                _buildNavItem(Icons.person_rounded, 'Profile', 2),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth >= 800;
+
+        return Scaffold(
+          extendBody: !isDesktop,
+          backgroundColor: const Color(0xFFF8FBFD),
+          appBar: isDesktop
+              ? PreferredSize(
+                  preferredSize: const Size.fromHeight(80),
+                  child: _TopNavBar(
+                    selectedIndex: _selectedIndex,
+                    onItemSelected: (index) =>
+                        setState(() => _selectedIndex = index),
+                  ),
+                )
+              : null,
+          body: _screens[_selectedIndex],
+          bottomNavigationBar: !isDesktop
+              ? SafeArea(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.only(left: 24, right: 24, bottom: 24),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1D1B16).withValues(alpha: 0.95),
+                        borderRadius: BorderRadius.circular(32),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildNavItem(Icons.home_rounded, 'Home', 0),
+                          _buildNavItem(
+                            Icons.calendar_today_rounded,
+                            'Bookings',
+                            1,
+                          ),
+                          _buildNavItem(Icons.star_rounded, 'Ratings', 2),
+                          _buildNavItem(Icons.person_rounded, 'Profile', 3),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              : null,
+        );
+      },
     );
   }
 
@@ -67,6 +93,122 @@ class _StudentDashboardState extends State<StudentDashboard> {
       label: label,
       isSelected: isSelected,
       onTap: () => setState(() => _selectedIndex = index),
+    );
+  }
+}
+
+class _TopNavBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onItemSelected;
+
+  const _TopNavBar({required this.selectedIndex, required this.onItemSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+
+    return Container(
+      height: 80,
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Logo
+          Row(
+            children: [
+              const Text(
+                'VacanSee',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1D1B16),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 1,
+                height: 24,
+                color: Colors.grey[300],
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Tenant Dashboard',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          // Nav Items
+          _buildTopNavItem('Home', 0),
+          _buildTopNavItem('My Bookings', 1),
+          _buildTopNavItem('Ratings', 2),
+          _buildTopNavItem('Profile', 3),
+          const SizedBox(width: 24),
+          // Logout Button
+          ElevatedButton.icon(
+            onPressed: () => authProvider.signOut(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF5287B2),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              elevation: 0,
+            ),
+            icon: const Icon(Icons.logout_rounded, size: 18),
+            label: const Text(
+              'Logout',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopNavItem(String label, int index) {
+    final isSelected = selectedIndex == index;
+    return InkWell(
+      onTap: () => onItemSelected(index),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        height: 80,
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? const Color(0xFF1D1B16) : Colors.grey[600],
+              ),
+            ),
+            if (isSelected)
+              Container(
+                margin: const EdgeInsets.only(top: 4),
+                height: 2,
+                width: 20,
+                color: const Color(0xFF5287B2),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -179,32 +321,13 @@ class _HomeTab extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Hello, $userName 👋',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF5287B2),
-                          ),
-                        ),
-                        NotificationBadge(
-                          child: IconButton(
-                            icon: const Icon(Icons.notifications_none_rounded),
-                            color: const Color(0xFF5287B2),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const NotificationsScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
+                    Text(
+                      'Hello, $userName 👋',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF5287B2),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     const Text(

@@ -6,9 +6,11 @@ const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 serve(async (req) => {
   try {
     const payload = await req.json()
+    console.log("Received notification payload:", JSON.stringify(payload))
     const { record } = payload
 
     if (!record || !record.user_id) {
+      console.error("Invalid payload structure. Missing record or user_id.")
       throw new Error("Invalid notification record")
     }
     
@@ -26,9 +28,11 @@ serve(async (req) => {
       .single()
 
     if (userError || !user) {
-      console.error(`Error fetching user: ${userError?.message}`)
+      console.error(`Error fetching user for ID ${record.user_id}: ${userError?.message}`)
       return new Response(JSON.stringify({ error: "User not found" }), { status: 404 })
     }
+
+    console.log(`Sending email to: ${user.email} (${user.display_name}) for notification: ${record.title}`)
 
     // 3. Send Email via Resend
     // Note: 'from' address must be verified in Resend. 'onboarding@resend.dev' works for testing.
@@ -71,7 +75,8 @@ serve(async (req) => {
     const result = await res.json()
     
     if (!res.ok) {
-      throw new Error(`Resend API Error: ${JSON.stringify(result)}`)
+      console.error(`Resend API Error details: ${JSON.stringify(result)}`)
+      throw new Error(`Resend API Error: ${res.status} - ${JSON.stringify(result)}`)
     }
 
     return new Response(JSON.stringify({ success: true, message_id: result.id }), { 

@@ -13,24 +13,38 @@ class OwnerBookingsScreen extends StatefulWidget {
 }
 
 class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
+  List<String>? _lastPropertyIds;
+
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authProvider = context.read<AuthProvider>();
-      final propertyProvider = context.read<PropertyProvider>();
-      final bookingProvider = context.read<BookingProvider>();
-      
-      if (authProvider.user != null) {
-        propertyProvider.loadOwnerProperties(authProvider.user!.uid).then((_) {
-          if (!mounted) return;
-          final ids = propertyProvider.properties.map((p) => p.propertyId).toList();
-          if (ids.isNotEmpty) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final authProvider = context.read<AuthProvider>();
+    final propertyProvider = context.watch<PropertyProvider>();
+    final bookingProvider = context.read<BookingProvider>();
+
+    if (authProvider.user != null) {
+      final ids = propertyProvider.properties
+          .where((p) => p.ownerId == authProvider.user!.uid)
+          .map((p) => p.propertyId)
+          .toList();
+
+      if (ids.isNotEmpty) {
+        // Only load if the IDs have changed
+        final idsChanged = _lastPropertyIds == null ||
+            _lastPropertyIds!.length != ids.length ||
+            !ids.every((id) => _lastPropertyIds!.contains(id));
+
+        if (idsChanged) {
+          _lastPropertyIds = ids;
+          // loadOwnerBookings cancels old sub, so it's safe to call.
+          // We also load the pending count for the dashboard badge.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             bookingProvider.loadOwnerBookings(ids);
-          }
-        });
+            bookingProvider.loadPendingCount(ids);
+          });
+        }
       }
-    });
+    }
   }
 
   @override
@@ -49,20 +63,40 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
         foregroundColor: const Color(0xFF1D1B16),
         elevation: 0,
       ),
-      body: bookingProvider.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : bookings.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.inbox_outlined, size: 64, color: Colors.grey[400]),
-                      const SizedBox(height: 16),
-                      const Text('No booking requests found'),
-                    ],
+      body: bookingProvider.errorMessage != null
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(bookingProvider.errorMessage!),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _lastPropertyIds = null;
+                      });
+                    },
+                    child: const Text('Retry'),
                   ),
-                )
-              : ListView.builder(
+                ],
+              ),
+            )
+          : bookingProvider.isLoading && bookings.isEmpty
+              ? const Center(child: CircularProgressIndicator())
+              : bookings.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.inbox_outlined, size: 64, color: Colors.grey[400]),
+                          const SizedBox(height: 16),
+                          const Text('No booking requests found'),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: bookings.length,
                   itemBuilder: (context, index) {

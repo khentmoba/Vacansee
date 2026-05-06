@@ -4,10 +4,9 @@ import '../../models/property_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/booking_provider.dart';
 import '../../providers/property_provider.dart';
-import '../booking/owner_bookings_screen.dart';
+import '../owner/owner_bookings_screen.dart';
 import '../owner/edit_property_screen.dart';
 import '../property/create_property_screen.dart';
-import '../../widgets/common/confirmation_dialog.dart';
 import '../notifications/notifications_screen.dart';
 import '../../widgets/notifications/notification_badge.dart';
 
@@ -47,107 +46,77 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     final properties = propertyProvider.properties;
     final pendingCount = bookingProvider.pendingCount;
 
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text('Owner Dashboard'),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF1D1B16),
-        elevation: 0,
-        actions: [
-          NotificationBadge(
-            child: IconButton(
-              icon: const Icon(Icons.notifications_none_rounded),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const NotificationsScreen(),
-                  ),
-                );
-              },
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => authProvider.signOut(),
-          ),
-        ],
-      ),
-      body: propertyProvider.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : properties.isEmpty
-          ? _buildEmptyState(context)
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  const Text(
-                    'Owner Dashboard',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1D1B16),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth >= 900;
+
+        return Scaffold(
+          backgroundColor: const Color(0xFFF8FBFD),
+          appBar: isDesktop
+              ? PreferredSize(
+                  preferredSize: const Size.fromHeight(80),
+                  child: _OwnerTopNavBar(),
+                )
+              : AppBar(
+                  title: const Text('Owner Dashboard'),
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF1D1B16),
+                  elevation: 0,
+                  actions: [
+                    NotificationBadge(
+                      child: IconButton(
+                        icon: const Icon(Icons.notifications_none_rounded),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const NotificationsScreen(),
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Text(
-                        'Manage your boarding house listings and booking requests',
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                      ),
-                      const SizedBox(width: 8),
-                      // Verification Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: (authProvider.user?.isVerified ?? false)
-                              ? const Color(0xFF10B981).withValues(alpha: 0.1)
-                              : Colors.orange.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: (authProvider.user?.isVerified ?? false)
-                                ? const Color(0xFF10B981).withValues(alpha: 0.2)
-                                : Colors.orange.withValues(alpha: 0.2),
+                    IconButton(
+                      icon: const Icon(Icons.logout),
+                      onPressed: () => authProvider.signOut(),
+                    ),
+                  ],
+                ),
+          body: propertyProvider.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : properties.isEmpty
+                  ? _buildEmptyState(context)
+                  : SingleChildScrollView(
+                      child: Center(
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 1200),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isDesktop ? 40 : 20,
+                            vertical: 32,
                           ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              (authProvider.user?.isVerified ?? false)
-                                  ? Icons.verified_rounded
-                                  : Icons.pending_actions_rounded,
-                              size: 14,
-                              color: (authProvider.user?.isVerified ?? false)
-                                  ? const Color(0xFF10B981)
-                                  : Colors.orange,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              (authProvider.user?.isVerified ?? false)
-                                  ? 'Verified Owner'
-                                  : 'Verification Pending',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: (authProvider.user?.isVerified ?? false)
-                                    ? const Color(0xFF10B981)
-                                    : Colors.orange,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Header Section
+                              const Text(
+                                'Owner Dashboard',
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1D1B16),
+                                  letterSpacing: -0.5,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Manage your boarding house listings and booking requests',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              const SizedBox(height: 32),
                   // Owner Verification Alert Banner
                   if (!(authProvider.user?.isVerified ?? false))
                     Container(
@@ -198,7 +167,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   Row(
                     children: [
                       _buildStatCard(
-                        Icons.home_outlined,
+                        Icons.home_rounded,
                         properties
                             .where((p) => p.status != PropertyStatus.deleted)
                             .length
@@ -206,44 +175,44 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                         'Total Listings',
                         const Color(0xFF3B82F6),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 20),
                       _buildStatCard(
-                        Icons.bed_outlined,
-                        properties
-                            .fold<int>(
-                              0,
-                              (sum, p) => sum + (p.hasVacancy ? 1 : 0),
-                            )
-                            .toString(),
+                        Icons.check_circle_rounded,
+                        propertyProvider.totalOccupiedRooms.toString(),
+                        'Occupied Rooms',
+                        const Color(0xFF10B981),
+                      ),
+                      const SizedBox(width: 20),
+                      _buildStatCard(
+                        Icons.home_outlined,
+                        propertyProvider.totalAvailableRooms.toString(),
                         'Available Rooms',
                         const Color(0xFF8B5CF6),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 20),
                       _buildStatCard(
-                        Icons.calendar_today_outlined,
+                        Icons.calendar_today_rounded,
                         pendingCount.toString(),
                         'Pending Requests',
                         const Color(0xFFF59E0B),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 32),
                   // Pending Requests Banner
                   if (pendingCount > 0)
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFEF3C7),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFFCD34D)),
+                        color: const Color(0xFFFFFBEB),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFFFEF3C7),
+                          width: 1.5,
+                        ),
                       ),
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.notifications_active_outlined,
-                            color: const Color(0xFFD97706),
-                          ),
-                          const SizedBox(width: 12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,17 +220,18 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                                 Text(
                                   'You have $pendingCount pending booking request${pendingCount > 1 ? 's' : ''}',
                                   style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                     color: Color(0xFF92400E),
                                   ),
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 4),
                                 Text(
                                   'Review and respond to booking requests to keep your tenants updated',
                                   style: TextStyle(
-                                    fontSize: 12,
-                                    color: const Color(0xFFA16207),
+                                    fontSize: 14,
+                                    color: const Color(0xFFB45309),
+                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ],
@@ -279,17 +249,27 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFD97706),
                               foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 18,
+                              ),
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text('Review Now'),
+                            child: const Text(
+                              'Review Now',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 40),
                   // My Boarding Houses Header
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -317,18 +297,26 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF5287B2),
                           foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
                           disabledBackgroundColor:
                               const Color(0xFF5287B2).withValues(alpha: 0.4),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        icon: const Icon(Icons.add, size: 18),
+                        icon: const Icon(Icons.add, size: 20),
                         label: Text(
                           (authProvider.user?.isVerified ?? false)
                               ? 'Add New Listing'
                               : 'Verification Required',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                     ],
@@ -338,13 +326,12 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 0.75,
-                        ),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: isDesktop ? 3 : 2,
+                      crossAxisSpacing: 24,
+                      mainAxisSpacing: 24,
+                      childAspectRatio: isDesktop ? 0.9 : 0.75,
+                    ),
                     itemCount: properties.length,
                     itemBuilder: (context, index) {
                       final property = properties[index];
@@ -354,8 +341,12 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 ],
               ),
             ),
-    );
-  }
+          ),
+        ),
+      );
+    },
+  );
+}
 
   Widget _buildStatCard(
     IconData icon,
@@ -365,15 +356,15 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
   ) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -381,26 +372,31 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                color: color.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: color, size: 20),
+              child: Icon(icon, color: color, size: 24),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
             Text(
               value,
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 32,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF1D1B16),
+                letterSpacing: -1,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               label,
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -412,12 +408,12 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -430,7 +426,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
+                    top: Radius.circular(20),
                   ),
                   child: property.coverImageUrl != null
                       ? Image.network(
@@ -440,19 +436,20 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                           height: double.infinity,
                         )
                       : Container(
-                          color: Colors.grey[200],
+                          color: Colors.grey[100],
                           child: Center(
                             child: Icon(
-                              Icons.home_work,
-                              size: 40,
-                              color: Colors.grey[400],
+                              Icons.home_work_rounded,
+                              size: 48,
+                              color: Colors.grey[300],
                             ),
                           ),
                         ),
                 ),
+                // Edit Button Overlay
                 Positioned(
-                  top: 8,
-                  left: 8,
+                  top: 12,
+                  left: 12,
                   child: GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -465,254 +462,92 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
+                        horizontal: 16,
+                        vertical: 8,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 4,
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.edit_outlined,
-                            size: 14,
-                            color: Color(0xFF1D1B16),
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            'Edit',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1D1B16),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // Delete Button
-                Positioned(
-                  top: 8,
-                  left: 70, // Positioned next to Edit
-                  child: GestureDetector(
-                    onTap: () async {
-                      final provider = context.read<PropertyProvider>();
-                      final hasBookings =
-                          await provider.hasActiveBookings(property.propertyId);
-
-                      if (!mounted) return;
-
-                      showDialog(
-                        context: context,
-                        builder: (ctx) => ConfirmationDialog(
-                          title: 'Delete Listing',
-                          content: hasBookings
-                              ? 'WARNING: This property has active or pending bookings. Deleting it will hide it from new students, but existing bookings will remain in the system. Are you sure you want to proceed?'
-                              : 'Are you sure you want to delete "${property.name}"? This listing will no longer be visible to students.',
-                          onConfirm: () async {
-                            final success = await provider.deleteProperty(
-                              property.propertyId,
-                            );
-
-                            if (mounted && success) {
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Text('Listing deleted'),
-                                  duration: const Duration(seconds: 5),
-                                  action: SnackBarAction(
-                                    label: 'UNDO',
-                                    onPressed: () {
-                                      provider.restoreProperty(
-                                        property.propertyId,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              );
-                            } else if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    provider.errorMessage ?? 'Deletion failed',
-                                  ),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          },
+                      child: const Text(
+                        'Edit',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1D1B16),
                         ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.delete_outline,
-                        size: 14,
-                        color: Colors.red,
                       ),
                     ),
                   ),
                 ),
-                // Available/Full badge
+                // Available Badge Overlay
                 Positioned(
-                  top: 8,
-                  right: 8,
+                  top: 12,
+                  right: 12,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
+                      horizontal: 16,
+                      vertical: 8,
                     ),
                     decoration: BoxDecoration(
                       color: property.hasVacancy
-                          ? const Color(0xFF22C55E)
+                          ? const Color(0xFF10B981)
                           : const Color(0xFFEF4444),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       property.hasVacancy ? 'Available' : 'Full',
                       style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
                   ),
                 ),
-                // Status Badge (Pending/Verified/Deleted)
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(
-                        property.status,
-                      ).withValues(alpha: 0.9),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _getStatusIcon(property.status),
-                          size: 10,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          property.status.name.toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                // Rejection Reason Banner
-                if (property.status == PropertyStatus.rejected && property.rejectionReason != null)
-                  Container(
-                    margin: const EdgeInsets.only(top: 32, left: 8, right: 8),
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.red[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.red[100]!),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.info_outline, size: 14, color: Colors.red),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Rejection Reason',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red[900],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          property.rejectionReason!,
-                          style: TextStyle(fontSize: 11, color: Colors.red[800]),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Tip: Edit and save to re-submit for verification.',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.red[700],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
               ],
             ),
           ),
-          // Info
+          // Info Section
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   property.name,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1D1B16),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Row(
                   children: [
                     Icon(
-                      Icons.location_on_outlined,
-                      size: 14,
-                      color: Colors.grey[500],
+                      Icons.location_on_rounded,
+                      size: 16,
+                      color: Colors.grey[400],
                     ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         property.address,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w400,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -733,36 +568,44 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 120,
-            height: 120,
+            width: 140,
+            height: 140,
             decoration: BoxDecoration(
-              color: const Color(0xFF5287B2).withValues(alpha: 0.1),
+              color: const Color(0xFF5287B2).withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.home_work_outlined,
-              size: 64,
-              color: const Color(0xFF5287B2).withValues(alpha: 0.5),
+              size: 80,
+              color: const Color(0xFF5287B2).withValues(alpha: 0.4),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           const Text(
             'No Properties Yet',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1D1B16),
+              letterSpacing: -0.5,
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            (context.read<AuthProvider>().user?.isVerified ?? false)
-                ? 'Start by adding your first boarding house listing'
-                : 'Your account is pending verification. Once approved, you can add listings.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              (context.read<AuthProvider>().user?.isVerified ?? false)
+                  ? 'Start by adding your first boarding house listing to manage vacancies'
+                  : 'Your account is pending verification. Once approved, you can add listings.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+                height: 1.5,
+              ),
+            ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 40),
           ElevatedButton.icon(
             onPressed: (context.read<AuthProvider>().user?.isVerified ?? false)
                 ? () {
@@ -777,18 +620,23 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF5287B2),
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
               disabledBackgroundColor:
                   const Color(0xFF5287B2).withValues(alpha: 0.4),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(16),
               ),
             ),
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add_rounded),
             label: Text(
               (context.read<AuthProvider>().user?.isVerified ?? false)
                   ? 'Add Your First Property'
                   : 'Verification Required',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -796,29 +644,118 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     );
   }
 
-  Color _getStatusColor(PropertyStatus status) {
-    switch (status) {
-      case PropertyStatus.verified:
-        return const Color(0xFF10B981);
-      case PropertyStatus.pending:
-        return Colors.orange;
-      case PropertyStatus.rejected:
-        return Colors.red;
-      case PropertyStatus.deleted:
-        return Colors.red[900]!;
-    }
+}
+
+class _OwnerTopNavBar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+
+    return Container(
+      height: 80,
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Logo
+          Row(
+            children: [
+              const Text(
+                'VacanSee',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1D1B16),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 1,
+                height: 24,
+                color: Colors.grey[300],
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Owner Dashboard',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          // Nav Items
+          _buildTopNavItem(context, 'Dashboard', true),
+          _buildTopNavItem(context, 'Booking Requests', false, onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const OwnerBookingsScreen()),
+            );
+          }),
+          _buildTopNavItem(context, 'Profile', false),
+          const SizedBox(width: 24),
+          // Logout Button
+          ElevatedButton.icon(
+            onPressed: () => authProvider.signOut(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF5287B2),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              elevation: 0,
+            ),
+            icon: const Icon(Icons.logout_rounded, size: 18),
+            label: const Text(
+              'Logout',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  IconData _getStatusIcon(PropertyStatus status) {
-    switch (status) {
-      case PropertyStatus.verified:
-        return Icons.verified_rounded;
-      case PropertyStatus.pending:
-        return Icons.pending_actions_rounded;
-      case PropertyStatus.rejected:
-        return Icons.error_outline_rounded;
-      case PropertyStatus.deleted:
-        return Icons.delete_forever_rounded;
-    }
+  Widget _buildTopNavItem(BuildContext context, String label, bool isSelected, {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        height: 80,
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? const Color(0xFF1D1B16) : Colors.grey[600],
+              ),
+            ),
+            if (isSelected)
+              Container(
+                margin: const EdgeInsets.only(top: 4),
+                height: 2,
+                width: 20,
+                color: const Color(0xFF5287B2),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }

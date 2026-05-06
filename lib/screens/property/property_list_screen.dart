@@ -33,98 +33,278 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
     final roomProvider = context.watch<RoomProvider>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Find Boarding Houses'),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF1D1B16),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () => _showFilterSheet(context),
-          ),
-        ],
+      backgroundColor: const Color(0xFFF8FBFD),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isDesktop = constraints.maxWidth >= 800;
+
+          return CustomScrollView(
+            slivers: [
+              // Hero Section
+              SliverToBoxAdapter(
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isDesktop ? 60 : 24,
+                    vertical: isDesktop ? 60 : 32,
+                  ),
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Find Your Perfect Boarding House',
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1D1B16),
+                          height: 1.1,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Discover comfortable and affordable boarding houses in Cagayan de Oro City',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      // Horizontal Filter Bar (Desktop) or Vertical (Mobile)
+                      _buildFilterBar(isDesktop, propertyProvider),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Results Count
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isDesktop ? 60 : 24,
+                    vertical: 24,
+                  ),
+                  child: Text(
+                    '${propertyProvider.properties.length} boarding houses found',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1D1B16),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Property List (Grid)
+              SliverPadding(
+                padding: EdgeInsets.only(
+                  left: isDesktop ? 60 : 24,
+                  right: isDesktop ? 60 : 24,
+                  bottom: 100,
+                ),
+                sliver: propertyProvider.isLoading
+                    ? SliverToBoxAdapter(child: _buildSkeletonLoader())
+                    : propertyProvider.properties.isEmpty
+                    ? SliverToBoxAdapter(child: _buildEmptyState())
+                    : SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: isDesktop ? 3 : (constraints.maxWidth > 600 ? 2 : 1),
+                          crossAxisSpacing: 24,
+                          mainAxisSpacing: 24,
+                          childAspectRatio: 0.82,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final property = propertyProvider.properties[index];
+                            final isLiveVacant = roomProvider.hasVacancyForProperty(
+                              property.propertyId,
+                            );
+
+                            return _PropertyCard(
+                              property: property,
+                              liveVacancy: isLiveVacant,
+                              lastUpdate: 'Live',
+                            );
+                          },
+                          childCount: propertyProvider.properties.length,
+                        ),
+                      ),
+              ),
+            ],
+          );
+        },
       ),
-      body: Column(
+    );
+  }
+
+  Widget _buildFilterBar(bool isDesktop, PropertyProvider provider) {
+    if (isDesktop) {
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            ),
+          ],
+          border: Border.all(color: Colors.grey[100]!),
+        ),
+        child: Row(
+          children: [
+            // Search
+            Expanded(
+              flex: 3,
+              child: _buildFilterField(
+                label: 'Search Location or Name',
+                hint: 'Search boarding houses...',
+                icon: Icons.search,
+                onChanged: (val) {
+                  provider.setSearchQuery(val);
+                  provider.loadProperties();
+                },
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Min Price
+            Expanded(
+              flex: 1,
+              child: _buildFilterField(
+                label: 'Min Price',
+                hint: '0',
+                keyboardType: TextInputType.number,
+                onChanged: (val) {
+                  provider.setMinPrice(int.tryParse(val));
+                  provider.loadProperties();
+                },
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Max Price
+            Expanded(
+              flex: 1,
+              child: _buildFilterField(
+                label: 'Max Price',
+                hint: '10000',
+                keyboardType: TextInputType.number,
+                onChanged: (val) {
+                  provider.setMaxPrice(int.tryParse(val));
+                  provider.loadProperties();
+                },
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Available Only Toggle
+            _buildAvailableOnlyToggle(provider),
+          ],
+        ),
+      );
+    } else {
+      // Mobile vertical filter stack
+      return Column(
         children: [
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              onChanged: (value) {
-                propertyProvider.setSearchQuery(value);
-                propertyProvider.loadProperties();
-              },
-              decoration: InputDecoration(
-                hintText: 'Search by name or location...',
-                prefixIcon: const Icon(Icons.search, color: Color(0xFF5287B2)),
-                filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: Color(0xFF5287B2),
-                    width: 2,
-                  ),
-                ),
+          TextField(
+            onChanged: (val) {
+              provider.setSearchQuery(val);
+              provider.loadProperties();
+            },
+            decoration: InputDecoration(
+              hintText: 'Search boarding houses...',
+              prefixIcon: const Icon(Icons.search),
+              filled: true,
+              fillColor: Colors.grey[100],
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
               ),
             ),
           ),
-
-          // Active filters
-          if (propertyProvider.genderFilter != null ||
-              propertyProvider.minPrice != null ||
-              propertyProvider.selectedAmenities.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      propertyProvider.clearFilters();
-                      propertyProvider.loadProperties();
-                    },
-                    icon: const Icon(Icons.clear, size: 16),
-                    label: const Text('Clear filters'),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => _showFilterSheet(context),
+                  icon: const Icon(Icons.filter_list),
+                  label: const Text('Filters'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFF1D1B16),
+                    elevation: 0,
+                    side: BorderSide(color: Colors.grey[300]!),
                   ),
-                ],
+                ),
               ),
-            ),
-
-          // Property list
-          Expanded(
-            child: propertyProvider.isLoading
-                ? _buildSkeletonLoader()
-                : propertyProvider.properties.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: propertyProvider.properties.length,
-                    itemBuilder: (context, index) {
-                      final property = propertyProvider.properties[index];
-                      // Use the new RoomProvider for 'Live' vacancy data
-                      final isLiveVacant = roomProvider.hasVacancyForProperty(
-                        property.propertyId,
-                      );
-
-                      return _PropertyCard(
-                        property: property,
-                        liveVacancy: isLiveVacant,
-                        // For the summary time, we can still use the property-level last_updated or add more logic
-                        lastUpdate: 'Live',
-                      );
-                    },
-                  ),
+              const SizedBox(width: 12),
+              _buildAvailableOnlyToggle(provider),
+            ],
           ),
         ],
+      );
+    }
+  }
+
+  Widget _buildFilterField({
+    required String label,
+    required String hint,
+    IconData? icon,
+    TextInputType? keyboardType,
+    required Function(String) onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1D1B16),
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          onChanged: onChanged,
+          keyboardType: keyboardType,
+          decoration: InputDecoration(
+            hintText: hint,
+            prefixIcon: icon != null ? Icon(icon, size: 20) : null,
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAvailableOnlyToggle(PropertyProvider provider) {
+    // We'll use a simple filter toggle for availability
+    // Since our provider doesn't have a direct 'showOnlyAvailable' yet, 
+    // we can use a custom state or just mock the button for now
+    return OutlinedButton.icon(
+      onPressed: () {
+        // Toggle logic here if provider supported it
+      },
+      icon: const Icon(Icons.tune_rounded, size: 18),
+      label: const Text('Available Only'),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: const Color(0xFF1D1B16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        side: BorderSide(color: Colors.grey[300]!),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -593,33 +773,31 @@ class _PropertyCardState extends State<_PropertyCard> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOutCubic,
-            margin: EdgeInsets.only(bottom: 24, top: _isHovered ? 0 : 0),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
                   color: _isHovered
-                      ? const Color(0xFF5287B2).withValues(alpha: 0.2)
-                      : Colors.black.withValues(alpha: 0.04),
-                  blurRadius: _isHovered ? 32 : 16,
-                  spreadRadius: _isHovered ? 2 : 0,
-                  offset: Offset(0, _isHovered ? 12 : 4),
+                      ? const Color(0xFF5287B2).withValues(alpha: 0.15)
+                      : Colors.black.withValues(alpha: 0.05),
+                  blurRadius: _isHovered ? 24 : 10,
+                  offset: Offset(0, _isHovered ? 8 : 2),
                 ),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Image with gradient overlay
+                // Image with status badge
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(24),
+                    top: Radius.circular(16),
                   ),
                   child: Stack(
                     children: [
                       Container(
-                        height: 220,
+                        height: 200,
                         width: double.infinity,
                         color: Colors.grey[200],
                         child: widget.property.coverImageUrl != null
@@ -632,206 +810,63 @@ class _PropertyCardState extends State<_PropertyCard> {
                               )
                             : _buildGradientPlaceholder(),
                       ),
-                      // New Listing Badge
-                      if (DateTime.now()
-                              .difference(widget.property.lastUpdated)
-                              .inHours <
-                          1)
-                        Positioned(
-                          top: 16,
-                          left: 16,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF59E0B), // Amber 500
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 4,
-                                ),
-                              ],
-                            ),
-                            child: const Text(
-                              'NEW',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                                letterSpacing: 1,
-                              ),
+                      // Status Pill
+                      Positioned(
+                        top: 12,
+                        right: 12,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: widget.liveVacancy
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFFEF4444),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            widget.liveVacancy ? 'Available' : 'Full',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
-                        ),
-                      // Available/Full badge on image (top right) - LIVE
-                      Positioned(
-                        top: 16,
-                        right: 16,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            // Live indicator
-                            if (widget.lastUpdate != null)
-                              Container(
-                                margin: const EdgeInsets.only(bottom: 6),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.5),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      width: 5,
-                                      height: 5,
-                                      decoration: BoxDecoration(
-                                        color: widget.liveVacancy
-                                            ? const Color(0xFF10B981)
-                                            : const Color(0xFFEF4444),
-                                        shape: BoxShape.circle,
-                                        boxShadow: [
-                                          if (widget.liveVacancy)
-                                            BoxShadow(
-                                              color: const Color(
-                                                0xFF10B981,
-                                              ).withValues(alpha: 0.5),
-                                              blurRadius: 4,
-                                              spreadRadius: 2,
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Live',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white.withValues(
-                                          alpha: 0.9,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            // Vacancy badge
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: widget.liveVacancy
-                                    ? const Color(0xFF10B981)
-                                    : const Color(0xFFEF4444),
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.1),
-                                    blurRadius: 4,
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 6,
-                                    height: 6,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    widget.liveVacancy ? 'Available' : 'Full',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Title and tag row
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              widget.property.name,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF1D1B16),
-                                height: 1.3,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF5287B2,
-                              ).withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              widget.property.genderOrientation.name
-                                  .toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF5287B2),
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        widget.property.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1D1B16),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 8),
-                      // Address with icon
+                      const SizedBox(height: 6),
                       Row(
                         children: [
                           Icon(
                             Icons.location_on_outlined,
-                            size: 16,
+                            size: 14,
                             color: Colors.grey[500],
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               widget.property.address,
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 color: Colors.grey[600],
                               ),
                               maxLines: 1,
@@ -840,58 +875,75 @@ class _PropertyCardState extends State<_PropertyCard> {
                           ),
                         ],
                       ),
+                      if (widget.property.reviewsCount > 0) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              size: 14,
+                              color: Color(0xFFFFB800),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              widget.property.averageRating.toStringAsFixed(1),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '(${widget.property.reviewsCount})',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 16),
-                      const Divider(height: 1),
-                      const SizedBox(height: 16),
-                      // Price and View Details row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Monthly Rate',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[500],
-                                  letterSpacing: 0.5,
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: '₱${widget.property.priceRange.min.toString().replaceAllMapped(RegExp(r"\B(?=(\d{3})+(?!\d))"), (match) => ",")}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF5287B2),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                widget.property.priceRange.formatted,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF5287B2),
+                                TextSpan(
+                                  text: ' /month',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey[500],
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
+                          Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
+                              horizontal: 16,
+                              vertical: 10,
                             ),
                             decoration: BoxDecoration(
-                              color: _isHovered
-                                  ? const Color(0xFF5287B2)
-                                  : const Color(
-                                      0xFF5287B2,
-                                    ).withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
+                              color: const Color(0xFF5287B2),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Text(
+                            child: const Text(
                               'View Details',
                               style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: _isHovered
-                                    ? Colors.white
-                                    : const Color(0xFF5287B2),
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
                           ),

@@ -19,7 +19,10 @@ BEGIN
       url := 'https://hzelyxvecggwormsoesa.supabase.co/functions/v1/send-notification-email',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer ' || COALESCE(current_setting('vault.service_role_key', true), 'placeholder')
+        'Authorization', 'Bearer ' || COALESCE(
+          current_setting('vault.service_role_key', true), 
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6ZWx5eHZlY2dnd29ybXNvZXNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMTk0NzIsImV4cCI6MjA5MTg5NTQ3Mn0.GInyDYoBe3Tu8aJQ0nOmEVS1mmRNIAYSGW_VmClc2o0'
+        )
       ),
       body := jsonb_build_object('record', row_to_json(NEW))
     );
