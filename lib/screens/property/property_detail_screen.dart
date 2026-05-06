@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/property_model.dart';
 import '../../models/room_model.dart';
 import '../../providers/property_provider.dart';
-import '../booking/booking_screen.dart';
+import '../../widgets/booking/booking_dialog.dart';
 
 class PropertyDetailScreen extends StatefulWidget {
   final PropertyModel property;
@@ -55,13 +55,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     final firstVacantRoom = rooms.firstWhere(
                       (r) => r.status == RoomStatus.vacant,
                     );
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => BookingScreen(
-                          property: widget.property,
-                          room: firstVacantRoom,
-                        ),
+                    showDialog(
+                      context: context,
+                      builder: (_) => BookingDialog(
+                        property: widget.property,
+                        room: firstVacantRoom,
                       ),
                     );
                   }
@@ -518,13 +516,11 @@ class _RoomCardState extends State<_RoomCard> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BookingScreen(
-                        property: widget.property,
-                        room: widget.room,
-                      ),
+                  showDialog(
+                    context: context,
+                    builder: (_) => BookingDialog(
+                      property: widget.property,
+                      room: widget.room,
                     ),
                   );
                 },

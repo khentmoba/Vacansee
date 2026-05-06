@@ -11,6 +11,7 @@ class UserModel {
   final DateTime createdAt;
   final DateTime? lastLoginAt;
   final bool isVerified;
+  final String? gender; // Added for gender orientation enforcement
 
   const UserModel({
     required this.uid,
@@ -21,6 +22,7 @@ class UserModel {
     required this.createdAt,
     this.lastLoginAt,
     this.isVerified = false,
+    this.gender,
   });
 
   /// Create UserModel from JSON (Supabase)
@@ -46,6 +48,7 @@ class UserModel {
           ? DateTime.parse(data['last_login_at'] as String)
           : null,
       isVerified: data['is_verified'] as bool? ?? false,
+      gender: data['gender'] as String?,
     );
   }
 
@@ -59,6 +62,7 @@ class UserModel {
       'phone_number': phoneNumber,
       'created_at': createdAt.toIso8601String(),
       'is_verified': isVerified,
+      'gender': gender,
       if (lastLoginAt != null) 'last_login_at': lastLoginAt!.toIso8601String(),
     };
   }
@@ -74,6 +78,7 @@ class UserModel {
     DateTime? createdAt,
     DateTime? lastLoginAt,
     bool? isVerified,
+    String? gender,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -84,6 +89,7 @@ class UserModel {
       createdAt: createdAt ?? this.createdAt,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       isVerified: isVerified ?? this.isVerified,
+      gender: gender ?? this.gender,
     );
   }
 

@@ -27,6 +27,8 @@ class VacanSeeApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PropertyProvider()),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
         ChangeNotifierProvider(create: (_) => RoomProvider()),
+        ChangeNotifierProvider(create: (_) => AdminProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: MaterialApp(
         title: 'VacanSee',
@@ -84,6 +86,10 @@ class AuthWrapper extends StatelessWidget {
       case AuthStatus.uninitialized:
         return const _LoadingScreen();
       case AuthStatus.authenticated:
+        // Initialize notification listener when authenticated
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.read<NotificationProvider>().initialize(authProvider.user!.uid);
+        });
         return const HomeScreen();
       case AuthStatus.needsRole:
         return const RoleSelectionScreen();

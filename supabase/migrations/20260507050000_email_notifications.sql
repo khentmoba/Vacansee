@@ -1,0 +1,37 @@
+-- Email Notifications Webhook Setup
+-- Note: Requires pg_net extension and SUPABASE_SERVICE_ROLE_KEY to be set in DB settings
+
+-- 1. Enable pg_net extension (Standard for Supabase webhooks)
+CREATE EXTENSION IF NOT EXISTS pg_net;
+
+-- 2. Create function to trigger the Edge Function
+CREATE OR REPLACE FUNCTION public.trigger_notification_email()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  -- We use net.http_post to call the Edge Function asynchronously
+  -- The URL should be updated to the production URL if different from the project reference
+  PERFORM
+    net.http_post(
+      url := 'https://hzelyxvecggwormsoesa.supabase.co/functions/v1/send-notification-email',
+      headers := jsonb_build_object(
+        'Content-Type', 'application/json',
+        'Authorization', 'Bearer ' || COALESCE(current_setting('vault.service_role_key', true), 'placeholder')
+      ),
+      body := jsonb_build_object('record', row_to_json(NEW))
+    );
+  RETURN NEW;
+END;
+$$;
+
+-- 3. Create trigger on notifications table
+DROP TRIGGER IF EXISTS on_notification_inserted ON public.notifications;
+CREATE TRIGGER on_notification_inserted
+  AFTER INSERT ON public.notifications
+  FOR EACH ROW
+  EXECUTE FUNCTION public.trigger_notification_email();
+
+COMMENT ON FUNCTION public.trigger_notification_email() IS 'Triggers the send-notification-email Edge Function via pg_net whenever a notification is created.';

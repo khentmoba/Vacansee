@@ -172,55 +172,74 @@ class PropertyProvider extends ChangeNotifier {
   }
 
   /// Load all properties with current filters
-  void loadProperties() {
+  Future<void> loadProperties() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     _propertiesSubscription?.cancel();
-    _propertiesSubscription = _propertyService
-        .getProperties(
-          searchQuery: _searchQuery,
-          genderOrientation: _genderFilter,
-          minPrice: _minPrice,
-          maxPrice: _maxPrice,
-          amenities: _selectedAmenities.isEmpty ? null : _selectedAmenities,
-        )
-        .listen(
-          (properties) {
-            _properties = properties;
-            _isLoading = false;
-            notifyListeners();
-          },
-          onError: (error) {
-            _errorMessage = 'Failed to load properties: $error';
-            _isLoading = false;
-            notifyListeners();
-          },
-        );
+    final stream = _propertyService.getProperties(
+      searchQuery: _searchQuery,
+      genderOrientation: _genderFilter,
+      minPrice: _minPrice,
+      maxPrice: _maxPrice,
+      amenities: _selectedAmenities.isEmpty ? null : _selectedAmenities,
+    );
+    
+    _propertiesSubscription = stream.listen(
+      (properties) {
+        _properties = properties;
+        _isLoading = false;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Failed to load properties: $error';
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
+
+    try {
+      final initialProperties = await stream.first;
+      _properties = initialProperties;
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading initial properties: $e');
+    }
   }
 
   /// Load properties for a specific owner
-  void loadOwnerProperties(String ownerId) {
+  Future<void> loadOwnerProperties(String ownerId) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     _propertiesSubscription?.cancel();
-    _propertiesSubscription = _propertyService
-        .getOwnerProperties(ownerId)
-        .listen(
-          (properties) {
-            _properties = properties;
-            _isLoading = false;
-            notifyListeners();
-          },
-          onError: (error) {
-            _errorMessage = 'Failed to load properties: $error';
-            _isLoading = false;
-            notifyListeners();
-          },
-        );
+    final stream = _propertyService.getOwnerProperties(ownerId);
+    
+    _propertiesSubscription = stream.listen(
+      (properties) {
+        _properties = properties;
+        _isLoading = false;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Failed to load properties: $error';
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
+
+    // Wait for initial data to ensure subsequent calls (like pending count) have property IDs
+    try {
+      final initialProperties = await stream.first;
+      _properties = initialProperties;
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading initial properties: $e');
+    }
   }
 
   /// Get a single property by ID

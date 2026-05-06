@@ -1,369 +1,241 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shimmer/shimmer.dart';
 import '../../models/booking_model.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/booking_provider.dart';
+import '../../services/booking_service.dart';
 
-class MyBookingsScreen extends StatefulWidget {
+class MyBookingsScreen extends StatelessWidget {
   const MyBookingsScreen({super.key});
 
   @override
-  State<MyBookingsScreen> createState() => _MyBookingsScreenState();
-}
-
-class _MyBookingsScreenState extends State<MyBookingsScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authProvider = context.read<AuthProvider>();
-      final bookingProvider = context.read<BookingProvider>();
-      if (authProvider.user != null) {
-        bookingProvider.loadStudentBookings(authProvider.user!.uid);
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final bookingProvider = context.watch<BookingProvider>();
-    final bookings = bookingProvider.bookings;
+    final authProvider = context.watch<AuthProvider>();
+    final student = authProvider.user;
+
+    if (student == null) {
+      return const Scaffold(body: Center(child: Text('Please log in')));
+    }
+
+    final bookingService = BookingService();
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color(0xFFF8FBFD),
       appBar: AppBar(
-        title: const Text('My Bookings'),
+        title: const Text(
+          'My Bookings',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF1D1B16),
         elevation: 0,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'My Bookings',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1D1B16),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Track the status of your booking requests',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                ),
-              ],
-            ),
-          ),
-          // Bookings list
-          Expanded(
-            child: bookingProvider.isLoading
-                ? _buildShimmerLoader()
-                : bookings.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: bookings.length,
-                    itemBuilder: (context, index) {
-                      return _BookingCard(booking: bookings[index]);
-                    },
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
+      body: StreamBuilder<List<BookingModel>>(
+        stream: bookingService.getStudentBookings(student.uid),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: const Color(0xFF5287B2).withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.calendar_today_outlined,
-              size: 64,
-              color: const Color(0xFF5287B2).withValues(alpha: 0.5),
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'No bookings yet',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1D1B16),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Start exploring and book your perfect boarding house',
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-          ),
-        ],
-      ),
-    );
-  }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
 
-  Widget _buildShimmerLoader() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: 3,
-      itemBuilder: (context, index) {
-        return Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            height: 180,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
-      },
+          final bookings = snapshot.data ?? [];
+
+          if (bookings.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.bookmark_border, size: 64, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No bookings yet',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 18),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text('Your requested rooms will appear here'),
+                ],
+              ),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: bookings.length,
+            itemBuilder: (context, index) {
+              final booking = bookings[index];
+              return _BookingListItem(booking: booking);
+            },
+          );
+        },
+      ),
     );
   }
 }
 
-class _BookingCard extends StatefulWidget {
+class _BookingListItem extends StatelessWidget {
   final BookingModel booking;
 
-  const _BookingCard({required this.booking});
-
-  @override
-  State<_BookingCard> createState() => _BookingCardState();
-}
-
-class _BookingCardState extends State<_BookingCard> {
-  bool _isHovered = false;
+  const _BookingListItem({required this.booking});
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: _isHovered ? 0.1 : 0.05),
-              blurRadius: _isHovered ? 16 : 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-          border: Border.all(
-            color: _isHovered
-                ? const Color(0xFF5287B2).withValues(alpha: 0.3)
-                : Colors.transparent,
-            width: 1.5,
-          ),
-        ),
-        transform: Matrix4.identity()
-          ..translateByDouble(0.0, _isHovered ? -4.0 : 0.0, 0.0, 0.0),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title and status row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.booking.propertyName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1D1B16),
-                      ),
-                    ),
-                  ),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(
-                        widget.booking.status,
-                      ).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _getStatusIcon(widget.booking.status),
-                          size: 14,
-                          color: _getStatusColor(widget.booking.status),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          widget.booking.statusLabel,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: _getStatusColor(widget.booking.status),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // Info row
-              Row(
-                children: [
-                  _buildInfoItem(
-                    Icons.calendar_today_outlined,
-                    'Booking Date',
-                    '${widget.booking.requestedAt.day} ${_getMonthName(widget.booking.requestedAt.month)} ${widget.booking.requestedAt.year}',
-                  ),
-                  const SizedBox(width: 32),
-                  _buildInfoItem(
-                    Icons.confirmation_number_outlined,
-                    'Booking ID',
-                    '#${widget.booking.bookingId.substring(0, 6).toUpperCase()}',
-                  ),
-                ],
-              ),
-              // Status message
-              if (widget.booking.status == BookingStatus.pending) ...[
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEBF5FF),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.info_outline,
-                        size: 20,
-                        color: Color(0xFF5287B2),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Your booking request is being reviewed by the owner. You\'ll receive a notification once they respond.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: const Color(0xFF5287B2),
-                            height: 1.5,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoItem(IconData icon, String label, String value) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 16, color: Colors.grey[500]),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1D1B16),
-            ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: const EdgeInsets.all(16),
+            leading: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: booking.statusColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                _getStatusIcon(booking.status),
+                color: booking.statusColor,
+              ),
+            ),
+            title: Text(
+              booking.propertyName,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(booking.roomDescription),
+                const SizedBox(height: 4),
+                Text(
+                  'Requested: ${_formatDate(booking.requestedAt)}',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: booking.statusColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                booking.statusLabel,
+                style: TextStyle(
+                  color: booking.statusColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ),
+          if (booking.status == BookingStatus.pending)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => _cancelBooking(context),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        side: const BorderSide(color: Colors.red),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text('Cancel Request'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (booking.ownerNotes != null && booking.ownerNotes!.isNotEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(16),
+                ),
+              ),
+              child: Text(
+                'Owner Note: ${booking.ownerNotes}',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey[700],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
-  }
-
-  Color _getStatusColor(BookingStatus status) {
-    switch (status) {
-      case BookingStatus.pending:
-        return const Color(0xFFFFA000);
-      case BookingStatus.approved:
-        return const Color(0xFF22C55E);
-      case BookingStatus.rejected:
-        return const Color(0xFFEF4444);
-      case BookingStatus.cancelled:
-        return Colors.grey;
-      case BookingStatus.completed:
-        return const Color(0xFF5287B2);
-    }
   }
 
   IconData _getStatusIcon(BookingStatus status) {
     switch (status) {
       case BookingStatus.pending:
-        return Icons.schedule;
+        return Icons.timer_outlined;
       case BookingStatus.approved:
-        return Icons.check_circle;
+        return Icons.check_circle_outline;
       case BookingStatus.rejected:
-        return Icons.cancel;
+        return Icons.cancel_outlined;
+      case BookingStatus.expired:
+        return Icons.history;
       case BookingStatus.cancelled:
-        return Icons.block;
+        return Icons.block_flipped;
       case BookingStatus.completed:
-        return Icons.done_all;
+        return Icons.home_outlined;
     }
   }
 
-  String _getMonthName(int month) {
-    const months = [
-      '',
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return months[month];
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  Future<void> _cancelBooking(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel Request'),
+        content: const Text('Are you sure you want to cancel this booking request?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Yes, Cancel'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await BookingService().cancelBooking(booking.bookingId);
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to cancel: $e')),
+          );
+        }
+      }
+    }
   }
 }

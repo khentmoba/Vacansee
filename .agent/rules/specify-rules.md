@@ -1,6 +1,6 @@
 ﻿# vacansee Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-04-17
+Auto-generated from all feature plans. Last updated: 2026-05-07
 
 ## Active Technologies
 - Dart 3.10+ / Flutter 3.13+ (Web) + Vercel CLI (v30+), Flutter Action (Subosito) (002-github-vercel-cicd)
@@ -12,6 +12,9 @@ Auto-generated from all feature plans. Last updated: 2026-04-17
 - [if applicable, e.g., PostgreSQL, CoreData, files or N/A] (003-fix-cicd-pipeline)
 - Dart 3.x / Flutter 3.x + `supabase_flutter`, `provider`, `freezed` (007-fix-owner-property-deletion)
 - Supabase (PostgreSQL) - `properties` table needs status/reason updates. (008-stealth-admin-access)
+- Dart 3.x / Flutter 3.x + `provider`, `supabase_flutter`, `freezed`, `json_serializable` (011-admin-signout-stats)
+- Dart 3.x (Flutter 3.x) + `supabase_flutter`, `flutter_riverpod`, `freezed` (013-room-booking-system)
+- Supabase (PostgreSQL) + `pg_cron` extension (013-room-booking-system)
 
 - [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION] (001-owner-property-management)
 
@@ -32,9 +35,9 @@ cd src; pytest; ruff check .
 [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]: Follow standard conventions
 
 ## Recent Changes
-- 010-duplicate-email-error: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
-- 008-stealth-admin-access: Added Dart 3.x / Flutter 3.x + `supabase_flutter`, `provider`, `freezed`
-- 007-fix-owner-property-deletion: Added Dart 3.x / Flutter 3.x + `supabase_flutter`, `provider`, `freezed`
+- 013-room-booking-system: Added Dart 3.x (Flutter 3.x) + `supabase_flutter`, `flutter_riverpod`, `freezed`
+- 013-room-booking-system: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+- 011-admin-signout-stats: Added Dart 3.x / Flutter 3.x + `provider`, `supabase_flutter`, `freezed`, `json_serializable`
 
 
 <!-- MANUAL ADDITIONS START -->

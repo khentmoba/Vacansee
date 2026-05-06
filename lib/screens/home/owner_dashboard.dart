@@ -8,6 +8,8 @@ import '../booking/owner_bookings_screen.dart';
 import '../owner/edit_property_screen.dart';
 import '../property/create_property_screen.dart';
 import '../../widgets/common/confirmation_dialog.dart';
+import '../notifications/notifications_screen.dart';
+import '../../widgets/notifications/notification_badge.dart';
 
 class OwnerDashboard extends StatefulWidget {
   const OwnerDashboard({super.key});
@@ -22,14 +24,17 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = context.read<AuthProvider>();
-      final propertyProvider = context.read<PropertyProvider>();
-      final bookingProvider = context.read<BookingProvider>();
       if (authProvider.user != null) {
-        propertyProvider.loadOwnerProperties(authProvider.user!.uid);
-        final propertyIds = propertyProvider.properties
-            .map((p) => p.propertyId)
-            .toList();
-        bookingProvider.loadPendingCount(propertyIds);
+        context.read<PropertyProvider>().loadOwnerProperties(authProvider.user!.uid).then((_) {
+          if (!mounted) return;
+          final propertyProvider = context.read<PropertyProvider>();
+          final propertyIds = propertyProvider.properties
+              .map((p) => p.propertyId)
+              .toList();
+          if (propertyIds.isNotEmpty) {
+            context.read<BookingProvider>().loadPendingCount(propertyIds);
+          }
+        });
       }
     });
   }
@@ -50,6 +55,19 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
         foregroundColor: const Color(0xFF1D1B16),
         elevation: 0,
         actions: [
+          NotificationBadge(
+            child: IconButton(
+              icon: const Icon(Icons.notifications_none_rounded),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const NotificationsScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => authProvider.signOut(),
