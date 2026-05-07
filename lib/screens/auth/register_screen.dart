@@ -658,7 +658,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
             child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
                       'Continue with',
@@ -668,14 +668,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     Image.network(
-                      'https://developers.google.com/static/identity/images/g-logo.png',
-                      height: 22,
-                      width: 22,
+                      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png',
+                      height: 24,
+                      width: 24,
                       errorBuilder: (context, error, stackTrace) => const Icon(
                         Icons.g_mobiledata,
-                        size: 24,
+                        size: 28,
                         color: Color(0xFF4285F4),
                       ),
                     ),
