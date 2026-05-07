@@ -41,6 +41,9 @@ class PropertyModel with _$PropertyModel {
     required GenderOrientation genderOrientation,
     @Default([]) List<String> amenities,
     @JsonKey(name: 'price_range') required PriceRange priceRange,
+    @JsonKey(name: 'total_rooms') @Default(0) int totalRooms,
+    @JsonKey(name: 'available_rooms') @Default(0) int availableRooms,
+    @JsonKey(name: 'monthly_price') @Default(0) int monthlyPrice,
     @Default(PropertyStatus.pending) PropertyStatus status,
     @JsonKey(name: 'last_updated') required DateTime lastUpdated,
     @Default([]) List<String> images,
@@ -49,6 +52,7 @@ class PropertyModel with _$PropertyModel {
     @JsonKey(name: 'has_vacancy') @Default(true) bool hasVacancy,
     @JsonKey(name: 'average_rating') @Default(0.0) double averageRating,
     @JsonKey(name: 'reviews_count') @Default(0) int reviewsCount,
+    @JsonKey(name: 'owner_name') String? ownerName,
   }) = _PropertyModel;
 
   factory PropertyModel.fromJson(Map<String, dynamic> json) =>

@@ -31,6 +31,8 @@ _$BookingModelImpl _$$BookingModelImplFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['move_in_date'] as String),
       durationMonths: (json['duration_months'] as num?)?.toInt() ?? 1,
+      ownerName: json['owner_name'] as String?,
+      monthlyRate: (json['monthly_rate'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$$BookingModelImplToJson(_$BookingModelImpl instance) =>
@@ -52,6 +54,8 @@ Map<String, dynamic> _$$BookingModelImplToJson(_$BookingModelImpl instance) =>
       'student_notes': instance.studentNotes,
       'move_in_date': instance.moveInDate?.toIso8601String(),
       'duration_months': instance.durationMonths,
+      'owner_name': instance.ownerName,
+      'monthly_rate': instance.monthlyRate,
     };
 
 const _$BookingStatusEnumMap = {

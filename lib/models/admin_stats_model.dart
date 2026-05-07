@@ -10,6 +10,11 @@ class AdminStatsModel with _$AdminStatsModel {
     required int verifiedProperties,
     required int totalOwners,
     required int totalStudents,
+    @Default(0) int totalUsers,
+    @Default(0.0) double occupancyRate,
+    @Default(0) int totalBookings,
+    @Default(0) int activeTenants,
+    @Default(0) int pendingBookings,
     required DateTime lastUpdated,
   }) = _AdminStatsModel;
 

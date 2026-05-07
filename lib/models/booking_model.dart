@@ -44,6 +44,8 @@ class BookingModel with _$BookingModel {
     @JsonKey(name: 'student_notes') String? studentNotes,
     @JsonKey(name: 'move_in_date') DateTime? moveInDate,
     @JsonKey(name: 'duration_months') @Default(1) int durationMonths,
+    @JsonKey(name: 'owner_name') String? ownerName,
+    @JsonKey(name: 'monthly_rate') @Default(0) int monthlyRate,
   }) = _BookingModel;
 
   factory BookingModel.fromJson(Map<String, dynamic> json) =>
@@ -55,11 +57,17 @@ class BookingModel with _$BookingModel {
     // Extract from properties join
     if (json['properties'] != null && json['properties'] is Map) {
       flattened['property_name'] ??= json['properties']['name'];
+      
+      // Handle nested owner join if present
+      if (json['properties']['owner'] != null && json['properties']['owner'] is Map) {
+        flattened['owner_name'] ??= json['properties']['owner']['display_name'];
+      }
     }
 
     // Extract from rooms join
     if (json['rooms'] != null && json['rooms'] is Map) {
       flattened['room_description'] ??= json['rooms']['description'];
+      flattened['monthly_rate'] ??= json['rooms']['monthly_rate'];
     }
 
     // Extract from users join (student profile)

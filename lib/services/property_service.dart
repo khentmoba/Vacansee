@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/property_model.dart';
 import '../models/room_model.dart';
+import '../models/rating_model.dart';
 
 import 'storage_service.dart';
 
@@ -55,6 +56,8 @@ class PropertyService {
       final json = property.toJson();
       json.remove('id'); // Explicitly remove for insert
       json.remove('has_vacancy'); // UI-only field not in DB schema
+      json.remove('average_rating');
+      json.remove('reviews_count');
 
       final response = await _supabase
           .from('properties')
@@ -81,6 +84,43 @@ class PropertyService {
       return PropertyModel.fromJson(data);
     } catch (e) {
       throw PropertyException('Failed to fetch property: $e');
+    }
+  }
+
+  /// Get all properties with owner names (for admin)
+  Future<List<PropertyModel>> getPropertiesWithOwners({
+    String? searchQuery,
+    GenderOrientation? genderOrientation,
+  }) async {
+    try {
+      var query = _supabase
+          .from('properties')
+          .select('*, users!owner_id(display_name)')
+          .neq('status', 'deleted');
+
+      if (genderOrientation != null) {
+        query = query.eq('gender_orientation', genderOrientation.name);
+      }
+
+      final data = await query.order('last_updated', ascending: false);
+
+      return (data as List).map((json) {
+        final Map<String, dynamic> flattened = Map<String, dynamic>.from(json);
+        if (json['users'] != null) {
+          flattened['owner_name'] = json['users']['display_name'];
+        }
+        return PropertyModel.fromJson(flattened);
+      }).where((p) {
+        if (searchQuery != null && searchQuery.isNotEmpty) {
+          final lowerQuery = searchQuery.toLowerCase();
+          return p.name.toLowerCase().contains(lowerQuery) ||
+                 p.address.toLowerCase().contains(lowerQuery) ||
+                 (p.ownerName?.toLowerCase().contains(lowerQuery) ?? false);
+        }
+        return true;
+      }).toList();
+    } catch (e) {
+      throw PropertyException('Failed to fetch properties with owners: $e');
     }
   }
 
@@ -166,6 +206,8 @@ class PropertyService {
 
       final json = updated.toJson();
       json.remove('has_vacancy'); // UI-only field not in DB schema
+      json.remove('average_rating');
+      json.remove('reviews_count');
 
       await _supabase
           .from('properties')
@@ -346,5 +388,15 @@ class PropertyService {
     } catch (e) {
       throw PropertyException('Failed to submit rating: $e');
     }
+  }
+
+  /// Get ratings submitted by a student
+  Stream<List<RatingModel>> getStudentRatings(String studentId) {
+    return _supabase
+        .from('ratings')
+        .stream(primaryKey: ['id'])
+        .eq('student_id', studentId)
+        .order('created_at', ascending: false)
+        .map((data) => data.map((json) => RatingModel.fromJson(json)).toList());
   }
 }

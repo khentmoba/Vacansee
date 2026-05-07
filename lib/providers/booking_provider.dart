@@ -230,6 +230,46 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Admin stats
+  int get totalBookingCount => _bookings.length;
+  int get pendingBookingCount => _bookings.where((b) => b.status == BookingStatus.pending).length;
+  int get approvedBookingCount => _bookings.where((b) => b.status == BookingStatus.approved).length;
+  int get rejectedBookingCount => _bookings.where((b) => b.status == BookingStatus.rejected).length;
+
+  /// Load all bookings for admin
+  Future<void> loadAdminBookings({BookingStatus? statusFilter}) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _bookings = await _bookingService.getAdminBookings(statusFilter: statusFilter);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = 'Failed to load bookings: $e';
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Load recent bookings for admin
+  Future<void> loadRecentBookings({int limit = 5}) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _bookings = await _bookingService.getRecentBookings(limit: limit);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = 'Failed to load recent bookings: $e';
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   @override
   void dispose() {
     _bookingsSubscription?.cancel();

@@ -11,7 +11,14 @@ class UserModel {
   final DateTime createdAt;
   final DateTime? lastLoginAt;
   final bool isVerified;
-  final String? gender; // Added for gender orientation enforcement
+  final String? gender;
+  final String? firstName;
+  final String? lastName;
+  final String? address;
+  final String? businessName;
+  final String? businessPermitNo;
+  final String? emergencyContactName;
+  final String? emergencyContactPhone;
 
   const UserModel({
     required this.uid,
@@ -23,6 +30,13 @@ class UserModel {
     this.lastLoginAt,
     this.isVerified = false,
     this.gender,
+    this.firstName,
+    this.lastName,
+    this.address,
+    this.businessName,
+    this.businessPermitNo,
+    this.emergencyContactName,
+    this.emergencyContactPhone,
   });
 
   /// Create UserModel from JSON (Supabase)
@@ -49,6 +63,13 @@ class UserModel {
           : null,
       isVerified: data['is_verified'] as bool? ?? false,
       gender: data['gender'] as String?,
+      firstName: data['first_name'] as String?,
+      lastName: data['last_name'] as String?,
+      address: data['address'] as String?,
+      businessName: data['business_name'] as String?,
+      businessPermitNo: data['business_permit_no'] as String?,
+      emergencyContactName: data['emergency_contact_name'] as String?,
+      emergencyContactPhone: data['emergency_contact_phone'] as String?,
     );
   }
 
@@ -63,6 +84,13 @@ class UserModel {
       'created_at': createdAt.toIso8601String(),
       'is_verified': isVerified,
       'gender': gender,
+      'first_name': firstName,
+      'last_name': lastName,
+      'address': address,
+      'business_name': businessName,
+      'business_permit_no': businessPermitNo,
+      'emergency_contact_name': emergencyContactName,
+      'emergency_contact_phone': emergencyContactPhone,
       if (lastLoginAt != null) 'last_login_at': lastLoginAt!.toIso8601String(),
     };
   }
@@ -79,6 +107,13 @@ class UserModel {
     DateTime? lastLoginAt,
     bool? isVerified,
     String? gender,
+    String? firstName,
+    String? lastName,
+    String? address,
+    String? businessName,
+    String? businessPermitNo,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -90,6 +125,13 @@ class UserModel {
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       isVerified: isVerified ?? this.isVerified,
       gender: gender ?? this.gender,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      address: address ?? this.address,
+      businessName: businessName ?? this.businessName,
+      businessPermitNo: businessPermitNo ?? this.businessPermitNo,
+      emergencyContactName: emergencyContactName ?? this.emergencyContactName,
+      emergencyContactPhone: emergencyContactPhone ?? this.emergencyContactPhone,
     );
   }
 

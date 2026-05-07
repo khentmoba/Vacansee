@@ -205,4 +205,49 @@ class BookingService {
       throw BookingException('Failed to cancel booking: $e');
     }
   }
+
+  /// Get all bookings (for admin)
+  Stream<List<BookingModel>> getAllBookings() {
+    return _supabase
+        .from('bookings')
+        .stream(primaryKey: ['id'])
+        .order('requested_at', ascending: false)
+        .map(
+          (data) => data.map((json) => BookingModel.fromJson(json)).toList(),
+        );
+  }
+
+  /// Get recent bookings (limit 5 for dashboard)
+  Future<List<BookingModel>> getRecentBookings({int limit = 5}) async {
+    try {
+      final data = await _supabase
+          .from('bookings')
+          .select('*, properties(name), rooms(description), users:student_id(display_name, email, phone_number)')
+          .order('requested_at', ascending: false)
+          .limit(limit);
+
+      return (data as List).map((json) => BookingModel.fromJson(json)).toList();
+    } catch (e) {
+      throw BookingException('Failed to fetch recent bookings: $e');
+    }
+  }
+
+  /// Get all bookings with full details (for admin)
+  Future<List<BookingModel>> getAdminBookings({BookingStatus? statusFilter}) async {
+    try {
+      var query = _supabase
+          .from('bookings')
+          .select('*, properties(name, owner:owner_id(display_name)), rooms(description, monthly_rate), users:student_id(display_name, email, phone_number)');
+
+      if (statusFilter != null) {
+        query = query.eq('status', statusFilter.name);
+      }
+
+      final data = await query.order('requested_at', ascending: false);
+
+      return (data as List).map((json) => BookingModel.fromJson(json)).toList();
+    } catch (e) {
+      throw BookingException('Failed to fetch admin bookings: $e');
+    }
+  }
 }

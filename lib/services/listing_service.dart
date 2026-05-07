@@ -46,6 +46,8 @@ class ListingService {
       final propertyJson = updatedProperty.toJson();
       propertyJson.remove('id');
       propertyJson.remove('has_vacancy');
+      propertyJson.remove('average_rating');
+      propertyJson.remove('reviews_count');
 
       await _supabase
           .from('properties')

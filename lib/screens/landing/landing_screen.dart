@@ -273,43 +273,11 @@ class LandingScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: isMobile ? 40 : 60),
-                // Stats
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: isMobile ? 20 : 40,
-                  runSpacing: 24,
-                  children: [
-                    _buildStat('500+', 'Boarding Houses', isMobile),
-                    _buildStat('1,200+', 'Happy Tenants', isMobile),
-                    _buildStat('4.8/5', 'Average Rating', isMobile),
-                  ],
-                ),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildStat(String number, String label, bool isMobile) {
-    return Column(
-      children: [
-        Text(
-          number,
-          style: TextStyle(
-            fontSize: isMobile ? 32 : 48,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF5287B2),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, color: Color(0xFF666666)),
-        ),
-      ],
     );
   }
 

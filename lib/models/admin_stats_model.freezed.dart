@@ -25,6 +25,11 @@ mixin _$AdminStatsModel {
   int get verifiedProperties => throw _privateConstructorUsedError;
   int get totalOwners => throw _privateConstructorUsedError;
   int get totalStudents => throw _privateConstructorUsedError;
+  int get totalUsers => throw _privateConstructorUsedError;
+  double get occupancyRate => throw _privateConstructorUsedError;
+  int get totalBookings => throw _privateConstructorUsedError;
+  int get activeTenants => throw _privateConstructorUsedError;
+  int get pendingBookings => throw _privateConstructorUsedError;
   DateTime get lastUpdated => throw _privateConstructorUsedError;
 
   /// Serializes this AdminStatsModel to a JSON map.
@@ -49,6 +54,11 @@ abstract class $AdminStatsModelCopyWith<$Res> {
     int verifiedProperties,
     int totalOwners,
     int totalStudents,
+    int totalUsers,
+    double occupancyRate,
+    int totalBookings,
+    int activeTenants,
+    int pendingBookings,
     DateTime lastUpdated,
   });
 }
@@ -72,6 +82,11 @@ class _$AdminStatsModelCopyWithImpl<$Res, $Val extends AdminStatsModel>
     Object? verifiedProperties = null,
     Object? totalOwners = null,
     Object? totalStudents = null,
+    Object? totalUsers = null,
+    Object? occupancyRate = null,
+    Object? totalBookings = null,
+    Object? activeTenants = null,
+    Object? pendingBookings = null,
     Object? lastUpdated = null,
   }) {
     return _then(
@@ -91,6 +106,26 @@ class _$AdminStatsModelCopyWithImpl<$Res, $Val extends AdminStatsModel>
             totalStudents: null == totalStudents
                 ? _value.totalStudents
                 : totalStudents // ignore: cast_nullable_to_non_nullable
+                      as int,
+            totalUsers: null == totalUsers
+                ? _value.totalUsers
+                : totalUsers // ignore: cast_nullable_to_non_nullable
+                      as int,
+            occupancyRate: null == occupancyRate
+                ? _value.occupancyRate
+                : occupancyRate // ignore: cast_nullable_to_non_nullable
+                      as double,
+            totalBookings: null == totalBookings
+                ? _value.totalBookings
+                : totalBookings // ignore: cast_nullable_to_non_nullable
+                      as int,
+            activeTenants: null == activeTenants
+                ? _value.activeTenants
+                : activeTenants // ignore: cast_nullable_to_non_nullable
+                      as int,
+            pendingBookings: null == pendingBookings
+                ? _value.pendingBookings
+                : pendingBookings // ignore: cast_nullable_to_non_nullable
                       as int,
             lastUpdated: null == lastUpdated
                 ? _value.lastUpdated
@@ -116,6 +151,11 @@ abstract class _$$AdminStatsModelImplCopyWith<$Res>
     int verifiedProperties,
     int totalOwners,
     int totalStudents,
+    int totalUsers,
+    double occupancyRate,
+    int totalBookings,
+    int activeTenants,
+    int pendingBookings,
     DateTime lastUpdated,
   });
 }
@@ -138,6 +178,11 @@ class __$$AdminStatsModelImplCopyWithImpl<$Res>
     Object? verifiedProperties = null,
     Object? totalOwners = null,
     Object? totalStudents = null,
+    Object? totalUsers = null,
+    Object? occupancyRate = null,
+    Object? totalBookings = null,
+    Object? activeTenants = null,
+    Object? pendingBookings = null,
     Object? lastUpdated = null,
   }) {
     return _then(
@@ -158,6 +203,26 @@ class __$$AdminStatsModelImplCopyWithImpl<$Res>
             ? _value.totalStudents
             : totalStudents // ignore: cast_nullable_to_non_nullable
                   as int,
+        totalUsers: null == totalUsers
+            ? _value.totalUsers
+            : totalUsers // ignore: cast_nullable_to_non_nullable
+                  as int,
+        occupancyRate: null == occupancyRate
+            ? _value.occupancyRate
+            : occupancyRate // ignore: cast_nullable_to_non_nullable
+                  as double,
+        totalBookings: null == totalBookings
+            ? _value.totalBookings
+            : totalBookings // ignore: cast_nullable_to_non_nullable
+                  as int,
+        activeTenants: null == activeTenants
+            ? _value.activeTenants
+            : activeTenants // ignore: cast_nullable_to_non_nullable
+                  as int,
+        pendingBookings: null == pendingBookings
+            ? _value.pendingBookings
+            : pendingBookings // ignore: cast_nullable_to_non_nullable
+                  as int,
         lastUpdated: null == lastUpdated
             ? _value.lastUpdated
             : lastUpdated // ignore: cast_nullable_to_non_nullable
@@ -175,6 +240,11 @@ class _$AdminStatsModelImpl implements _AdminStatsModel {
     required this.verifiedProperties,
     required this.totalOwners,
     required this.totalStudents,
+    this.totalUsers = 0,
+    this.occupancyRate = 0.0,
+    this.totalBookings = 0,
+    this.activeTenants = 0,
+    this.pendingBookings = 0,
     required this.lastUpdated,
   });
 
@@ -190,11 +260,26 @@ class _$AdminStatsModelImpl implements _AdminStatsModel {
   @override
   final int totalStudents;
   @override
+  @JsonKey()
+  final int totalUsers;
+  @override
+  @JsonKey()
+  final double occupancyRate;
+  @override
+  @JsonKey()
+  final int totalBookings;
+  @override
+  @JsonKey()
+  final int activeTenants;
+  @override
+  @JsonKey()
+  final int pendingBookings;
+  @override
   final DateTime lastUpdated;
 
   @override
   String toString() {
-    return 'AdminStatsModel(totalProperties: $totalProperties, verifiedProperties: $verifiedProperties, totalOwners: $totalOwners, totalStudents: $totalStudents, lastUpdated: $lastUpdated)';
+    return 'AdminStatsModel(totalProperties: $totalProperties, verifiedProperties: $verifiedProperties, totalOwners: $totalOwners, totalStudents: $totalStudents, totalUsers: $totalUsers, occupancyRate: $occupancyRate, totalBookings: $totalBookings, activeTenants: $activeTenants, pendingBookings: $pendingBookings, lastUpdated: $lastUpdated)';
   }
 
   @override
@@ -210,6 +295,16 @@ class _$AdminStatsModelImpl implements _AdminStatsModel {
                 other.totalOwners == totalOwners) &&
             (identical(other.totalStudents, totalStudents) ||
                 other.totalStudents == totalStudents) &&
+            (identical(other.totalUsers, totalUsers) ||
+                other.totalUsers == totalUsers) &&
+            (identical(other.occupancyRate, occupancyRate) ||
+                other.occupancyRate == occupancyRate) &&
+            (identical(other.totalBookings, totalBookings) ||
+                other.totalBookings == totalBookings) &&
+            (identical(other.activeTenants, activeTenants) ||
+                other.activeTenants == activeTenants) &&
+            (identical(other.pendingBookings, pendingBookings) ||
+                other.pendingBookings == pendingBookings) &&
             (identical(other.lastUpdated, lastUpdated) ||
                 other.lastUpdated == lastUpdated));
   }
@@ -222,6 +317,11 @@ class _$AdminStatsModelImpl implements _AdminStatsModel {
     verifiedProperties,
     totalOwners,
     totalStudents,
+    totalUsers,
+    occupancyRate,
+    totalBookings,
+    activeTenants,
+    pendingBookings,
     lastUpdated,
   );
 
@@ -248,6 +348,11 @@ abstract class _AdminStatsModel implements AdminStatsModel {
     required final int verifiedProperties,
     required final int totalOwners,
     required final int totalStudents,
+    final int totalUsers,
+    final double occupancyRate,
+    final int totalBookings,
+    final int activeTenants,
+    final int pendingBookings,
     required final DateTime lastUpdated,
   }) = _$AdminStatsModelImpl;
 
@@ -262,6 +367,16 @@ abstract class _AdminStatsModel implements AdminStatsModel {
   int get totalOwners;
   @override
   int get totalStudents;
+  @override
+  int get totalUsers;
+  @override
+  double get occupancyRate;
+  @override
+  int get totalBookings;
+  @override
+  int get activeTenants;
+  @override
+  int get pendingBookings;
   @override
   DateTime get lastUpdated;
 

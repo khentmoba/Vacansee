@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/property_model.dart';
 import '../models/room_model.dart';
+import '../models/rating_model.dart';
 import '../services/property_service.dart';
 import '../services/listing_service.dart';
 
@@ -20,6 +21,7 @@ class PropertyProvider extends ChangeNotifier {
   List<PropertyModel> _properties = [];
   PropertyModel? _selectedProperty;
   List<RoomModel> _rooms = [];
+  List<RatingModel> _studentRatings = [];
   final Map<String, List<RoomModel>> _propertyRoomsMap = {}; // Cache rooms per property
   bool _isLoading = false;
   String? _errorMessage;
@@ -30,6 +32,7 @@ class PropertyProvider extends ChangeNotifier {
   StreamSubscription<List<RoomModel>>? _allRoomsSubscription;
   StreamSubscription<List<PropertyModel>>? _propertiesSubscription;
   StreamSubscription<List<RoomModel>>? _propertyRoomsSubscription;
+  StreamSubscription<List<RatingModel>>? _studentRatingsSubscription;
 
   // Filters
   String? _searchQuery;
@@ -43,6 +46,7 @@ class PropertyProvider extends ChangeNotifier {
       _properties.where((p) => p.status != PropertyStatus.deleted).toList();
   PropertyModel? get selectedProperty => _selectedProperty;
   List<RoomModel> get rooms => _rooms;
+  List<RatingModel> get studentRatings => _studentRatings;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get searchQuery => _searchQuery;
@@ -198,7 +202,34 @@ class PropertyProvider extends ChangeNotifier {
     _allRoomsSubscription?.cancel();
     _propertiesSubscription?.cancel();
     _propertyRoomsSubscription?.cancel();
+    _studentRatingsSubscription?.cancel();
     super.dispose();
+  }
+
+  // Admin stats
+  int get totalListings => _properties.length;
+  int get availableListings => _properties.where((p) => p.hasVacancy).length;
+  int get fullListings => _properties.where((p) => !p.hasVacancy).length;
+  int get totalAvailableRoomCount => _properties.fold(0, (sum, p) => sum + p.availableRooms);
+
+  /// Load all properties with owner names for admin
+  Future<void> loadAdminProperties() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _properties = await _propertyService.getPropertiesWithOwners(
+        searchQuery: _searchQuery,
+        genderOrientation: _genderFilter,
+      );
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = 'Failed to load properties: $e';
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   /// Load all properties with current filters
@@ -659,6 +690,21 @@ class PropertyProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  /// Subscribe to student ratings
+  void subscribeToStudentRatings(String studentId) {
+    _studentRatingsSubscription?.cancel();
+    _studentRatingsSubscription = _propertyService.getStudentRatings(studentId).listen(
+      (ratings) {
+        _studentRatings = ratings;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Failed to sync rating data: $error';
+        notifyListeners();
+      },
+    );
   }
 }
 

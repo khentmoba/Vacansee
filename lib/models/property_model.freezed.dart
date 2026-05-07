@@ -34,6 +34,12 @@ mixin _$PropertyModel {
   List<String> get amenities => throw _privateConstructorUsedError;
   @JsonKey(name: 'price_range')
   PriceRange get priceRange => throw _privateConstructorUsedError;
+  @JsonKey(name: 'total_rooms')
+  int get totalRooms => throw _privateConstructorUsedError;
+  @JsonKey(name: 'available_rooms')
+  int get availableRooms => throw _privateConstructorUsedError;
+  @JsonKey(name: 'monthly_price')
+  int get monthlyPrice => throw _privateConstructorUsedError;
   PropertyStatus get status => throw _privateConstructorUsedError;
   @JsonKey(name: 'last_updated')
   DateTime get lastUpdated => throw _privateConstructorUsedError;
@@ -47,6 +53,8 @@ mixin _$PropertyModel {
   double get averageRating => throw _privateConstructorUsedError;
   @JsonKey(name: 'reviews_count')
   int get reviewsCount => throw _privateConstructorUsedError;
+  @JsonKey(name: 'owner_name')
+  String? get ownerName => throw _privateConstructorUsedError;
 
   /// Serializes this PropertyModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -75,6 +83,9 @@ abstract class $PropertyModelCopyWith<$Res> {
     @JsonKey(name: 'gender_orientation') GenderOrientation genderOrientation,
     List<String> amenities,
     @JsonKey(name: 'price_range') PriceRange priceRange,
+    @JsonKey(name: 'total_rooms') int totalRooms,
+    @JsonKey(name: 'available_rooms') int availableRooms,
+    @JsonKey(name: 'monthly_price') int monthlyPrice,
     PropertyStatus status,
     @JsonKey(name: 'last_updated') DateTime lastUpdated,
     List<String> images,
@@ -83,6 +94,7 @@ abstract class $PropertyModelCopyWith<$Res> {
     @JsonKey(name: 'has_vacancy') bool hasVacancy,
     @JsonKey(name: 'average_rating') double averageRating,
     @JsonKey(name: 'reviews_count') int reviewsCount,
+    @JsonKey(name: 'owner_name') String? ownerName,
   });
 
   $PriceRangeCopyWith<$Res> get priceRange;
@@ -112,6 +124,9 @@ class _$PropertyModelCopyWithImpl<$Res, $Val extends PropertyModel>
     Object? genderOrientation = null,
     Object? amenities = null,
     Object? priceRange = null,
+    Object? totalRooms = null,
+    Object? availableRooms = null,
+    Object? monthlyPrice = null,
     Object? status = null,
     Object? lastUpdated = null,
     Object? images = null,
@@ -120,6 +135,7 @@ class _$PropertyModelCopyWithImpl<$Res, $Val extends PropertyModel>
     Object? hasVacancy = null,
     Object? averageRating = null,
     Object? reviewsCount = null,
+    Object? ownerName = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -159,6 +175,18 @@ class _$PropertyModelCopyWithImpl<$Res, $Val extends PropertyModel>
                 ? _value.priceRange
                 : priceRange // ignore: cast_nullable_to_non_nullable
                       as PriceRange,
+            totalRooms: null == totalRooms
+                ? _value.totalRooms
+                : totalRooms // ignore: cast_nullable_to_non_nullable
+                      as int,
+            availableRooms: null == availableRooms
+                ? _value.availableRooms
+                : availableRooms // ignore: cast_nullable_to_non_nullable
+                      as int,
+            monthlyPrice: null == monthlyPrice
+                ? _value.monthlyPrice
+                : monthlyPrice // ignore: cast_nullable_to_non_nullable
+                      as int,
             status: null == status
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
@@ -191,6 +219,10 @@ class _$PropertyModelCopyWithImpl<$Res, $Val extends PropertyModel>
                 ? _value.reviewsCount
                 : reviewsCount // ignore: cast_nullable_to_non_nullable
                       as int,
+            ownerName: freezed == ownerName
+                ? _value.ownerName
+                : ownerName // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -226,6 +258,9 @@ abstract class _$$PropertyModelImplCopyWith<$Res>
     @JsonKey(name: 'gender_orientation') GenderOrientation genderOrientation,
     List<String> amenities,
     @JsonKey(name: 'price_range') PriceRange priceRange,
+    @JsonKey(name: 'total_rooms') int totalRooms,
+    @JsonKey(name: 'available_rooms') int availableRooms,
+    @JsonKey(name: 'monthly_price') int monthlyPrice,
     PropertyStatus status,
     @JsonKey(name: 'last_updated') DateTime lastUpdated,
     List<String> images,
@@ -234,6 +269,7 @@ abstract class _$$PropertyModelImplCopyWith<$Res>
     @JsonKey(name: 'has_vacancy') bool hasVacancy,
     @JsonKey(name: 'average_rating') double averageRating,
     @JsonKey(name: 'reviews_count') int reviewsCount,
+    @JsonKey(name: 'owner_name') String? ownerName,
   });
 
   @override
@@ -263,6 +299,9 @@ class __$$PropertyModelImplCopyWithImpl<$Res>
     Object? genderOrientation = null,
     Object? amenities = null,
     Object? priceRange = null,
+    Object? totalRooms = null,
+    Object? availableRooms = null,
+    Object? monthlyPrice = null,
     Object? status = null,
     Object? lastUpdated = null,
     Object? images = null,
@@ -271,6 +310,7 @@ class __$$PropertyModelImplCopyWithImpl<$Res>
     Object? hasVacancy = null,
     Object? averageRating = null,
     Object? reviewsCount = null,
+    Object? ownerName = freezed,
   }) {
     return _then(
       _$PropertyModelImpl(
@@ -310,6 +350,18 @@ class __$$PropertyModelImplCopyWithImpl<$Res>
             ? _value.priceRange
             : priceRange // ignore: cast_nullable_to_non_nullable
                   as PriceRange,
+        totalRooms: null == totalRooms
+            ? _value.totalRooms
+            : totalRooms // ignore: cast_nullable_to_non_nullable
+                  as int,
+        availableRooms: null == availableRooms
+            ? _value.availableRooms
+            : availableRooms // ignore: cast_nullable_to_non_nullable
+                  as int,
+        monthlyPrice: null == monthlyPrice
+            ? _value.monthlyPrice
+            : monthlyPrice // ignore: cast_nullable_to_non_nullable
+                  as int,
         status: null == status
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
@@ -342,6 +394,10 @@ class __$$PropertyModelImplCopyWithImpl<$Res>
             ? _value.reviewsCount
             : reviewsCount // ignore: cast_nullable_to_non_nullable
                   as int,
+        ownerName: freezed == ownerName
+            ? _value.ownerName
+            : ownerName // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -360,6 +416,9 @@ class _$PropertyModelImpl extends _PropertyModel {
     @JsonKey(name: 'gender_orientation') required this.genderOrientation,
     final List<String> amenities = const [],
     @JsonKey(name: 'price_range') required this.priceRange,
+    @JsonKey(name: 'total_rooms') this.totalRooms = 0,
+    @JsonKey(name: 'available_rooms') this.availableRooms = 0,
+    @JsonKey(name: 'monthly_price') this.monthlyPrice = 0,
     this.status = PropertyStatus.pending,
     @JsonKey(name: 'last_updated') required this.lastUpdated,
     final List<String> images = const [],
@@ -368,6 +427,7 @@ class _$PropertyModelImpl extends _PropertyModel {
     @JsonKey(name: 'has_vacancy') this.hasVacancy = true,
     @JsonKey(name: 'average_rating') this.averageRating = 0.0,
     @JsonKey(name: 'reviews_count') this.reviewsCount = 0,
+    @JsonKey(name: 'owner_name') this.ownerName,
   }) : _amenities = amenities,
        _images = images,
        super._();
@@ -405,6 +465,15 @@ class _$PropertyModelImpl extends _PropertyModel {
   @JsonKey(name: 'price_range')
   final PriceRange priceRange;
   @override
+  @JsonKey(name: 'total_rooms')
+  final int totalRooms;
+  @override
+  @JsonKey(name: 'available_rooms')
+  final int availableRooms;
+  @override
+  @JsonKey(name: 'monthly_price')
+  final int monthlyPrice;
+  @override
   @JsonKey()
   final PropertyStatus status;
   @override
@@ -433,10 +502,13 @@ class _$PropertyModelImpl extends _PropertyModel {
   @override
   @JsonKey(name: 'reviews_count')
   final int reviewsCount;
+  @override
+  @JsonKey(name: 'owner_name')
+  final String? ownerName;
 
   @override
   String toString() {
-    return 'PropertyModel(propertyId: $propertyId, ownerId: $ownerId, name: $name, address: $address, lat: $lat, lng: $lng, genderOrientation: $genderOrientation, amenities: $amenities, priceRange: $priceRange, status: $status, lastUpdated: $lastUpdated, images: $images, description: $description, rejectionReason: $rejectionReason, hasVacancy: $hasVacancy, averageRating: $averageRating, reviewsCount: $reviewsCount)';
+    return 'PropertyModel(propertyId: $propertyId, ownerId: $ownerId, name: $name, address: $address, lat: $lat, lng: $lng, genderOrientation: $genderOrientation, amenities: $amenities, priceRange: $priceRange, totalRooms: $totalRooms, availableRooms: $availableRooms, monthlyPrice: $monthlyPrice, status: $status, lastUpdated: $lastUpdated, images: $images, description: $description, rejectionReason: $rejectionReason, hasVacancy: $hasVacancy, averageRating: $averageRating, reviewsCount: $reviewsCount, ownerName: $ownerName)';
   }
 
   @override
@@ -459,6 +531,12 @@ class _$PropertyModelImpl extends _PropertyModel {
             ) &&
             (identical(other.priceRange, priceRange) ||
                 other.priceRange == priceRange) &&
+            (identical(other.totalRooms, totalRooms) ||
+                other.totalRooms == totalRooms) &&
+            (identical(other.availableRooms, availableRooms) ||
+                other.availableRooms == availableRooms) &&
+            (identical(other.monthlyPrice, monthlyPrice) ||
+                other.monthlyPrice == monthlyPrice) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.lastUpdated, lastUpdated) ||
                 other.lastUpdated == lastUpdated) &&
@@ -472,12 +550,14 @@ class _$PropertyModelImpl extends _PropertyModel {
             (identical(other.averageRating, averageRating) ||
                 other.averageRating == averageRating) &&
             (identical(other.reviewsCount, reviewsCount) ||
-                other.reviewsCount == reviewsCount));
+                other.reviewsCount == reviewsCount) &&
+            (identical(other.ownerName, ownerName) ||
+                other.ownerName == ownerName));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     propertyId,
     ownerId,
@@ -488,6 +568,9 @@ class _$PropertyModelImpl extends _PropertyModel {
     genderOrientation,
     const DeepCollectionEquality().hash(_amenities),
     priceRange,
+    totalRooms,
+    availableRooms,
+    monthlyPrice,
     status,
     lastUpdated,
     const DeepCollectionEquality().hash(_images),
@@ -496,7 +579,8 @@ class _$PropertyModelImpl extends _PropertyModel {
     hasVacancy,
     averageRating,
     reviewsCount,
-  );
+    ownerName,
+  ]);
 
   /// Create a copy of PropertyModel
   /// with the given fields replaced by the non-null parameter values.
@@ -524,6 +608,9 @@ abstract class _PropertyModel extends PropertyModel {
     required final GenderOrientation genderOrientation,
     final List<String> amenities,
     @JsonKey(name: 'price_range') required final PriceRange priceRange,
+    @JsonKey(name: 'total_rooms') final int totalRooms,
+    @JsonKey(name: 'available_rooms') final int availableRooms,
+    @JsonKey(name: 'monthly_price') final int monthlyPrice,
     final PropertyStatus status,
     @JsonKey(name: 'last_updated') required final DateTime lastUpdated,
     final List<String> images,
@@ -532,6 +619,7 @@ abstract class _PropertyModel extends PropertyModel {
     @JsonKey(name: 'has_vacancy') final bool hasVacancy,
     @JsonKey(name: 'average_rating') final double averageRating,
     @JsonKey(name: 'reviews_count') final int reviewsCount,
+    @JsonKey(name: 'owner_name') final String? ownerName,
   }) = _$PropertyModelImpl;
   const _PropertyModel._() : super._();
 
@@ -561,6 +649,15 @@ abstract class _PropertyModel extends PropertyModel {
   @JsonKey(name: 'price_range')
   PriceRange get priceRange;
   @override
+  @JsonKey(name: 'total_rooms')
+  int get totalRooms;
+  @override
+  @JsonKey(name: 'available_rooms')
+  int get availableRooms;
+  @override
+  @JsonKey(name: 'monthly_price')
+  int get monthlyPrice;
+  @override
   PropertyStatus get status;
   @override
   @JsonKey(name: 'last_updated')
@@ -581,6 +678,9 @@ abstract class _PropertyModel extends PropertyModel {
   @override
   @JsonKey(name: 'reviews_count')
   int get reviewsCount;
+  @override
+  @JsonKey(name: 'owner_name')
+  String? get ownerName;
 
   /// Create a copy of PropertyModel
   /// with the given fields replaced by the non-null parameter values.

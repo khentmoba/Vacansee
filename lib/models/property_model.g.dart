@@ -23,6 +23,9 @@ _$PropertyModelImpl _$$PropertyModelImplFromJson(
       (json['amenities'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
   priceRange: PriceRange.fromJson(json['price_range'] as Map<String, dynamic>),
+  totalRooms: (json['total_rooms'] as num?)?.toInt() ?? 0,
+  availableRooms: (json['available_rooms'] as num?)?.toInt() ?? 0,
+  monthlyPrice: (json['monthly_price'] as num?)?.toInt() ?? 0,
   status:
       $enumDecodeNullable(_$PropertyStatusEnumMap, json['status']) ??
       PropertyStatus.pending,
@@ -35,6 +38,7 @@ _$PropertyModelImpl _$$PropertyModelImplFromJson(
   hasVacancy: json['has_vacancy'] as bool? ?? true,
   averageRating: (json['average_rating'] as num?)?.toDouble() ?? 0.0,
   reviewsCount: (json['reviews_count'] as num?)?.toInt() ?? 0,
+  ownerName: json['owner_name'] as String?,
 );
 
 Map<String, dynamic> _$$PropertyModelImplToJson(
@@ -49,6 +53,9 @@ Map<String, dynamic> _$$PropertyModelImplToJson(
   'gender_orientation': _$GenderOrientationEnumMap[instance.genderOrientation]!,
   'amenities': instance.amenities,
   'price_range': instance.priceRange,
+  'total_rooms': instance.totalRooms,
+  'available_rooms': instance.availableRooms,
+  'monthly_price': instance.monthlyPrice,
   'status': _$PropertyStatusEnumMap[instance.status]!,
   'last_updated': instance.lastUpdated.toIso8601String(),
   'images': instance.images,
@@ -57,6 +64,7 @@ Map<String, dynamic> _$$PropertyModelImplToJson(
   'has_vacancy': instance.hasVacancy,
   'average_rating': instance.averageRating,
   'reviews_count': instance.reviewsCount,
+  'owner_name': instance.ownerName,
 };
 
 const _$GenderOrientationEnumMap = {

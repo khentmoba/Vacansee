@@ -54,6 +54,10 @@ mixin _$BookingModel {
   DateTime? get moveInDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'duration_months')
   int get durationMonths => throw _privateConstructorUsedError;
+  @JsonKey(name: 'owner_name')
+  String? get ownerName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'monthly_rate')
+  int get monthlyRate => throw _privateConstructorUsedError;
 
   /// Serializes this BookingModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -90,6 +94,8 @@ abstract class $BookingModelCopyWith<$Res> {
     @JsonKey(name: 'student_notes') String? studentNotes,
     @JsonKey(name: 'move_in_date') DateTime? moveInDate,
     @JsonKey(name: 'duration_months') int durationMonths,
+    @JsonKey(name: 'owner_name') String? ownerName,
+    @JsonKey(name: 'monthly_rate') int monthlyRate,
   });
 }
 
@@ -125,6 +131,8 @@ class _$BookingModelCopyWithImpl<$Res, $Val extends BookingModel>
     Object? studentNotes = freezed,
     Object? moveInDate = freezed,
     Object? durationMonths = null,
+    Object? ownerName = freezed,
+    Object? monthlyRate = null,
   }) {
     return _then(
       _value.copyWith(
@@ -196,6 +204,14 @@ class _$BookingModelCopyWithImpl<$Res, $Val extends BookingModel>
                 ? _value.durationMonths
                 : durationMonths // ignore: cast_nullable_to_non_nullable
                       as int,
+            ownerName: freezed == ownerName
+                ? _value.ownerName
+                : ownerName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            monthlyRate: null == monthlyRate
+                ? _value.monthlyRate
+                : monthlyRate // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -229,6 +245,8 @@ abstract class _$$BookingModelImplCopyWith<$Res>
     @JsonKey(name: 'student_notes') String? studentNotes,
     @JsonKey(name: 'move_in_date') DateTime? moveInDate,
     @JsonKey(name: 'duration_months') int durationMonths,
+    @JsonKey(name: 'owner_name') String? ownerName,
+    @JsonKey(name: 'monthly_rate') int monthlyRate,
   });
 }
 
@@ -263,6 +281,8 @@ class __$$BookingModelImplCopyWithImpl<$Res>
     Object? studentNotes = freezed,
     Object? moveInDate = freezed,
     Object? durationMonths = null,
+    Object? ownerName = freezed,
+    Object? monthlyRate = null,
   }) {
     return _then(
       _$BookingModelImpl(
@@ -334,6 +354,14 @@ class __$$BookingModelImplCopyWithImpl<$Res>
             ? _value.durationMonths
             : durationMonths // ignore: cast_nullable_to_non_nullable
                   as int,
+        ownerName: freezed == ownerName
+            ? _value.ownerName
+            : ownerName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        monthlyRate: null == monthlyRate
+            ? _value.monthlyRate
+            : monthlyRate // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -360,6 +388,8 @@ class _$BookingModelImpl extends _BookingModel {
     @JsonKey(name: 'student_notes') this.studentNotes,
     @JsonKey(name: 'move_in_date') this.moveInDate,
     @JsonKey(name: 'duration_months') this.durationMonths = 1,
+    @JsonKey(name: 'owner_name') this.ownerName,
+    @JsonKey(name: 'monthly_rate') this.monthlyRate = 0,
   }) : super._();
 
   factory _$BookingModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -415,10 +445,16 @@ class _$BookingModelImpl extends _BookingModel {
   @override
   @JsonKey(name: 'duration_months')
   final int durationMonths;
+  @override
+  @JsonKey(name: 'owner_name')
+  final String? ownerName;
+  @override
+  @JsonKey(name: 'monthly_rate')
+  final int monthlyRate;
 
   @override
   String toString() {
-    return 'BookingModel(bookingId: $bookingId, studentId: $studentId, propertyId: $propertyId, roomId: $roomId, propertyName: $propertyName, roomDescription: $roomDescription, studentName: $studentName, studentEmail: $studentEmail, studentPhone: $studentPhone, status: $status, requestedAt: $requestedAt, respondedAt: $respondedAt, expiresAt: $expiresAt, ownerNotes: $ownerNotes, studentNotes: $studentNotes, moveInDate: $moveInDate, durationMonths: $durationMonths)';
+    return 'BookingModel(bookingId: $bookingId, studentId: $studentId, propertyId: $propertyId, roomId: $roomId, propertyName: $propertyName, roomDescription: $roomDescription, studentName: $studentName, studentEmail: $studentEmail, studentPhone: $studentPhone, status: $status, requestedAt: $requestedAt, respondedAt: $respondedAt, expiresAt: $expiresAt, ownerNotes: $ownerNotes, studentNotes: $studentNotes, moveInDate: $moveInDate, durationMonths: $durationMonths, ownerName: $ownerName, monthlyRate: $monthlyRate)';
   }
 
   @override
@@ -457,12 +493,16 @@ class _$BookingModelImpl extends _BookingModel {
             (identical(other.moveInDate, moveInDate) ||
                 other.moveInDate == moveInDate) &&
             (identical(other.durationMonths, durationMonths) ||
-                other.durationMonths == durationMonths));
+                other.durationMonths == durationMonths) &&
+            (identical(other.ownerName, ownerName) ||
+                other.ownerName == ownerName) &&
+            (identical(other.monthlyRate, monthlyRate) ||
+                other.monthlyRate == monthlyRate));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     bookingId,
     studentId,
@@ -481,7 +521,9 @@ class _$BookingModelImpl extends _BookingModel {
     studentNotes,
     moveInDate,
     durationMonths,
-  );
+    ownerName,
+    monthlyRate,
+  ]);
 
   /// Create a copy of BookingModel
   /// with the given fields replaced by the non-null parameter values.
@@ -516,6 +558,8 @@ abstract class _BookingModel extends BookingModel {
     @JsonKey(name: 'student_notes') final String? studentNotes,
     @JsonKey(name: 'move_in_date') final DateTime? moveInDate,
     @JsonKey(name: 'duration_months') final int durationMonths,
+    @JsonKey(name: 'owner_name') final String? ownerName,
+    @JsonKey(name: 'monthly_rate') final int monthlyRate,
   }) = _$BookingModelImpl;
   const _BookingModel._() : super._();
 
@@ -572,6 +616,12 @@ abstract class _BookingModel extends BookingModel {
   @override
   @JsonKey(name: 'duration_months')
   int get durationMonths;
+  @override
+  @JsonKey(name: 'owner_name')
+  String? get ownerName;
+  @override
+  @JsonKey(name: 'monthly_rate')
+  int get monthlyRate;
 
   /// Create a copy of BookingModel
   /// with the given fields replaced by the non-null parameter values.

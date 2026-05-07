@@ -1,10 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/property_model.dart';
 import '../../models/room_model.dart';
 import '../../providers/property_provider.dart';
 import '../../widgets/booking/booking_dialog.dart';
+import '../booking/booking_screen.dart';
+import '../../utils/transitions.dart';
 
 class PropertyDetailScreen extends StatefulWidget {
   final PropertyModel property;
@@ -16,6 +17,8 @@ class PropertyDetailScreen extends StatefulWidget {
 }
 
 class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
+  int _selectedImageIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -28,546 +31,428 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   Widget build(BuildContext context) {
     final propertyProvider = context.watch<PropertyProvider>();
     final rooms = propertyProvider.rooms;
-    final vacantRooms = rooms
-        .where((r) => r.status == RoomStatus.vacant)
-        .length;
+    final vacantRooms = rooms.where((r) => r.status == RoomStatus.vacant).length;
     final totalRooms = rooms.length;
+    final isDesktop = MediaQuery.of(context).size.width >= 1000;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FBFD),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
-            ),
-          ],
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(
+          horizontal: isDesktop ? 60 : 24,
+          vertical: isDesktop ? 48 : 32,
         ),
-        child: SizedBox(
-          height: 56,
-          child: ElevatedButton(
-            onPressed: vacantRooms > 0
-                ? () {
-                    final firstVacantRoom = rooms.firstWhere(
-                      (r) => r.status == RoomStatus.vacant,
-                    );
-                    showDialog(
-                      context: context,
-                      builder: (_) => BookingDialog(
-                        property: widget.property,
-                        room: firstVacantRoom,
-                      ),
-                    );
-                  }
-                : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: vacantRooms > 0
-                  ? const Color(0xFF5287B2)
-                  : Colors.grey[300],
-              foregroundColor: vacantRooms > 0
-                  ? Colors.white
-                  : Colors.grey[600],
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Back Button
+            TextButton.icon(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.arrow_back_rounded, size: 18),
+              label: const Text('Back to Search'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.grey[600],
+                textStyle: const TextStyle(fontWeight: FontWeight.w500),
               ),
             ),
-            child: Text(
-              vacantRooms > 0 ? 'Book Now' : 'No Rooms Available',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-      ),
-      body: CustomScrollView(
-        slivers: [
-          // Parallax Hero
-          SliverAppBar(
-            expandedHeight: 350,
-            pinned: true,
-            backgroundColor: Colors.white,
-            foregroundColor: const Color(0xFF5287B2), // Changed from 0xFF1D1B16
-            elevation: 0,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                fit: StackFit.expand,
+            const SizedBox(height: 24),
+
+            // Main Content Area
+            if (isDesktop)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  widget.property.coverImageUrl != null
-                      ? Image.network(
-                          widget.property.coverImageUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => _buildPlaceholder(),
-                        )
-                      : _buildPlaceholder(),
-                  // Premium gradient overlay
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 0.4),
-                          Colors.transparent,
-                          Colors.black.withValues(alpha: 0.7),
-                        ],
-                        stops: const [0.0, 0.4, 1.0],
-                      ),
-                    ),
-                  ),
-                  // Glassmorphism tags on image with BackdropFilter
-                  Positioned(
-                    bottom: 24,
-                    left: 24,
-                    right: 24,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // Left Column: Gallery, About, Amenities
+                  Expanded(
+                    flex: 65,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.3),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Text(
-                                widget.property.genderOrientation.name
-                                    .toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 1.0,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(
-                                  0xFF5287B2,
-                                ).withValues(alpha: 0.85),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.3),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Text(
-                                widget.property.priceRange.formatted,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                        _buildGallery(),
+                        const SizedBox(height: 48),
+                        _buildAboutSection(),
+                        const SizedBox(height: 48),
+                        _buildAmenitiesSection(),
                       ],
                     ),
+                  ),
+                  const SizedBox(width: 48),
+                  // Right Column: Sticky Sidebar
+                  Expanded(
+                    flex: 35,
+                    child: _buildSidebar(vacantRooms, totalRooms, rooms),
                   ),
                 ],
+              )
+            else
+              Column(
+                children: [
+                  _buildGallery(),
+                  const SizedBox(height: 32),
+                  _buildSidebar(vacantRooms, totalRooms, rooms),
+                  const SizedBox(height: 32),
+                  _buildAboutSection(),
+                  const SizedBox(height: 32),
+                  _buildAmenitiesSection(),
+                ],
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGallery() {
+    final images = [
+      widget.property.coverImageUrl,
+      // Add other images if available in your model
+    ].whereType<String>().toList();
+
+    // Fallback if no images
+    if (images.isEmpty) return _buildPlaceholder();
+
+    return Column(
+      children: [
+        // Main Image
+        Container(
+          height: 450,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            image: DecorationImage(
+              image: NetworkImage(images[_selectedImageIndex]),
+              fit: BoxFit.cover,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Thumbnails
+        if (images.length > 1)
+          SizedBox(
+            height: 100,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: images.length,
+              itemBuilder: (context, index) {
+                final isSelected = _selectedImageIndex == index;
+                return GestureDetector(
+                  onTap: () => setState(() => _selectedImageIndex = index),
+                  child: Container(
+                    width: 150,
+                    margin: const EdgeInsets.only(right: 16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isSelected ? const Color(0xFF5287B2) : Colors.transparent,
+                        width: 2,
+                      ),
+                      image: DecorationImage(
+                        image: NetworkImage(images[index]),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-          // Content
-          SliverToBoxAdapter(
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFFF8FBFD),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.property.name,
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF1D1B16),
-                        height: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.location_on,
-                          color: Color(0xFF5287B2),
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            widget.property.address,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF666666),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (widget.property.reviewsCount > 0) ...[
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.star_rounded,
-                            color: Color(0xFFFFB800),
-                            size: 24,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            widget.property.averageRating.toStringAsFixed(1),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1D1B16),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '(${widget.property.reviewsCount} reviews)',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                    const SizedBox(height: 32),
+      ],
+    );
+  }
 
-                    // Real-time vacancy card
-                    if (totalRooms > 0)
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: vacantRooms > 0
-                                  ? const Color(
-                                      0xFF10B981,
-                                    ).withValues(alpha: 0.1)
-                                  : const Color(
-                                      0xFFEF4444,
-                                    ).withValues(alpha: 0.1),
-                              blurRadius: 24,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                          border: Border.all(
-                            color: vacantRooms > 0
-                                ? const Color(0xFF10B981).withValues(alpha: 0.3)
-                                : const Color(
-                                    0xFFEF4444,
-                                  ).withValues(alpha: 0.3),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 56,
-                              height: 56,
-                              decoration: BoxDecoration(
-                                color: vacantRooms > 0
-                                    ? const Color(
-                                        0xFF10B981,
-                                      ).withValues(alpha: 0.1)
-                                    : const Color(
-                                        0xFFEF4444,
-                                      ).withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                vacantRooms > 0
-                                    ? Icons.check_circle
-                                    : Icons.cancel,
-                                color: vacantRooms > 0
-                                    ? const Color(0xFF10B981)
-                                    : const Color(0xFFEF4444),
-                                size: 32,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    vacantRooms > 0
-                                        ? 'Rooms Available'
-                                        : 'Fully Occupied',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: vacantRooms > 0
-                                          ? const Color(0xFF10B981)
-                                          : const Color(0xFFEF4444),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '$vacantRooms of $totalRooms rooms available',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Color(0xFF666666),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    const SizedBox(height: 32),
-
-                    if (widget.property.description != null &&
-                        widget.property.description!.isNotEmpty) ...[
-                      const Text(
-                        'About this Property',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF1D1B16),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        widget.property.description!,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF666666),
-                          height: 1.6,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                    ],
-
-                    if (widget.property.amenities.isNotEmpty) ...[
-                      const Text(
-                        'Amenities',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF1D1B16),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: widget.property.amenities.map((amenity) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey[200]!),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.check_circle_outline,
-                                  size: 18,
-                                  color: Color(0xFF5287B2),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  amenity,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF1D1B16),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                      const SizedBox(height: 32),
-                    ],
-
-                    if (rooms.isNotEmpty) ...[
-                      const Text(
-                        'Available Rooms',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF1D1B16),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      ...rooms.where((r) => r.status == RoomStatus.vacant).map((
-                        room,
-                      ) {
-                        return _RoomCard(room: room, property: widget.property);
-                      }),
-                    ],
-                  ],
-                ),
-              ),
+  Widget _buildAboutSection() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'About This Property',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1D1B16),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            widget.property.description ?? 'No description provided.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[700],
+              height: 1.6,
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildAmenitiesSection() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Amenities',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1D1B16),
+            ),
+          ),
+          const SizedBox(height: 32),
+          Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: widget.property.amenities.map((amenity) {
+              return _buildAmenityChip(amenity);
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAmenityChip(String amenity) {
+    IconData icon;
+    switch (amenity.toLowerCase()) {
+      case 'wifi':
+        icon = Icons.wifi;
+        break;
+      case 'air conditioning':
+      case 'ac':
+        icon = Icons.ac_unit_rounded;
+        break;
+      case 'kitchen':
+        icon = Icons.restaurant_rounded;
+        break;
+      case 'laundry area':
+      case 'laundry':
+        icon = Icons.local_laundry_service_rounded;
+        break;
+      case '24/7 security':
+      case 'security':
+        icon = Icons.security_rounded;
+        break;
+      case 'parking':
+        icon = Icons.local_parking_rounded;
+        break;
+      default:
+        icon = Icons.check_circle_outline_rounded;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFBFBFB),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 20, color: const Color(0xFF5287B2)),
+          const SizedBox(width: 12),
+          Text(
+            amenity,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF1D1B16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSidebar(int vacantRooms, int totalRooms, List<RoomModel> rooms) {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.property.name,
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1D1B16),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              const Icon(Icons.location_on_rounded, size: 18, color: Colors.grey),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  widget.property.address,
+                  style: TextStyle(fontSize: 15, color: Colors.grey[600]),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          const Divider(),
+          const SizedBox(height: 24),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                widget.property.priceRange.formatted,
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF5287B2),
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '/month',
+                style: TextStyle(fontSize: 16, color: Colors.grey[500]),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _buildSidebarRow('Available Rooms:', '$vacantRooms / $totalRooms'),
+          const SizedBox(height: 16),
+          _buildSidebarRow(
+            'Status:',
+            vacantRooms > 0 ? 'Available' : 'Fully Occupied',
+            valueColor: vacantRooms > 0 ? const Color(0xFF10B981) : Colors.red,
+          ),
+          const SizedBox(height: 16),
+          _buildSidebarRow('Owner:', 'Owner Name'), // Replace with actual owner name if available
+          const SizedBox(height: 32),
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: vacantRooms > 0
+                  ? () {
+                      final firstVacantRoom = rooms.firstWhere(
+                        (r) => r.status == RoomStatus.vacant,
+                      );
+                      Navigator.push(
+                        context,
+                        SharedAxisPageRoute(
+                          page: BookingScreen(
+                            property: widget.property,
+                            room: firstVacantRoom,
+                          ),
+                        ),
+                      );
+                    }
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF5287B2),
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.grey[300],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                vacantRooms > 0 ? 'Book Now' : 'No Rooms Available',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Center(
+            child: Text(
+              'You won\'t be charged yet',
+              style: TextStyle(fontSize: 13, color: Colors.grey),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSidebarRow(String label, String value, {Color? valueColor}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(fontSize: 15, color: Colors.grey[600]),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: valueColor ?? const Color(0xFF1D1B16),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildPlaceholder() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.home_work, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
-          Text('No Image Available', style: TextStyle(color: Colors.grey[500])),
-        ],
+    return Container(
+      height: 450,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(24),
       ),
-    );
-  }
-}
-
-class _RoomCard extends StatefulWidget {
-  final RoomModel room;
-  final PropertyModel property;
-
-  const _RoomCard({required this.room, required this.property});
-
-  @override
-  State<_RoomCard> createState() => _RoomCardState();
-}
-
-class _RoomCardState extends State<_RoomCard> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
-        cursor: SystemMouseCursors.click,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          margin: const EdgeInsets.only(bottom: 16),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: _isHovered
-                  ? const Color(0xFF5287B2).withValues(alpha: 0.3)
-                  : Colors.transparent,
-              width: _isHovered ? 2 : 0,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: _isHovered
-                    ? const Color(0xFF5287B2).withValues(alpha: 0.15)
-                    : Colors.black.withValues(alpha: 0.03),
-                blurRadius: _isHovered ? 24 : 10,
-                spreadRadius: _isHovered ? 1 : 0,
-                offset: Offset(0, _isHovered ? 8 : 4),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.bed_rounded, color: Color(0xFF10B981)),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.room.description ?? 'Standard Room',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1D1B16),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${widget.room.capacity} slots • ${widget.room.monthlyRate != null ? '₱${widget.room.monthlyRate}/mo' : 'Price varies'}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF666666),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => BookingDialog(
-                      property: widget.property,
-                      room: widget.room,
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF10B981),
-                  foregroundColor: Colors.white,
-                  elevation: _isHovered ? 4 : 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  'Book',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.home_work_rounded, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text('No Image Available', style: TextStyle(color: Colors.grey[500])),
+          ],
         ),
       ),
     );

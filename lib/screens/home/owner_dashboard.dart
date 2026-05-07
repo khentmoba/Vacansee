@@ -9,6 +9,8 @@ import '../owner/edit_property_screen.dart';
 import '../property/create_property_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../../widgets/notifications/notification_badge.dart';
+import '../../widgets/owner/owner_top_nav_bar.dart';
+import '../../core/utils/fade_page_route.dart';
 
 class OwnerDashboard extends StatefulWidget {
   const OwnerDashboard({super.key});
@@ -53,9 +55,9 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
         return Scaffold(
           backgroundColor: const Color(0xFFF8FBFD),
           appBar: isDesktop
-              ? PreferredSize(
-                  preferredSize: const Size.fromHeight(80),
-                  child: _OwnerTopNavBar(),
+              ? const PreferredSize(
+                  preferredSize: Size.fromHeight(80),
+                  child: OwnerTopNavBar(currentRoute: 'Dashboard'),
                 )
               : AppBar(
                   title: const Text('Owner Dashboard'),
@@ -117,236 +119,235 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                                 ),
                               ),
                               const SizedBox(height: 32),
-                  // Owner Verification Alert Banner
-                  if (!(authProvider.user?.isVerified ?? false))
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.orange[50],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.orange[200]!),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.pending_actions_rounded,
-                            color: Colors.orange[700],
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Account Verification Pending',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.orange[800],
+                              // Owner Verification Alert Banner
+                              if (!(authProvider.user?.isVerified ?? false))
+                                Container(
+                                  margin: const EdgeInsets.only(bottom: 16),
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange[50],
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.orange[200]!),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.pending_actions_rounded,
+                                        color: Colors.orange[700],
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Account Verification Pending',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.orange[800],
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              'An admin will review your account shortly. You can browse the dashboard, but publishing listings is locked until verified.',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.orange[700],
+                                                height: 1.4,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'An admin will review your account shortly. You can browse the dashboard, but publishing listings is locked until verified.',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.orange[700],
-                                    height: 1.4,
+                              // Stats Cards
+                              Row(
+                                children: [
+                                  _buildStatCard(
+                                    Icons.home_rounded,
+                                    properties
+                                        .where((p) => p.status != PropertyStatus.deleted)
+                                        .length
+                                        .toString(),
+                                    'Total Listings',
+                                    const Color(0xFF3B82F6),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  _buildStatCard(
+                                    Icons.check_circle_rounded,
+                                    propertyProvider.totalOccupiedRooms.toString(),
+                                    'Occupied Rooms',
+                                    const Color(0xFF10B981),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  _buildStatCard(
+                                    Icons.home_outlined,
+                                    propertyProvider.totalAvailableRooms.toString(),
+                                    'Available Rooms',
+                                    const Color(0xFF8B5CF6),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  _buildStatCard(
+                                    Icons.calendar_today_rounded,
+                                    pendingCount.toString(),
+                                    'Pending Requests',
+                                    const Color(0xFFF59E0B),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 32),
+                              // Pending Requests Banner
+                              if (pendingCount > 0)
+                                Container(
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFFBEB),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: const Color(0xFFFEF3C7),
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'You have $pendingCount pending booking request${pendingCount > 1 ? 's' : ''}',
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF92400E),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              'Review and respond to booking requests to keep your tenants updated',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: const Color(0xFFB45309),
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            FadePageRoute(
+                                              child: const OwnerBookingsScreen(),
+                                            ),
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFFD97706),
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 24,
+                                            vertical: 18,
+                                          ),
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'Review Now',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
+                              const SizedBox(height: 40),
+                              // My Boarding Houses Header
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'My Boarding Houses',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF1D1B16),
+                                    ),
+                                  ),
+                                  ElevatedButton.icon(
+                                    onPressed: (authProvider.user?.isVerified ?? false)
+                                        ? () {
+                                            Navigator.push(
+                                              context,
+                                              FadePageRoute(
+                                                child: const CreatePropertyScreen(),
+                                              ),
+                                            );
+                                          }
+                                        : null,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF5287B2),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                        vertical: 16,
+                                      ),
+                                      disabledBackgroundColor:
+                                          const Color(0xFF5287B2).withValues(alpha: 0.4),
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    icon: const Icon(Icons.add, size: 20),
+                                    label: Text(
+                                      (authProvider.user?.isVerified ?? false)
+                                          ? 'Add New Listing'
+                                          : 'Verification Required',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              // Property Grid
+                              GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: isDesktop ? 3 : 2,
+                                  crossAxisSpacing: 24,
+                                  mainAxisSpacing: 24,
+                                  childAspectRatio: isDesktop ? 0.9 : 0.75,
+                                ),
+                                itemCount: properties.length,
+                                itemBuilder: (context, index) {
+                                  final property = properties[index];
+                                  return _buildPropertyCard(property);
+                                },
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  // Stats Cards
-                  Row(
-                    children: [
-                      _buildStatCard(
-                        Icons.home_rounded,
-                        properties
-                            .where((p) => p.status != PropertyStatus.deleted)
-                            .length
-                            .toString(),
-                        'Total Listings',
-                        const Color(0xFF3B82F6),
-                      ),
-                      const SizedBox(width: 20),
-                      _buildStatCard(
-                        Icons.check_circle_rounded,
-                        propertyProvider.totalOccupiedRooms.toString(),
-                        'Occupied Rooms',
-                        const Color(0xFF10B981),
-                      ),
-                      const SizedBox(width: 20),
-                      _buildStatCard(
-                        Icons.home_outlined,
-                        propertyProvider.totalAvailableRooms.toString(),
-                        'Available Rooms',
-                        const Color(0xFF8B5CF6),
-                      ),
-                      const SizedBox(width: 20),
-                      _buildStatCard(
-                        Icons.calendar_today_rounded,
-                        pendingCount.toString(),
-                        'Pending Requests',
-                        const Color(0xFFF59E0B),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
-                  // Pending Requests Banner
-                  if (pendingCount > 0)
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFFBEB),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: const Color(0xFFFEF3C7),
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'You have $pendingCount pending booking request${pendingCount > 1 ? 's' : ''}',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF92400E),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Review and respond to booking requests to keep your tenants updated',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: const Color(0xFFB45309),
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const OwnerBookingsScreen(),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFD97706),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 18,
-                              ),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              'Review Now',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  const SizedBox(height: 40),
-                  // My Boarding Houses Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'My Boarding Houses',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1D1B16),
-                        ),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: (authProvider.user?.isVerified ?? false)
-                            ? () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const CreatePropertyScreen(),
-                                  ),
-                                );
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF5287B2),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
-                          disabledBackgroundColor:
-                              const Color(0xFF5287B2).withValues(alpha: 0.4),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        icon: const Icon(Icons.add, size: 20),
-                        label: Text(
-                          (authProvider.user?.isVerified ?? false)
-                              ? 'Add New Listing'
-                              : 'Verification Required',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  // Property Grid
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: isDesktop ? 3 : 2,
-                      crossAxisSpacing: 24,
-                      mainAxisSpacing: 24,
-                      childAspectRatio: isDesktop ? 0.9 : 0.75,
-                    ),
-                    itemCount: properties.length,
-                    itemBuilder: (context, index) {
-                      final property = properties[index];
-                      return _buildPropertyCard(property);
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
   Widget _buildStatCard(
     IconData icon,
@@ -454,9 +455,8 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              EditPropertyScreen(property: property),
+                        FadePageRoute(
+                          child: EditPropertyScreen(property: property),
                         ),
                       );
                     },
@@ -640,121 +640,6 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-}
-
-class _OwnerTopNavBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
-
-    return Container(
-      height: 80,
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Logo
-          Row(
-            children: [
-              const Text(
-                'VacanSee',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1D1B16),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                width: 1,
-                height: 24,
-                color: Colors.grey[300],
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Owner Dashboard',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          // Nav Items
-          _buildTopNavItem(context, 'Dashboard', true),
-          _buildTopNavItem(context, 'Booking Requests', false, onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const OwnerBookingsScreen()),
-            );
-          }),
-          _buildTopNavItem(context, 'Profile', false),
-          const SizedBox(width: 24),
-          // Logout Button
-          ElevatedButton.icon(
-            onPressed: () => authProvider.signOut(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF5287B2),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 0,
-            ),
-            icon: const Icon(Icons.logout_rounded, size: 18),
-            label: const Text(
-              'Logout',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTopNavItem(BuildContext context, String label, bool isSelected, {VoidCallback? onTap}) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        height: 80,
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? const Color(0xFF1D1B16) : Colors.grey[600],
-              ),
-            ),
-            if (isSelected)
-              Container(
-                margin: const EdgeInsets.only(top: 4),
-                height: 2,
-                width: 20,
-                color: const Color(0xFF5287B2),
-              ),
-          ],
-        ),
       ),
     );
   }

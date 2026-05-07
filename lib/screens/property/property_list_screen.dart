@@ -4,6 +4,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../models/property_model.dart';
 import '../../providers/providers.dart';
 import 'property_detail_screen.dart';
+import '../../utils/transitions.dart';
 
 class PropertyListScreen extends StatefulWidget {
   const PropertyListScreen({super.key});
@@ -63,7 +64,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Discover comfortable and affordable boarding houses in Cagayan de Oro City',
+                        'Discover comfortable and affordable boarding houses in Metro Manila',
                         style: TextStyle(
                           fontSize: 18,
                           color: Colors.grey[600],
@@ -260,10 +261,10 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1D1B16),
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[600],
           ),
         ),
         const SizedBox(height: 8),
@@ -272,17 +273,21 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
           keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: icon != null ? Icon(icon, size: 20) : null,
+            prefixIcon: icon != null ? Icon(icon, size: 20, color: Colors.grey[400]) : null,
             filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            fillColor: const Color(0xFFFBFBFB),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.grey[200]!),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.grey[200]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
             ),
           ),
         ),
@@ -291,20 +296,35 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
   }
 
   Widget _buildAvailableOnlyToggle(PropertyProvider provider) {
-    // We'll use a simple filter toggle for availability
-    // Since our provider doesn't have a direct 'showOnlyAvailable' yet, 
-    // we can use a custom state or just mock the button for now
-    return OutlinedButton.icon(
-      onPressed: () {
-        // Toggle logic here if provider supported it
-      },
-      icon: const Icon(Icons.tune_rounded, size: 18),
-      label: const Text('Available Only'),
-      style: OutlinedButton.styleFrom(
-        foregroundColor: const Color(0xFF1D1B16),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-        side: BorderSide(color: Colors.grey[300]!),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFE5E7EB),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {},
+          borderRadius: BorderRadius.circular(10),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.tune_rounded, size: 20, color: Colors.grey[700]),
+                const SizedBox(width: 8),
+                Text(
+                  'Available Only',
+                  style: TextStyle(
+                    color: Colors.grey[800],
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -765,8 +785,8 @@ class _PropertyCardState extends State<_PropertyCard> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => PropertyDetailScreen(property: widget.property),
+              SharedAxisPageRoute(
+                page: PropertyDetailScreen(property: widget.property),
               ),
             );
           },
@@ -816,19 +836,19 @@ class _PropertyCardState extends State<_PropertyCard> {
                         right: 12,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
+                            horizontal: 14,
+                            vertical: 8,
                           ),
                           decoration: BoxDecoration(
                             color: widget.liveVacancy
-                                ? const Color(0xFF10B981)
-                                : const Color(0xFFEF4444),
-                            borderRadius: BorderRadius.circular(20),
+                                ? const Color(0xFF00D27B)
+                                : const Color(0xFFFF3B30),
+                            borderRadius: BorderRadius.circular(30),
                           ),
                           child: Text(
                             widget.liveVacancy ? 'Available' : 'Full',
                             style: const TextStyle(
-                              fontSize: 11,
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -931,17 +951,17 @@ class _PropertyCardState extends State<_PropertyCard> {
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
+                              horizontal: 20,
+                              vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF5287B2),
-                              borderRadius: BorderRadius.circular(8),
+                              color: const Color(0xFF5D95C2),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Text(
                               'View Details',
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),

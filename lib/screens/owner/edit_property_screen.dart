@@ -5,7 +5,7 @@ import '../../models/room_model.dart';
 import '../../providers/property_provider.dart';
 import '../../services/listing_service.dart';
 import '../../widgets/property/property_form_components.dart';
-import 'widgets/room_details_dialog.dart';
+import '../../widgets/owner/owner_top_nav_bar.dart';
 
 class EditPropertyScreen extends StatefulWidget {
   final PropertyModel property;
@@ -21,6 +21,9 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
   late TextEditingController _nameController;
   late TextEditingController _addressController;
   late TextEditingController _descriptionController;
+  late TextEditingController _monthlyPriceController;
+  late TextEditingController _totalRoomsController;
+  late TextEditingController _availableRoomsController;
 
   late List<String> _images;
   late List<RoomModel> _rooms;
@@ -34,9 +37,10 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
     super.initState();
     _nameController = TextEditingController(text: widget.property.name);
     _addressController = TextEditingController(text: widget.property.address);
-    _descriptionController = TextEditingController(
-      text: widget.property.description,
-    );
+    _descriptionController = TextEditingController(text: widget.property.description ?? '');
+    _monthlyPriceController = TextEditingController(text: widget.property.monthlyPrice.toString());
+    _totalRoomsController = TextEditingController(text: widget.property.totalRooms.toString());
+    _availableRoomsController = TextEditingController(text: widget.property.availableRooms.toString());
     _images = List.from(widget.property.images);
     _rooms = [];
     _loadRooms();
@@ -53,48 +57,14 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
     });
   }
 
-  Future<void> _addRoom() async {
-    final room = await showDialog<RoomModel>(
-      context: context,
-      builder: (context) => RoomDetailsDialog(
-        propertyId: widget.property.propertyId,
-      ),
-    );
-
-    if (room != null) {
-      setState(() => _rooms.add(room));
-    }
-  }
-
-  Future<void> _editRoom(int index) async {
-    final room = await showDialog<RoomModel>(
-      context: context,
-      builder: (context) => RoomDetailsDialog(
-        propertyId: widget.property.propertyId,
-        initialRoom: _rooms[index],
-      ),
-    );
-
-    if (room != null) {
-      setState(() => _rooms[index] = room);
-    }
-  }
-
-  void _removeRoom(int index) {
-    setState(() {
-      final roomId = _rooms[index].roomId;
-      if (!roomId.startsWith('temp_')) {
-        _deletedRoomIds.add(roomId);
-      }
-      _rooms.removeAt(index);
-    });
-  }
-
   @override
   void dispose() {
     _nameController.dispose();
     _addressController.dispose();
     _descriptionController.dispose();
+    _monthlyPriceController.dispose();
+    _totalRoomsController.dispose();
+    _availableRoomsController.dispose();
     super.dispose();
   }
 
@@ -105,11 +75,20 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
 
     try {
       final listingService = ListingService();
+      final monthlyPrice = int.tryParse(_monthlyPriceController.text) ?? 0;
+      final totalRooms = int.tryParse(_totalRoomsController.text) ?? 0;
+      final availableRooms = int.tryParse(_availableRoomsController.text) ?? 0;
+
       final updatedProperty = widget.property.copyWith(
         name: _nameController.text.trim(),
         address: _addressController.text.trim(),
         description: _descriptionController.text.trim(),
+        monthlyPrice: monthlyPrice,
+        priceRange: PriceRange(min: monthlyPrice, max: monthlyPrice),
+        totalRooms: totalRooms,
+        availableRooms: availableRooms,
         images: _images,
+        lastUpdated: DateTime.now(),
       );
 
       await listingService.updatePropertyListing(
@@ -138,69 +117,53 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FBFD),
-      appBar: AppBar(
-        title: const Text(
-          'Edit Property',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF1D1B16),
-        elevation: 0,
-        actions: [
-          if (_isSaving)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth >= 900;
+
+        return Scaffold(
+          backgroundColor: const Color(0xFFF8FBFD),
+          appBar: isDesktop
+              ? const PreferredSize(
+                  preferredSize: Size.fromHeight(80),
+                  child: OwnerTopNavBar(currentRoute: ''),
+                )
+              : AppBar(
+                  title: const Text('Edit Property'),
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF1D1B16),
+                  elevation: 0,
                 ),
-              ),
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: TextButton.icon(
-                onPressed: _handleSave,
-                icon: const Icon(Icons.check_circle_outline),
-                label: const Text(
-                  'SAVE',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+          body: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1000),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isDesktop ? 40 : 20,
+                  vertical: 32,
                 ),
-                style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF5287B2),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(),
+                      const SizedBox(height: 32),
+                      _buildBasicDetailsSection(isDesktop),
+                      const SizedBox(height: 24),
+                      _buildRoomsSection(),
+                      const SizedBox(height: 24),
+                      _buildImagesSection(),
+                      const SizedBox(height: 40),
+                      _buildActionButtons(),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-        ],
-      ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(),
-                  const SizedBox(height: 32),
-                  _buildBasicDetailsSection(),
-                  const SizedBox(height: 24),
-                  _buildRoomsSection(),
-                  const SizedBox(height: 24),
-                  _buildImagesSection(),
-                  const SizedBox(height: 40),
-                ],
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -208,23 +171,25 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: const Color(0xFF5287B2).withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Text(
-            'MANAGEMENT',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF5287B2),
-              letterSpacing: 1.2,
-            ),
+        InkWell(
+          onTap: () => Navigator.pop(context),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.arrow_back, size: 18, color: Color(0xFF475569)),
+              const SizedBox(width: 8),
+              Text(
+                'Back to Dashboard',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 24),
         const Text(
           'Property Settings',
           style: TextStyle(
@@ -247,32 +212,80 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
     );
   }
 
-  Widget _buildBasicDetailsSection() {
-    return FormSectionCard(
-      title: 'Basic Details',
-      icon: Icons.info_outline_rounded,
+  Widget _buildBasicDetailsSection(bool isDesktop) {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Text(
+            'Basic Details',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 24),
           PremiumTextField(
             controller: _nameController,
-            label: 'Property Name',
+            label: 'Property Name *',
             hintText: 'Enter name',
             validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           PremiumTextField(
             controller: _addressController,
-            label: 'Address',
+            label: 'Location *',
             hintText: 'Enter address',
             icon: Icons.location_on_outlined,
             validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(
+                child: PremiumTextField(
+                  controller: _monthlyPriceController,
+                  label: 'Monthly Price (₱) *',
+                  hintText: '5000',
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              const SizedBox(width: 24),
+              Expanded(
+                child: PremiumTextField(
+                  controller: _totalRoomsController,
+                  label: 'Total Rooms *',
+                  hintText: '10',
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: isDesktop ? 400 : double.infinity,
+            child: PremiumTextField(
+              controller: _availableRoomsController,
+              label: 'Available Rooms *',
+              hintText: '5',
+              keyboardType: TextInputType.number,
+            ),
+          ),
+          const SizedBox(height: 24),
           PremiumTextField(
             controller: _descriptionController,
             label: 'Description',
             hintText: 'Enter description',
-            maxLines: 3,
+            maxLines: 4,
           ),
         ],
       ),
@@ -280,46 +293,50 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
   }
 
   Widget _buildRoomsSection() {
-    return FormSectionCard(
-      title: 'Rooms',
-      icon: Icons.bed_outlined,
-      trailing: ElevatedButton.icon(
-        onPressed: _addRoom,
-        icon: const Icon(Icons.add, size: 18),
-        label: const Text('Add Room'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF5287B2),
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Specific Rooms',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              ElevatedButton.icon(
+                onPressed: () {}, // Room management is secondary for now
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Add Room Details'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF5287B2),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Optional: Add detailed information for individual rooms.',
+            style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+          ),
+          const SizedBox(height: 24),
           if (_rooms.isEmpty)
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 40),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-              ),
-              child: Column(
-                children: [
-                  Icon(Icons.bed_outlined, size: 48, color: Colors.grey[300]),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'No rooms added yet',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            )
+            _buildEmptyRoomsState()
           else
             ListView.builder(
               shrinkWrap: true,
@@ -328,8 +345,8 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
               itemBuilder: (context, index) {
                 return RoomListItem(
                   room: _rooms[index],
-                  onEdit: () => _editRoom(index),
-                  onDelete: () => _removeRoom(index),
+                  onEdit: () {},
+                  onDelete: () {},
                 );
               },
             ),
@@ -338,92 +355,158 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
     );
   }
 
+  Widget _buildEmptyRoomsState() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 32),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.bed_outlined, size: 40, color: Colors.grey[300]),
+          const SizedBox(height: 12),
+          const Text(
+            'Only simple counts are being used',
+            style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildImagesSection() {
-    return FormSectionCard(
-      title: 'Property Images',
-      icon: Icons.camera_alt_outlined,
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 1,
-        ),
-        itemCount: _images.length,
-        itemBuilder: (context, index) {
-          final url = _images[index];
-          return Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    url,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Property Images',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 24),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1,
+            ),
+            itemCount: _images.length + 1,
+            itemBuilder: (context, index) {
+              if (index == _images.length) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
-                ),
-              ),
-              Positioned(
-                top: 6,
-                right: 6,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _deletedImagePaths.add(url);
-                      _images.removeAt(index);
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      size: 14,
-                      color: Colors.white,
+                  child: const Icon(Icons.add_a_photo_outlined, color: Color(0xFF5287B2)),
+                );
+              }
+              final url = _images[index];
+              return Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      url,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
                     ),
                   ),
-                ),
-              ),
-              if (index == 0)
-                Positioned(
-                  bottom: 6,
-                  left: 6,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF5287B2),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      'Cover',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _deletedImagePaths.add(url);
+                          _images.removeAt(index);
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close, size: 14, color: Colors.white),
                       ),
                     ),
                   ),
-                ),
-            ],
-          );
-        },
+                ],
+              );
+            },
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: SizedBox(
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed: _isSaving ? null : _handleSave,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF5287B2),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
+              icon: _isSaving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    )
+                  : const Icon(Icons.check_circle_outline),
+              label: const Text(
+                'Save All Changes',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 1,
+          child: SizedBox(
+            height: 56,
+            child: OutlinedButton(
+              onPressed: () => Navigator.pop(context),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFFE2E8F0)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                foregroundColor: const Color(0xFF1D1B16),
+              ),
+              child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

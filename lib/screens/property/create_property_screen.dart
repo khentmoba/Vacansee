@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +8,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/property_provider.dart';
 import '../../services/storage_service.dart';
 import '../../widgets/property/property_form_components.dart';
+import '../../widgets/owner/owner_top_nav_bar.dart';
 
 class CreatePropertyScreen extends StatefulWidget {
   final PropertyModel? property;
@@ -19,8 +22,10 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
   final _nameController = TextEditingController();
   final _addressController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _minPriceController = TextEditingController();
-  final _maxPriceController = TextEditingController();
+  final _monthlyPriceController = TextEditingController();
+  final _totalRoomsController = TextEditingController();
+  final _availableRoomsController = TextEditingController();
+  final _customAmenityController = TextEditingController();
 
   GenderOrientation _genderOrientation = GenderOrientation.mixed;
   List<String> _selectedAmenities = [];
@@ -34,8 +39,9 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
       _nameController.text = widget.property!.name;
       _addressController.text = widget.property!.address;
       _descriptionController.text = widget.property!.description ?? '';
-      _minPriceController.text = widget.property!.priceRange.min.toString();
-      _maxPriceController.text = widget.property!.priceRange.max.toString();
+      _monthlyPriceController.text = widget.property!.monthlyPrice.toString();
+      _totalRoomsController.text = widget.property!.totalRooms.toString();
+      _availableRoomsController.text = widget.property!.availableRooms.toString();
       _genderOrientation = widget.property!.genderOrientation;
       _selectedAmenities = List.from(widget.property!.amenities);
     }
@@ -44,14 +50,14 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
   final List<String> _availableAmenities = [
     'WiFi',
     'Air Conditioning',
-    'Laundry',
     'Kitchen',
+    'Laundry Area',
+    '24/7 Security',
     'Parking',
-    'Security',
-    'Study Area',
     'Gym',
-    'Pool',
-    'Pet Friendly',
+    'Swimming Pool',
+    'Study Area',
+    'Common Area',
   ];
 
   final Map<String, String?> _errors = {};
@@ -62,8 +68,10 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
     _nameController.dispose();
     _addressController.dispose();
     _descriptionController.dispose();
-    _minPriceController.dispose();
-    _maxPriceController.dispose();
+    _monthlyPriceController.dispose();
+    _totalRoomsController.dispose();
+    _availableRoomsController.dispose();
+    _customAmenityController.dispose();
     super.dispose();
   }
 
@@ -95,6 +103,16 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
     });
   }
 
+  void _addCustomAmenity() {
+    final text = _customAmenityController.text.trim();
+    if (text.isNotEmpty && !_selectedAmenities.contains(text)) {
+      setState(() {
+        _selectedAmenities.add(text);
+        _customAmenityController.clear();
+      });
+    }
+  }
+
   void _validateAndSubmit() {
     setState(() {
       _errors['name'] = _nameController.text.isEmpty
@@ -103,10 +121,13 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
       _errors['address'] = _addressController.text.isEmpty
           ? 'Address is required'
           : null;
-      _errors['minPrice'] = _minPriceController.text.isEmpty
+      _errors['price'] = _monthlyPriceController.text.isEmpty
           ? 'Required'
           : null;
-      _errors['maxPrice'] = _maxPriceController.text.isEmpty
+      _errors['totalRooms'] = _totalRoomsController.text.isEmpty
+          ? 'Required'
+          : null;
+      _errors['availableRooms'] = _availableRoomsController.text.isEmpty
           ? 'Required'
           : null;
     });
@@ -121,8 +142,9 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
     final propertyProvider = context.read<PropertyProvider>();
     final storageService = StorageService();
 
-    final minPrice = int.tryParse(_minPriceController.text) ?? 0;
-    final maxPrice = int.tryParse(_maxPriceController.text) ?? 0;
+    final monthlyPrice = int.tryParse(_monthlyPriceController.text) ?? 0;
+    final totalRooms = int.tryParse(_totalRoomsController.text) ?? 0;
+    final availableRooms = int.tryParse(_availableRoomsController.text) ?? 0;
     final isEditing = widget.property != null;
 
     setState(() => _isUploadingImages = true);
@@ -133,7 +155,10 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
         property = widget.property!.copyWith(
           name: _nameController.text.trim(),
           address: _addressController.text.trim(),
-          priceRange: PriceRange(min: minPrice, max: maxPrice),
+          monthlyPrice: monthlyPrice,
+          priceRange: PriceRange(min: monthlyPrice, max: monthlyPrice),
+          totalRooms: totalRooms,
+          availableRooms: availableRooms,
           description: _descriptionController.text.trim(),
           genderOrientation: _genderOrientation,
           amenities: _selectedAmenities,
@@ -148,9 +173,16 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
           lng: 0.0,
           genderOrientation: _genderOrientation,
           amenities: _selectedAmenities,
-          priceRange: PriceRange(min: minPrice, max: maxPrice),
+          priceRange: PriceRange(min: monthlyPrice, max: monthlyPrice),
           description: _descriptionController.text.trim(),
         );
+        
+        // Update with new fields (since createPropertyWithId might not handle them yet)
+        await propertyProvider.updateProperty(property.copyWith(
+          monthlyPrice: monthlyPrice,
+          totalRooms: totalRooms,
+          availableRooms: availableRooms,
+        ));
       }
 
       List<String> imageUrls = [];
@@ -198,25 +230,27 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
   Widget build(BuildContext context) {
     final propertyProvider = context.watch<PropertyProvider>();
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FBFD),
-      appBar: AppBar(
-        title: Text(
-          widget.property != null ? 'Edit Listing' : 'New Listing',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF1D1B16),
-        elevation: 0,
-      ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final isDesktop = constraints.maxWidth >= 700;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth >= 900;
 
-              return SingleChildScrollView(
+        return Scaffold(
+          backgroundColor: const Color(0xFFF8FBFD),
+          appBar: isDesktop
+              ? const PreferredSize(
+                  preferredSize: Size.fromHeight(80),
+                  child: OwnerTopNavBar(currentRoute: ''),
+                )
+              : AppBar(
+                  title: Text(widget.property != null ? 'Edit Boarding House' : 'Add New Boarding House'),
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF1D1B16),
+                  elevation: 0,
+                ),
+          body: SingleChildScrollView(
+            child: Center(
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 1000),
                 padding: EdgeInsets.symmetric(
                   horizontal: isDesktop ? 40 : 20,
                   vertical: 32,
@@ -224,412 +258,358 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeader(),
+                    // Breadcrumb
+                    InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.arrow_back, size: 18, color: Color(0xFF475569)),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Back to Dashboard',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Title
+                    Text(
+                      widget.property != null ? 'Edit Boarding House' : 'Add New Boarding House',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1D1B16),
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Fill in the details to create a new listing',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                     const SizedBox(height: 32),
 
                     if (propertyProvider.errorMessage != null)
                       _buildGlobalError(propertyProvider),
 
-                    if (isDesktop)
-                      Row(
+                    // Main Form Card
+                    Container(
+                      padding: const EdgeInsets.all(32),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 24,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            flex: 3,
-                            child: Column(
-                              children: [
-                                _buildBasicInfoSection(),
-                                const SizedBox(height: 24),
-                                _buildAmenitiesSection(),
-                              ],
+                          // Property Images Section
+                          const Text(
+                            'Property Images',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1D1B16),
                             ),
                           ),
-                          const SizedBox(width: 24),
-                          Expanded(
-                            flex: 2,
-                            child: Column(
-                              children: [
-                                _buildMediaSection(),
-                                const SizedBox(height: 24),
-                                _buildPublishCard(propertyProvider),
-                              ],
+                          const SizedBox(height: 16),
+                          if (_selectedImages.isEmpty)
+                            DashedUploadBox(onTap: _pickImage)
+                          else
+                            _buildImageGrid(),
+                          const SizedBox(height: 40),
+
+                          // Basic Information Section
+                          const Text(
+                            'Basic Information',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1D1B16),
                             ),
                           ),
-                        ],
-                      )
-                    else
-                      Column(
-                        children: [
-                          _buildBasicInfoSection(),
                           const SizedBox(height: 24),
-                          _buildAmenitiesSection(),
+                          PremiumTextField(
+                            controller: _nameController,
+                            label: 'Boarding House Name *',
+                            hintText: 'e.g., Sunshine Boarding House',
+                            errorText: _errors['name'],
+                          ),
                           const SizedBox(height: 24),
-                          _buildMediaSection(),
-                          const SizedBox(height: 32),
-                          _buildPublishCard(propertyProvider),
+                          PremiumTextField(
+                            controller: _addressController,
+                            label: 'Location *',
+                            hintText: 'e.g., Quezon City, Metro Manila',
+                            errorText: _errors['address'],
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: PremiumTextField(
+                                  controller: _monthlyPriceController,
+                                  label: 'Monthly Price (₱) *',
+                                  hintText: '5000',
+                                  keyboardType: TextInputType.number,
+                                  errorText: _errors['price'],
+                                ),
+                              ),
+                              const SizedBox(width: 24),
+                              Expanded(
+                                child: PremiumTextField(
+                                  controller: _totalRoomsController,
+                                  label: 'Total Rooms *',
+                                  hintText: '10',
+                                  keyboardType: TextInputType.number,
+                                  errorText: _errors['totalRooms'],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          SizedBox(
+                            width: isDesktop ? constraints.maxWidth * 0.4 : double.infinity,
+                            child: PremiumTextField(
+                              controller: _availableRoomsController,
+                              label: 'Available Rooms *',
+                              hintText: '5',
+                              keyboardType: TextInputType.number,
+                              errorText: _errors['availableRooms'],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          PremiumTextField(
+                            controller: _descriptionController,
+                            label: 'Description *',
+                            hintText: 'Describe your boarding house, its features, and what makes it special...',
+                            maxLines: 5,
+                          ),
+                          const SizedBox(height: 40),
+
+                          // Amenities Section
+                          const Text(
+                            'Amenities',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1D1B16),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Quick add common amenities:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: _availableAmenities.map((amenity) {
+                              final isSelected = _selectedAmenities.contains(amenity);
+                              return AmenityChip(
+                                label: amenity,
+                                isSelected: isSelected,
+                                onTap: () {
+                                  setState(() {
+                                    if (isSelected) {
+                                      _selectedAmenities.remove(amenity);
+                                    } else {
+                                      _selectedAmenities.add(amenity);
+                                    }
+                                  });
+                                },
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: PremiumTextField(
+                                  controller: _customAmenityController,
+                                  label: '',
+                                  hintText: 'Add custom amenity...',
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: ElevatedButton.icon(
+                                  onPressed: _addCustomAmenity,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF5287B2),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                  icon: const Icon(Icons.add, size: 20),
+                                  label: const Text('Add'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 48),
+
+                          // Action Buttons
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: SizedBox(
+                                  height: 56,
+                                  child: ElevatedButton.icon(
+                                    onPressed: propertyProvider.isLoading || _isUploadingImages
+                                        ? null
+                                        : _validateAndSubmit,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF5287B2),
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      elevation: 0,
+                                    ),
+                                    icon: propertyProvider.isLoading || _isUploadingImages
+                                        ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : const Icon(Icons.save_outlined),
+                                    label: Text(
+                                      widget.property != null ? 'Save Changes' : 'Create Listing',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                flex: 1,
+                                child: SizedBox(
+                                  height: 56,
+                                  child: OutlinedButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    style: OutlinedButton.styleFrom(
+                                      side: const BorderSide(color: Color(0xFFE2E8F0)),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      foregroundColor: const Color(0xFF1D1B16),
+                                    ),
+                                    child: const Text(
+                                      'Cancel',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
+                    ),
                   ],
                 ),
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: const Color(0xFF5287B2).withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Text(
-            'PROPERTY DETAILS',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF5287B2),
-              letterSpacing: 1.2,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          widget.property != null ? 'Edit Your Listing' : 'Add New Listing',
-          style: const TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1D1B16),
-            letterSpacing: -0.5,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Provide accurate details to help students find their perfect home.',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 
-  Widget _buildBasicInfoSection() {
-    return FormSectionCard(
-      title: 'Basic Information',
-      icon: Icons.info_outline_rounded,
-      child: Column(
-        children: [
-          PremiumTextField(
-            controller: _nameController,
-            label: 'Property Name *',
-            hintText: 'e.g., Sunshine Boarding House',
-            errorText: _errors['name'],
-          ),
-          const SizedBox(height: 20),
-          PremiumTextField(
-            controller: _addressController,
-            label: 'Address *',
-            hintText: 'e.g., 123 Main St, Cagayan de Oro City',
-            icon: Icons.location_on_outlined,
-            errorText: _errors['address'],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: PremiumTextField(
-                  controller: _minPriceController,
-                  label: 'Min Price (₱) *',
-                  hintText: '3000',
-                  keyboardType: TextInputType.number,
-                  errorText: _errors['minPrice'],
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: PremiumTextField(
-                  controller: _maxPriceController,
-                  label: 'Max Price (₱) *',
-                  hintText: '8000',
-                  keyboardType: TextInputType.number,
-                  errorText: _errors['maxPrice'],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _buildGenderSelector(),
-          const SizedBox(height: 20),
-          PremiumTextField(
-            controller: _descriptionController,
-            label: 'Description',
-            hintText: 'Tell students about your property, rules, and local vibe...',
-            maxLines: 4,
-          ),
-        ],
+  Widget _buildImageGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
       ),
-    );
-  }
-
-  Widget _buildGenderSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Gender Orientation',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1D1B16),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: GenderOrientation.values.map((val) {
-            final isSelected = _genderOrientation == val;
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: ChoiceChip(
-                label: Text(val.name.toUpperCase()),
-                selected: isSelected,
-                onSelected: (selected) {
-                  if (selected) setState(() => _genderOrientation = val);
-                },
-                selectedColor: const Color(0xFF5287B2),
-                labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : const Color(0xFF475569),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-                backgroundColor: const Color(0xFFF1F5F9),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+      itemCount: _selectedImages.length + 1,
+      itemBuilder: (context, index) {
+        if (index == _selectedImages.length) {
+          return InkWell(
+            onTap: _pickImage,
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAmenitiesSection() {
-    return FormSectionCard(
-      title: 'Amenities',
-      icon: Icons.star_border_rounded,
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: _availableAmenities.map((amenity) {
-          final isSelected = _selectedAmenities.contains(amenity);
-          return AmenityChip(
-            label: amenity,
-            isSelected: isSelected,
-            onTap: () {
-              setState(() {
-                if (isSelected) {
-                  _selectedAmenities.remove(amenity);
-                } else {
-                  _selectedAmenities.add(amenity);
-                }
-              });
-            },
+              child: const Icon(Icons.add_a_photo_outlined, color: Color(0xFF5287B2)),
+            ),
           );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildMediaSection() {
-    return FormSectionCard(
-      title: 'Photos',
-      icon: Icons.camera_alt_outlined,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_selectedImages.isEmpty)
-            InkWell(
-              onTap: _pickImage,
-              child: Container(
-                height: 160,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xFFE2E8F0),
-                    style: BorderStyle.solid,
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.cloud_upload_outlined,
-                      size: 40,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Upload Property Photos',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'PNG, JPG up to 5MB',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: _selectedImages.length + 1,
-              itemBuilder: (context, index) {
-                if (index == _selectedImages.length) {
-                  return InkWell(
-                    onTap: _pickImage,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.add_a_photo_outlined, color: Color(0xFF5287B2)),
-                    ),
-                  );
-                }
-                return Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        _selectedImages[index].path,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
-                    ),
-                    Positioned(
-                      top: 4,
-                      right: 4,
-                      child: GestureDetector(
-                        onTap: () => _removeImage(index),
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.5),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.close, size: 14, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPublishCard(PropertyProvider provider) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1D1B16),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          const Icon(Icons.verified_outlined, color: Color(0xFF5287B2), size: 40),
-          const SizedBox(height: 16),
-          const Text(
-            'Ready to Publish?',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'By publishing, your listing will be visible to students in the area.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: ElevatedButton(
-              onPressed: provider.isLoading || _isUploadingImages
-                  ? null
-                  : _validateAndSubmit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF5287B2),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: provider.isLoading || _isUploadingImages
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
+        }
+        return Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: kIsWeb
+                  ? Image.network(
+                      _selectedImages[index].path,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
                     )
-                  : Text(
-                      widget.property != null ? 'Save Changes' : 'Publish Listing',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  : Image.file(
+                      File(_selectedImages[index].path),
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
                     ),
             ),
-          ),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Discard Changes',
-              style: TextStyle(color: Colors.white60, fontSize: 14),
+            Positioned(
+              top: 4,
+              right: 4,
+              child: GestureDetector(
+                onTap: () => _removeImage(index),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, size: 14, color: Colors.white),
+                ),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 

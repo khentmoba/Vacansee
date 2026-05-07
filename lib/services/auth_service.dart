@@ -193,11 +193,22 @@ class AuthService {
     String? displayName,
     String? phoneNumber,
     UserRole? role,
+    String? firstName,
+    String? lastName,
+    String? address,
+    String? businessName,
+    String? businessPermitNo,
   }) async {
     try {
       final updates = <String, dynamic>{};
       if (displayName != null) updates['display_name'] = displayName;
       if (phoneNumber != null) updates['phone_number'] = phoneNumber;
+      if (firstName != null) updates['first_name'] = firstName;
+      if (lastName != null) updates['last_name'] = lastName;
+      if (address != null) updates['address'] = address;
+      if (businessName != null) updates['business_name'] = businessName;
+      if (businessPermitNo != null) updates['business_permit_no'] = businessPermitNo;
+      
       if (role != null) {
         updates['role'] = role.name;
         // Owners require admin verification; students and admins are auto-verified.

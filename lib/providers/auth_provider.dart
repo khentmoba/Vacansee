@@ -139,7 +139,15 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Update user profile
-  Future<bool> updateProfile({String? displayName, String? phoneNumber}) async {
+  Future<bool> updateProfile({
+    String? displayName,
+    String? phoneNumber,
+    String? firstName,
+    String? lastName,
+    String? address,
+    String? businessName,
+    String? businessPermitNo,
+  }) async {
     if (_user == null) return false;
 
     _isLoading = true;
@@ -151,11 +159,21 @@ class AuthProvider extends ChangeNotifier {
         uid: _user!.uid,
         displayName: displayName,
         phoneNumber: phoneNumber,
+        firstName: firstName,
+        lastName: lastName,
+        address: address,
+        businessName: businessName,
+        businessPermitNo: businessPermitNo,
       );
 
       _user = _user!.copyWith(
         displayName: displayName ?? _user!.displayName,
         phoneNumber: phoneNumber ?? _user!.phoneNumber,
+        firstName: firstName ?? _user!.firstName,
+        lastName: lastName ?? _user!.lastName,
+        address: address ?? _user!.address,
+        businessName: businessName ?? _user!.businessName,
+        businessPermitNo: businessPermitNo ?? _user!.businessPermitNo,
       );
       _isLoading = false;
       notifyListeners();

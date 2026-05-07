@@ -78,6 +78,7 @@ class PremiumTextField extends StatelessWidget {
   final int maxLines;
   final String? errorText;
   final String? Function(String?)? validator;
+  final bool readOnly;
 
   const PremiumTextField({
     super.key,
@@ -89,6 +90,7 @@ class PremiumTextField extends StatelessWidget {
     this.maxLines = 1,
     this.errorText,
     this.validator,
+    this.readOnly = false,
   });
 
   @override
@@ -96,12 +98,22 @@ class PremiumTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1D1B16),
+        RichText(
+          text: TextSpan(
+            text: label.replaceAll(' *', ''),
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1D1B16),
+              fontFamily: 'Inter',
+            ),
+            children: [
+              if (label.contains('*'))
+                const TextSpan(
+                  text: ' *',
+                  style: TextStyle(color: Color(0xFFEF4444)),
+                ),
+            ],
           ),
         ),
         const SizedBox(height: 8),
@@ -110,25 +122,31 @@ class PremiumTextField extends StatelessWidget {
           keyboardType: keyboardType,
           maxLines: maxLines,
           validator: validator,
+          readOnly: readOnly,
+          style: TextStyle(
+            fontSize: 15, 
+            color: readOnly ? Colors.grey[600] : const Color(0xFF1D1B16),
+          ),
           decoration: InputDecoration(
             hintText: hintText,
-            prefixIcon: icon != null ? Icon(icon, size: 20) : null,
+            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 15),
+            prefixIcon: icon != null ? Icon(icon, size: 20, color: Colors.grey[400]) : null,
             filled: true,
-            fillColor: const Color(0xFFF8FAFC),
+            fillColor: readOnly ? const Color(0xFFF1F5F9) : Colors.white,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
-              vertical: 16,
+              vertical: 18,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
             ),
             errorText: errorText,
@@ -137,6 +155,98 @@ class PremiumTextField extends StatelessWidget {
       ],
     );
   }
+}
+
+class DashedUploadBox extends StatelessWidget {
+  final VoidCallback onTap;
+  final String title;
+  final String subtitle;
+
+  const DashedUploadBox({
+    super.key,
+    required this.onTap,
+    this.title = 'Click to upload or drag and drop',
+    this.subtitle = 'PNG, JPG, or JPEG (Max 5MB each)',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        height: 180,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: CustomPaint(
+          painter: _DashedPainter(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.file_upload_outlined,
+                size: 48,
+                color: Color(0xFF94A3B8),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF475569),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF94A3B8),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DashedPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFCBD5E1)
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    const dashWidth = 8.0;
+    const dashSpace = 5.0;
+    final path = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        const Radius.circular(12),
+      ));
+
+    final dashPath = Path();
+    for (final metric in path.computeMetrics()) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        dashPath.addPath(
+          metric.extractPath(distance, distance + dashWidth),
+          Offset.zero,
+        );
+        distance += dashWidth + dashSpace;
+      }
+    }
+    canvas.drawPath(dashPath, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class AmenityChip extends StatelessWidget {
@@ -155,48 +265,29 @@ class AmenityChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF5287B2) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: isSelected ? const Color(0xFFEBF5FF) : const Color(0xFFF1F5F9),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? const Color(0xFF5287B2) : const Color(0xFFE2E8F0),
+            color: isSelected ? const Color(0xFF5287B2).withValues(alpha: 0.3) : Colors.transparent,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFF5287B2).withValues(alpha: 0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isSelected)
-              const Padding(
-                padding: EdgeInsets.only(right: 6),
-                child: Icon(Icons.check, size: 14, color: Colors.white),
-              ),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : const Color(0xFF475569),
-              ),
-            ),
-          ],
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            color: isSelected ? const Color(0xFF5287B2) : const Color(0xFF475569),
+          ),
         ),
       ),
     );
   }
 }
+
 
 class RoomListItem extends StatelessWidget {
   final RoomModel room;
