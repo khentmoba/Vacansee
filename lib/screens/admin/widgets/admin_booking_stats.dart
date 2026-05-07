@@ -16,44 +16,44 @@ class AdminBookingStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _BookingStatCard(
-            label: 'Total Bookings',
-            value: total.toString(),
-            icon: Icons.calendar_today_outlined,
-            iconColor: const Color(0xFF5287B2),
-          ),
-        ),
-        const SizedBox(width: 24),
-        Expanded(
-          child: _BookingStatCard(
-            label: 'Pending',
-            value: pending.toString(),
-            icon: Icons.access_time_outlined,
-            iconColor: const Color(0xFFFFA000),
-          ),
-        ),
-        const SizedBox(width: 24),
-        Expanded(
-          child: _BookingStatCard(
-            label: 'Approved',
-            value: approved.toString(),
-            icon: Icons.check_circle_outline,
-            iconColor: const Color(0xFF4CAF50),
-          ),
-        ),
-        const SizedBox(width: 24),
-        Expanded(
-          child: _BookingStatCard(
-            label: 'Rejected',
-            value: rejected.toString(),
-            icon: Icons.cancel_outlined,
-            iconColor: const Color(0xFFF44336),
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: isMobile ? 2 : 4,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: isMobile ? 1.0 : 1.3,
+          children: [
+            _BookingStatCard(
+              label: 'Total Bookings',
+              value: total.toString(),
+              icon: Icons.calendar_today_outlined,
+              iconColor: const Color(0xFF5287B2),
+            ),
+            _BookingStatCard(
+              label: 'Pending',
+              value: pending.toString(),
+              icon: Icons.access_time_outlined,
+              iconColor: const Color(0xFFFFA000),
+            ),
+            _BookingStatCard(
+              label: 'Approved',
+              value: approved.toString(),
+              icon: Icons.check_circle_outline,
+              iconColor: const Color(0xFF4CAF50),
+            ),
+            _BookingStatCard(
+              label: 'Rejected',
+              value: rejected.toString(),
+              icon: Icons.cancel_outlined,
+              iconColor: const Color(0xFFF44336),
+            ),
+          ],
+        );
+      },
     );
   }
 }

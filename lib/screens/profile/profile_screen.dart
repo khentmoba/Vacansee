@@ -10,46 +10,53 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late TextEditingController _displayNameController;
+  late TextEditingController _firstNameController;
+  late TextEditingController _lastNameController;
   late TextEditingController _phoneController;
+  late TextEditingController _addressController;
+  late TextEditingController _emergencyNameController;
+  late TextEditingController _emergencyPhoneController;
+  
   bool _isSaved = false;
-  String? _nameError;
   String? _gender;
 
   @override
   void initState() {
     super.initState();
     final user = context.read<AuthProvider>().user;
-    _displayNameController = TextEditingController(
-      text: user?.displayName ?? '',
-    );
+    _firstNameController = TextEditingController(text: user?.firstName ?? '');
+    _lastNameController = TextEditingController(text: user?.lastName ?? '');
     _phoneController = TextEditingController(text: user?.phoneNumber ?? '');
+    _addressController = TextEditingController(text: user?.address ?? '');
+    _emergencyNameController = TextEditingController(text: user?.emergencyContactName ?? '');
+    _emergencyPhoneController = TextEditingController(text: user?.emergencyContactPhone ?? '');
     _gender = user?.gender;
   }
 
   @override
   void dispose() {
-    _displayNameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _phoneController.dispose();
+    _addressController.dispose();
+    _emergencyNameController.dispose();
+    _emergencyPhoneController.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
-    final name = _displayNameController.text.trim();
-    if (name.isEmpty) {
-      setState(() => _nameError = 'Display name cannot be empty');
-      return;
-    }
-    setState(() => _nameError = null);
-
     final authProvider = context.read<AuthProvider>();
     final success = await authProvider.updateProfile(
-      displayName: name,
-      phoneNumber: _phoneController.text.trim().isEmpty
-          ? null
-          : _phoneController.text.trim(),
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
+      displayName: '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}'.trim(),
+      phoneNumber: _phoneController.text.trim(),
       gender: _gender,
+      address: _addressController.text.trim(),
+      emergencyContactName: _emergencyNameController.text.trim(),
+      emergencyContactPhone: _emergencyPhoneController.text.trim(),
     );
+
     if (success && mounted) {
       setState(() => _isSaved = true);
       Future.delayed(const Duration(seconds: 2), () {
@@ -62,12 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final user = authProvider.user;
-    final initials = (user?.displayName ?? 'U')
-        .trim()
-        .split(' ')
-        .map((w) => w.isNotEmpty ? w[0].toUpperCase() : '')
-        .take(2)
-        .join();
+    final isDesktop = MediaQuery.of(context).size.width >= 800;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FBFD),
@@ -75,319 +77,301 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF5287B2),
         elevation: 0,
+        centerTitle: false,
         title: const Text(
-          'My Profile',
+          'Edit Profile',
           style: TextStyle(
             color: Color(0xFF1D1B16),
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
           ),
         ),
         actions: [
-          TextButton.icon(
-            onPressed: authProvider.isLoading ? null : _save,
-            icon: authProvider.isLoading
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Icon(
-                    _isSaved ? Icons.check_circle : Icons.save_outlined,
-                    size: 18,
-                    color: _isSaved
-                        ? const Color(0xFF10B981)
-                        : const Color(0xFF5287B2),
-                  ),
-            label: Text(
-              _isSaved ? 'Saved!' : 'Save',
-              style: TextStyle(
-                color: _isSaved
-                    ? const Color(0xFF10B981)
-                    : const Color(0xFF5287B2),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Avatar card
-            Center(
-              child: Column(
-                children: [
-                  Container(
-                    width: 88,
-                    height: 88,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF5287B2), Color(0xFF3D6A8C)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF5287B2).withValues(alpha: 0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        initials,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    user?.email ?? '',
-                    style: const TextStyle(
-                      color: Color(0xFF666666),
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF5287B2).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      user?.role?.name.toUpperCase() ?? 'PENDING',
-                      style: const TextStyle(
-                        color: Color(0xFF5287B2),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40),
-
-            // Error from provider
-            if (authProvider.errorMessage != null)
-              Container(
-                margin: const EdgeInsets.only(bottom: 20),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.red[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
-                ),
+          if (_isSaved)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.only(right: 16),
                 child: Row(
                   children: [
-                    const Icon(
-                      Icons.error_outline,
-                      color: Colors.red,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        authProvider.errorMessage!,
-                        style: const TextStyle(color: Colors.red, fontSize: 13),
+                    Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18),
+                    SizedBox(width: 8),
+                    Text(
+                      'Changes Saved',
+                      style: TextStyle(
+                        color: Color(0xFF10B981),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
               ),
-
-            // Form card
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Personal Information',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1D1B16),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  _label('Display Name'),
-                  TextField(
-                    controller: _displayNameController,
-                    onChanged: (_) => setState(() => _nameError = null),
-                    decoration: _inputDecoration(
-                      hint: 'Your full name',
-                      icon: Icons.person_outline,
-                      error: _nameError,
-                    ),
-                  ),
-                  if (_nameError != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 6, left: 4),
-                      child: Text(
-                        _nameError!,
-                        style: const TextStyle(color: Colors.red, fontSize: 12),
-                      ),
-                    ),
-                  const SizedBox(height: 20),
-
-                  _label('Phone Number'),
-                  TextField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: _inputDecoration(
-                      hint: '09XXXXXXXXX (optional)',
-                      icon: Icons.phone_outlined,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  _label('Gender Orientation'),
-                  DropdownButtonFormField<String>(
-                    initialValue: _gender,
-                    items: const [
-                      DropdownMenuItem(value: 'male', child: Text('Male')),
-                      DropdownMenuItem(value: 'female', child: Text('Female')),
-                    ],
-                    onChanged: (value) => setState(() => _gender = value),
-                    decoration: _inputDecoration(
-                      hint: 'Select gender',
-                      icon: Icons.people_outline,
-                    ),
-                    dropdownColor: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  const SizedBox(height: 20),
-
-                  _label('Email Address'),
-                  TextField(
-                    enabled: false,
-                    controller: TextEditingController(text: user?.email ?? ''),
-                    decoration:
-                        _inputDecoration(
-                          hint: '',
-                          icon: Icons.email_outlined,
-                        ).copyWith(
-                          fillColor: Colors.grey[50],
-                          helperText: 'Email cannot be changed',
-                          helperStyle: const TextStyle(fontSize: 11),
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Sign Out
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: OutlinedButton.icon(
-                onPressed: () async {
-                  final navigator = Navigator.of(context);
-                  await context.read<AuthProvider>().signOut();
-                  if (mounted) {
-                    navigator.popUntil((route) => route.isFirst);
-                  }
-                },
-                icon: const Icon(Icons.logout_rounded, size: 20),
-                label: const Text(
-                  'Sign Out',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                ),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red[600],
-                  side: BorderSide(color: Colors.red[200]!, width: 1.5),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.only(right: 16, top: 8, bottom: 8),
+              child: ElevatedButton.icon(
+                onPressed: authProvider.isLoading ? null : _save,
+                icon: authProvider.isLoading
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Icon(Icons.save_rounded, size: 18),
+                label: const Text('Save Changes'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF5287B2),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 32),
-          ],
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(
+          horizontal: isDesktop ? 40 : 20,
+          vertical: 32,
+        ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (authProvider.errorMessage != null)
+                  _buildErrorBanner(authProvider.errorMessage!),
+
+                _buildSectionHeader('Personal Information'),
+                const SizedBox(height: 24),
+                
+                if (isDesktop) ...[
+                  Row(
+                    children: [
+                      Expanded(child: _buildTextField('First Name', _firstNameController, Icons.person_outline)),
+                      const SizedBox(width: 20),
+                      Expanded(child: _buildTextField('Last Name', _lastNameController, Icons.person_outline)),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(child: _buildGenderDropdown()),
+                      const SizedBox(width: 20),
+                      Expanded(child: _buildTextField('Phone Number', _phoneController, Icons.phone_outlined, keyboardType: TextInputType.phone)),
+                    ],
+                  ),
+                ] else ...[
+                  _buildTextField('First Name', _firstNameController, Icons.person_outline),
+                  const SizedBox(height: 20),
+                  _buildTextField('Last Name', _lastNameController, Icons.person_outline),
+                  const SizedBox(height: 20),
+                  _buildGenderDropdown(),
+                  const SizedBox(height: 20),
+                  _buildTextField('Phone Number', _phoneController, Icons.phone_outlined, keyboardType: TextInputType.phone),
+                ],
+                const SizedBox(height: 20),
+                _buildTextField('Email Address', TextEditingController(text: user?.email), Icons.email_outlined, enabled: false),
+                const SizedBox(height: 20),
+                _buildTextField('Home Address', _addressController, Icons.location_on_outlined),
+                
+                const SizedBox(height: 48),
+                _buildSectionHeader('Emergency Contact'),
+                const SizedBox(height: 24),
+
+                if (isDesktop) ...[
+                  Row(
+                    children: [
+                      Expanded(child: _buildTextField('Contact Name', _emergencyNameController, Icons.contact_page_outlined)),
+                      const SizedBox(width: 20),
+                      Expanded(child: _buildTextField('Contact Number', _emergencyPhoneController, Icons.phone_callback_outlined, keyboardType: TextInputType.phone)),
+                    ],
+                  ),
+                ] else ...[
+                  _buildTextField('Contact Name', _emergencyNameController, Icons.contact_page_outlined),
+                  const SizedBox(height: 20),
+                  _buildTextField('Contact Number', _emergencyPhoneController, Icons.phone_callback_outlined, keyboardType: TextInputType.phone),
+                ],
+                
+                const SizedBox(height: 60),
+                // Danger Zone / Sign Out
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withValues(alpha: 0.02),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.red.withValues(alpha: 0.1)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Account Actions',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            final navigator = Navigator.of(context);
+                            await authProvider.signOut();
+                            if (mounted) {
+                              navigator.popUntil((route) => route.isFirst);
+                            }
+                          },
+                          icon: const Icon(Icons.logout_rounded, size: 18),
+                          label: const Text('Sign Out of VacanSee'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.red,
+                            side: const BorderSide(color: Colors.red),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _label(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF444444),
-        ),
+  Widget _buildSectionHeader(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF1D1B16),
       ),
     );
   }
 
-  InputDecoration _inputDecoration({
-    required String hint,
-    required IconData icon,
-    String? error,
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller,
+    IconData icon, {
+    bool enabled = true,
+    TextInputType keyboardType = TextInputType.text,
   }) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF999999)),
-      prefixIcon: Icon(icon, color: const Color(0xFF5287B2), size: 20),
-      filled: true,
-      fillColor: error != null ? Colors.red[50] : Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: error != null ? Colors.red : const Color(0xFFE0E0E0),
-          width: 1.5,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1D1B16),
+          ),
         ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: error != null ? Colors.red : const Color(0xFFE0E0E0),
-          width: 1.5,
+        const SizedBox(height: 10),
+        TextField(
+          controller: controller,
+          enabled: enabled,
+          keyboardType: keyboardType,
+          style: const TextStyle(fontSize: 15),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, size: 18, color: const Color(0xFF5287B2)),
+            filled: true,
+            fillColor: enabled ? const Color(0xFFFBFBFB) : Colors.grey[50],
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.grey[100]!, width: 1),
+            ),
+            hintText: 'Enter $label',
+            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+          ),
         ),
-      ),
-      focusedBorder: OutlineInputBorder(
+      ],
+    );
+  }
+
+  Widget _buildGenderDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Gender',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1D1B16),
+          ),
+        ),
+        const SizedBox(height: 10),
+        DropdownButtonFormField<String>(
+          initialValue: _gender,
+          items: const [
+            DropdownMenuItem(value: 'male', child: Text('Male')),
+            DropdownMenuItem(value: 'female', child: Text('Female')),
+            DropdownMenuItem(value: 'other', child: Text('Other')),
+          ],
+          onChanged: (val) => setState(() => _gender = val),
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.people_outline, size: 18, color: Color(0xFF5287B2)),
+            filled: true,
+            fillColor: const Color(0xFFFBFBFB),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildErrorBanner(String message) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.red[50],
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
+        border: Border.all(color: Colors.red[100]!),
       ),
-      disabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[200]!, width: 1.5),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: Colors.red, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.red, fontSize: 14),
+            ),
+          ),
+        ],
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
   }
 }

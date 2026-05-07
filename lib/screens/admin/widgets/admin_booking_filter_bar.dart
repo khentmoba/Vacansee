@@ -34,43 +34,46 @@ class AdminBookingFilterBar extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Icon(Icons.filter_list, color: Colors.grey[600], size: 20),
-          const SizedBox(width: 12),
-          Text(
-            'Filter by Status:',
-            style: TextStyle(
-              color: Colors.grey[700],
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            Icon(Icons.filter_list, color: Colors.grey[600], size: 20),
+            const SizedBox(width: 12),
+            Text(
+              'Filter by Status:',
+              style: TextStyle(
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
             ),
-          ),
-          const SizedBox(width: 16),
-          _FilterChip(
-            label: 'All ($totalCount)',
-            isSelected: selectedStatus == null,
-            onTap: () => onStatusChanged(null),
-          ),
-          const SizedBox(width: 12),
-          _FilterChip(
-            label: 'Pending ($pendingCount)',
-            isSelected: selectedStatus == BookingStatus.pending,
-            onTap: () => onStatusChanged(BookingStatus.pending),
-          ),
-          const SizedBox(width: 12),
-          _FilterChip(
-            label: 'Approved ($approvedCount)',
-            isSelected: selectedStatus == BookingStatus.approved,
-            onTap: () => onStatusChanged(BookingStatus.approved),
-          ),
-          const SizedBox(width: 12),
-          _FilterChip(
-            label: 'Rejected ($rejectedCount)',
-            isSelected: selectedStatus == BookingStatus.rejected,
-            onTap: () => onStatusChanged(BookingStatus.rejected),
-          ),
-        ],
+            const SizedBox(width: 16),
+            _FilterChip(
+              label: 'All ($totalCount)',
+              isSelected: selectedStatus == null,
+              onTap: () => onStatusChanged(null),
+            ),
+            const SizedBox(width: 12),
+            _FilterChip(
+              label: 'Pending ($pendingCount)',
+              isSelected: selectedStatus == BookingStatus.pending,
+              onTap: () => onStatusChanged(BookingStatus.pending),
+            ),
+            const SizedBox(width: 12),
+            _FilterChip(
+              label: 'Approved ($approvedCount)',
+              isSelected: selectedStatus == BookingStatus.approved,
+              onTap: () => onStatusChanged(BookingStatus.approved),
+            ),
+            const SizedBox(width: 12),
+            _FilterChip(
+              label: 'Rejected ($rejectedCount)',
+              isSelected: selectedStatus == BookingStatus.rejected,
+              onTap: () => onStatusChanged(BookingStatus.rejected),
+            ),
+          ],
+        ),
       ),
     );
   }

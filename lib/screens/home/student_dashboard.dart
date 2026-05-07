@@ -356,9 +356,11 @@ class _ProfileTab extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1000),
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: isDesktop ? 40 : 20,
-            vertical: 32,
+          padding: EdgeInsets.only(
+            left: isDesktop ? 40 : 20,
+            right: isDesktop ? 40 : 20,
+            top: 32,
+            bottom: isDesktop ? 32 : 140,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,17 +496,25 @@ class _ProfileTab extends StatelessWidget {
                       if (isDesktop) ...[
                         Row(
                           children: [
-                            _buildProfileField('First Name', user?.firstName ?? 'First Name'),
+                            Expanded(child: _buildProfileField('First Name', user?.firstName ?? 'First Name')),
                             const SizedBox(width: 24),
-                            _buildProfileField('Last Name', user?.lastName ?? 'Last Name'),
+                            Expanded(child: _buildProfileField('Last Name', user?.lastName ?? 'Last Name')),
                           ],
                         ),
                         const SizedBox(height: 24),
                         Row(
                           children: [
-                            _buildProfileField('Email Address', user?.email ?? 'Email', icon: Icons.email_outlined),
+                            Expanded(child: _buildProfileField('Gender', user?.gender?.toUpperCase() ?? 'Not Set', icon: Icons.people_outline)),
                             const SizedBox(width: 24),
-                            _buildProfileField('Phone Number', user?.phoneNumber ?? 'Phone', icon: Icons.phone_outlined),
+                            Expanded(child: _buildProfileField('Phone Number', user?.phoneNumber ?? 'Phone', icon: Icons.phone_outlined)),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: [
+                            Expanded(child: _buildProfileField('Email Address', user?.email ?? 'Email', icon: Icons.email_outlined)),
+                            const SizedBox(width: 24),
+                            const Spacer(), // Keep it two-column aligned
                           ],
                         ),
                       ] else ...[
@@ -512,9 +522,11 @@ class _ProfileTab extends StatelessWidget {
                         const SizedBox(height: 24),
                         _buildProfileField('Last Name', user?.lastName ?? 'Last Name'),
                         const SizedBox(height: 24),
-                        _buildProfileField('Email Address', user?.email ?? 'Email', icon: Icons.email_outlined),
+                        _buildProfileField('Gender', user?.gender?.toUpperCase() ?? 'Not Set', icon: Icons.people_outline),
                         const SizedBox(height: 24),
                         _buildProfileField('Phone Number', user?.phoneNumber ?? 'Phone', icon: Icons.phone_outlined),
+                        const SizedBox(height: 24),
+                        _buildProfileField('Email Address', user?.email ?? 'Email', icon: Icons.email_outlined),
                       ],
                       const SizedBox(height: 24),
                       _buildProfileField('Address', user?.address ?? 'Your Address'),
@@ -534,9 +546,9 @@ class _ProfileTab extends StatelessWidget {
                       if (isDesktop)
                         Row(
                           children: [
-                            _buildProfileField('Contact Name', user?.emergencyContactName ?? 'Emergency Contact Name'),
+                            Expanded(child: _buildProfileField('Contact Name', user?.emergencyContactName ?? 'Emergency Contact Name')),
                             const SizedBox(width: 24),
-                            _buildProfileField('Contact Number', user?.emergencyContactPhone ?? 'Emergency Contact Number'),
+                            Expanded(child: _buildProfileField('Contact Number', user?.emergencyContactPhone ?? 'Emergency Contact Number')),
                           ],
                         )
                       else ...[
@@ -576,11 +588,9 @@ class _ProfileTab extends StatelessWidget {
   }
 
   Widget _buildProfileField(String label, String value, {IconData? icon}) {
-    return Expanded(
-      flex: 1,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
           Text(
             label,
             style: const TextStyle(
@@ -616,7 +626,6 @@ class _ProfileTab extends StatelessWidget {
             ),
           ),
         ],
-      ),
     );
   }
 }

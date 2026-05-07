@@ -16,40 +16,40 @@ class AdminListingStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _StatCard(
-            label: 'Total Listings',
-            value: total.toString(),
-            color: const Color(0xFF5287B2),
-          ),
-        ),
-        const SizedBox(width: 24),
-        Expanded(
-          child: _StatCard(
-            label: 'Available',
-            value: available.toString(),
-            color: const Color(0xFF4CAF50),
-          ),
-        ),
-        const SizedBox(width: 24),
-        Expanded(
-          child: _StatCard(
-            label: 'Full',
-            value: full.toString(),
-            color: const Color(0xFFF44336),
-          ),
-        ),
-        const SizedBox(width: 24),
-        Expanded(
-          child: _StatCard(
-            label: 'Available Rooms',
-            value: availableRooms.toString(),
-            color: const Color(0xFF9C27B0),
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: isMobile ? 2 : 4,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: isMobile ? 1.3 : 1.5,
+          children: [
+            _StatCard(
+              label: 'Total Listings',
+              value: total.toString(),
+              color: const Color(0xFF5287B2),
+            ),
+            _StatCard(
+              label: 'Available',
+              value: available.toString(),
+              color: const Color(0xFF4CAF50),
+            ),
+            _StatCard(
+              label: 'Full',
+              value: full.toString(),
+              color: const Color(0xFFF44336),
+            ),
+            _StatCard(
+              label: 'Available Rooms',
+              value: availableRooms.toString(),
+              color: const Color(0xFF9C27B0),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -16,44 +16,44 @@ class AdminUserStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _UserStatCard(
-            label: 'Total Users',
-            value: total.toString(),
-            icon: Icons.person_outline,
-            iconColor: const Color(0xFF5287B2),
-          ),
-        ),
-        const SizedBox(width: 24),
-        Expanded(
-          child: _UserStatCard(
-            label: 'Tenants',
-            value: tenants.toString(),
-            icon: Icons.person_search_outlined,
-            iconColor: const Color(0xFF4CAF50),
-          ),
-        ),
-        const SizedBox(width: 24),
-        Expanded(
-          child: _UserStatCard(
-            label: 'Owners',
-            value: owners.toString(),
-            icon: Icons.home_work_outlined,
-            iconColor: const Color(0xFF0288D1),
-          ),
-        ),
-        const SizedBox(width: 24),
-        Expanded(
-          child: _UserStatCard(
-            label: 'Admins',
-            value: admins.toString(),
-            icon: Icons.admin_panel_settings_outlined,
-            iconColor: const Color(0xFF9C27B0),
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: isMobile ? 2 : 4,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: isMobile ? 1.0 : 1.3,
+          children: [
+            _UserStatCard(
+              label: 'Total Users',
+              value: total.toString(),
+              icon: Icons.person_outline,
+              iconColor: const Color(0xFF5287B2),
+            ),
+            _UserStatCard(
+              label: 'Tenants',
+              value: tenants.toString(),
+              icon: Icons.person_search_outlined,
+              iconColor: const Color(0xFF4CAF50),
+            ),
+            _UserStatCard(
+              label: 'Owners',
+              value: owners.toString(),
+              icon: Icons.home_work_outlined,
+              iconColor: const Color(0xFF0288D1),
+            ),
+            _UserStatCard(
+              label: 'Admins',
+              value: admins.toString(),
+              icon: Icons.admin_panel_settings_outlined,
+              iconColor: const Color(0xFF9C27B0),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -199,6 +199,8 @@ class AuthService {
     String? address,
     String? businessName,
     String? businessPermitNo,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
   }) async {
     try {
       final updates = <String, dynamic>{};
@@ -210,6 +212,8 @@ class AuthService {
       if (address != null) updates['address'] = address;
       if (businessName != null) updates['business_name'] = businessName;
       if (businessPermitNo != null) updates['business_permit_no'] = businessPermitNo;
+      if (emergencyContactName != null) updates['emergency_contact_name'] = emergencyContactName;
+      if (emergencyContactPhone != null) updates['emergency_contact_phone'] = emergencyContactPhone;
       
       if (role != null) {
         updates['role'] = role.name;

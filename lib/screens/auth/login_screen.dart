@@ -479,15 +479,16 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.network(
-                  'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png',
-                  height: 20,
+                  'https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png',
+                  height: 24,
+                  width: 24,
                 ),
                 const SizedBox(width: 12),
                 const Text(
                   'Continue with Google',
                   style: TextStyle(
                     color: Color(0xFF1D1B16),
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

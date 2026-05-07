@@ -6,7 +6,8 @@ import '../../widgets/owner/owner_top_nav_bar.dart';
 import '../../widgets/property/property_form_components.dart';
 
 class OwnerProfileScreen extends StatefulWidget {
-  const OwnerProfileScreen({super.key});
+  final bool showAppBar;
+  const OwnerProfileScreen({super.key, this.showAppBar = true});
 
   @override
   State<OwnerProfileScreen> createState() => _OwnerProfileScreenState();
@@ -90,6 +91,44 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth >= 900;
 
+        final content = Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1000),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: isDesktop ? 40 : 20,
+                vertical: 32,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.showAppBar || isDesktop) ...[
+                    _buildBreadcrumb(),
+                    const SizedBox(height: 24),
+                  ],
+                  _buildProfileHeader(user),
+                  const SizedBox(height: 32),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        _buildOwnerInfoSection(isDesktop),
+                        const SizedBox(height: 32),
+                        _buildBusinessInfoSection(isDesktop),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          ),
+        );
+
+        if (!widget.showAppBar && !isDesktop) {
+          return content;
+        }
+
         return Scaffold(
           backgroundColor: const Color(0xFFF8FBFD),
           appBar: isDesktop
@@ -103,37 +142,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                   foregroundColor: const Color(0xFF1D1B16),
                   elevation: 0,
                 ),
-          body: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1000),
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isDesktop ? 40 : 20,
-                  vertical: 32,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildBreadcrumb(),
-                    const SizedBox(height: 24),
-                    _buildProfileHeader(user),
-                    const SizedBox(height: 32),
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          _buildOwnerInfoSection(isDesktop),
-                          const SizedBox(height: 32),
-                          _buildBusinessInfoSection(isDesktop),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          body: content,
         );
       },
     );
@@ -161,9 +170,10 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
   }
 
   Widget _buildProfileHeader(UserModel? user) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(40),
+      padding: EdgeInsets.all(isMobile ? 24 : 40),
       decoration: BoxDecoration(
         color: const Color(0xFF5287B2),
         borderRadius: BorderRadius.circular(16),
@@ -175,55 +185,87 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.business_rounded, size: 40, color: Color(0xFF5287B2)),
-          ),
-          const SizedBox(width: 24),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                user?.displayName ?? 'User Name',
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+      child: isMobile
+          ? Column(
+              children: [
+                Container(
+                  width: 70,
+                  height: 70,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.business_rounded, size: 35, color: Color(0xFF5287B2)),
                 ),
-              ),
-              const Text(
-                'Property Owner',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              if (user?.businessName != null && user!.businessName!.isNotEmpty)
+                const SizedBox(height: 20),
                 Text(
-                  user.businessName!,
+                  user?.displayName ?? 'User Name',
                   style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white60,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-            ],
-          ),
-        ],
-      ),
+                const Text(
+                  'Property Owner',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.business_rounded, size: 40, color: Color(0xFF5287B2)),
+                ),
+                const SizedBox(width: 24),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user?.displayName ?? 'User Name',
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const Text(
+                      'Property Owner',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    if (user?.businessName != null && user!.businessName!.isNotEmpty)
+                      Text(
+                        user.businessName!,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white60,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
     );
   }
 
   Widget _buildOwnerInfoSection(bool isDesktop) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
     return Container(
-      padding: const EdgeInsets.all(32),
+      padding: EdgeInsets.all(isMobile ? 20 : 32),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -260,48 +302,77 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: PremiumTextField(
-                  controller: _firstNameController,
-                  label: 'First Name',
-                  hintText: 'Enter first name',
+          if (isMobile) ...[
+            PremiumTextField(
+              controller: _firstNameController,
+              label: 'First Name',
+              hintText: 'Enter first name',
+            ),
+            const SizedBox(height: 20),
+            PremiumTextField(
+              controller: _lastNameController,
+              label: 'Last Name',
+              hintText: 'Enter last name',
+            ),
+          ] else
+            Row(
+              children: [
+                Expanded(
+                  child: PremiumTextField(
+                    controller: _firstNameController,
+                    label: 'First Name',
+                    hintText: 'Enter first name',
+                  ),
                 ),
-              ),
-              const SizedBox(width: 24),
-              Expanded(
-                child: PremiumTextField(
-                  controller: _lastNameController,
-                  label: 'Last Name',
-                  hintText: 'Enter last name',
+                const SizedBox(width: 24),
+                Expanded(
+                  child: PremiumTextField(
+                    controller: _lastNameController,
+                    label: 'Last Name',
+                    hintText: 'Enter last name',
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: PremiumTextField(
-                  controller: _emailController,
-                  label: 'Email Address',
-                  hintText: 'email@example.com',
-                  readOnly: true,
-                  icon: Icons.email_outlined,
+          if (isMobile) ...[
+            PremiumTextField(
+              controller: _emailController,
+              label: 'Email Address',
+              hintText: 'email@example.com',
+              readOnly: true,
+              icon: Icons.email_outlined,
+            ),
+            const SizedBox(height: 20),
+            PremiumTextField(
+              controller: _phoneController,
+              label: 'Phone Number',
+              hintText: '09123456789',
+              icon: Icons.phone_outlined,
+            ),
+          ] else
+            Row(
+              children: [
+                Expanded(
+                  child: PremiumTextField(
+                    controller: _emailController,
+                    label: 'Email Address',
+                    hintText: 'email@example.com',
+                    readOnly: true,
+                    icon: Icons.email_outlined,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 24),
-              Expanded(
-                child: PremiumTextField(
-                  controller: _phoneController,
-                  label: 'Phone Number',
-                  hintText: '09123456789',
-                  icon: Icons.phone_outlined,
+                const SizedBox(width: 24),
+                Expanded(
+                  child: PremiumTextField(
+                    controller: _phoneController,
+                    label: 'Phone Number',
+                    hintText: '09123456789',
+                    icon: Icons.phone_outlined,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           const SizedBox(height: 24),
           PremiumTextField(
             controller: _addressController,
@@ -314,8 +385,9 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
   }
 
   Widget _buildBusinessInfoSection(bool isDesktop) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
     return Container(
-      padding: const EdgeInsets.all(32),
+      padding: EdgeInsets.all(isMobile ? 20 : 32),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -335,26 +407,40 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: PremiumTextField(
-                  controller: _businessNameController,
-                  label: 'Business Name',
-                  hintText: 'Enter business name',
-                  icon: Icons.business_outlined,
+          if (isMobile) ...[
+            PremiumTextField(
+              controller: _businessNameController,
+              label: 'Business Name',
+              hintText: 'Enter business name',
+              icon: Icons.business_outlined,
+            ),
+            const SizedBox(height: 20),
+            PremiumTextField(
+              controller: _businessPermitController,
+              label: 'Business Permit No.',
+              hintText: 'BP-202X-XXXXX',
+            ),
+          ] else
+            Row(
+              children: [
+                Expanded(
+                  child: PremiumTextField(
+                    controller: _businessNameController,
+                    label: 'Business Name',
+                    hintText: 'Enter business name',
+                    icon: Icons.business_outlined,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 24),
-              Expanded(
-                child: PremiumTextField(
-                  controller: _businessPermitController,
-                  label: 'Business Permit No.',
-                  hintText: 'BP-202X-XXXXX',
+                const SizedBox(width: 24),
+                Expanded(
+                  child: PremiumTextField(
+                    controller: _businessPermitController,
+                    label: 'Business Permit No.',
+                    hintText: 'BP-202X-XXXXX',
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
         ],
       ),
     );

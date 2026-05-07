@@ -87,9 +87,11 @@ class _RatingsScreenState extends State<RatingsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FBFD),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(
-          horizontal: isDesktop ? 60 : 24,
-          vertical: isDesktop ? 48 : 32,
+        padding: EdgeInsets.only(
+          left: isDesktop ? 60 : 24,
+          right: isDesktop ? 60 : 24,
+          top: isDesktop ? 48 : 32,
+          bottom: isDesktop ? 48 : 140,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

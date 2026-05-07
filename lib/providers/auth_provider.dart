@@ -148,6 +148,8 @@ class AuthProvider extends ChangeNotifier {
     String? address,
     String? businessName,
     String? businessPermitNo,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
   }) async {
     if (_user == null) return false;
 
@@ -166,6 +168,8 @@ class AuthProvider extends ChangeNotifier {
         address: address,
         businessName: businessName,
         businessPermitNo: businessPermitNo,
+        emergencyContactName: emergencyContactName,
+        emergencyContactPhone: emergencyContactPhone,
       );
 
       _user = _user!.copyWith(
@@ -177,6 +181,8 @@ class AuthProvider extends ChangeNotifier {
         address: address ?? _user!.address,
         businessName: businessName ?? _user!.businessName,
         businessPermitNo: businessPermitNo ?? _user!.businessPermitNo,
+        emergencyContactName: emergencyContactName ?? _user!.emergencyContactName,
+        emergencyContactPhone: emergencyContactPhone ?? _user!.emergencyContactPhone,
       );
       _isLoading = false;
       notifyListeners();

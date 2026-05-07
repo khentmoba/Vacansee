@@ -10,6 +10,7 @@ import '../property/create_property_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../../widgets/notifications/notification_badge.dart';
 import '../../widgets/owner/owner_top_nav_bar.dart';
+import '../owner/owner_profile_screen.dart';
 import '../../core/utils/fade_page_route.dart';
 
 class OwnerDashboard extends StatefulWidget {
@@ -20,6 +21,14 @@ class OwnerDashboard extends StatefulWidget {
 }
 
 class _OwnerDashboardState extends State<OwnerDashboard> {
+  int _currentIndex = 0;
+
+  final List<String> _mobileTitles = [
+    'Dashboard',
+    'Bookings',
+    'Profile',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -60,10 +69,11 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   child: OwnerTopNavBar(currentRoute: 'Dashboard'),
                 )
               : AppBar(
-                  title: const Text('Owner Dashboard'),
+                  title: Text(_mobileTitles[_currentIndex]),
                   backgroundColor: Colors.white,
                   foregroundColor: const Color(0xFF1D1B16),
                   elevation: 0,
+                  automaticallyImplyLeading: false,
                   actions: [
                     NotificationBadge(
                       child: IconButton(
@@ -84,11 +94,42 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     ),
                   ],
                 ),
-          body: propertyProvider.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : properties.isEmpty
-                  ? _buildEmptyState(context)
-                  : SingleChildScrollView(
+          bottomNavigationBar: isDesktop
+              ? null
+              : BottomNavigationBar(
+                  currentIndex: _currentIndex,
+                  onTap: (index) => setState(() => _currentIndex = index),
+                  selectedItemColor: const Color(0xFF5287B2),
+                  unselectedItemColor: Colors.grey[400],
+                  showSelectedLabels: true,
+                  showUnselectedLabels: true,
+                  type: BottomNavigationBarType.fixed,
+                  backgroundColor: Colors.white,
+                  elevation: 8,
+                  items: const [
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.dashboard_rounded),
+                      label: 'Home',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.calendar_today_rounded),
+                      label: 'Bookings',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.person_rounded),
+                      label: 'Profile',
+                    ),
+                  ],
+                ),
+          body: !isDesktop && _currentIndex == 1
+              ? const OwnerBookingsScreen(showAppBar: false)
+              : !isDesktop && _currentIndex == 2
+                  ? const OwnerProfileScreen(showAppBar: false)
+                  : propertyProvider.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : properties.isEmpty
+                          ? _buildEmptyState(context)
+                          : SingleChildScrollView(
                       child: Center(
                         child: Container(
                           constraints: const BoxConstraints(maxWidth: 1200),
@@ -166,39 +207,51 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                                   ),
                                 ),
                               // Stats Cards
-                              Row(
-                                children: [
-                                  _buildStatCard(
-                                    Icons.home_rounded,
-                                    properties
-                                        .where((p) => p.status != PropertyStatus.deleted)
-                                        .length
-                                        .toString(),
-                                    'Total Listings',
-                                    const Color(0xFF3B82F6),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  _buildStatCard(
-                                    Icons.check_circle_rounded,
-                                    propertyProvider.totalOccupiedRooms.toString(),
-                                    'Occupied Rooms',
-                                    const Color(0xFF10B981),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  _buildStatCard(
-                                    Icons.home_outlined,
-                                    propertyProvider.totalAvailableRooms.toString(),
-                                    'Available Rooms',
-                                    const Color(0xFF8B5CF6),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  _buildStatCard(
-                                    Icons.calendar_today_rounded,
-                                    pendingCount.toString(),
-                                    'Pending Requests',
-                                    const Color(0xFFF59E0B),
-                                  ),
-                                ],
+                              LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final statsCrossAxisCount = isDesktop ? 4 : 2;
+                                  return GridView.count(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    crossAxisCount: statsCrossAxisCount,
+                                    crossAxisSpacing: 16,
+                                    mainAxisSpacing: 16,
+                                    childAspectRatio: isDesktop ? 1.3 : 1.1,
+                                    children: [
+                                      _buildStatCard(
+                                        Icons.home_rounded,
+                                        properties
+                                            .where((p) => p.status != PropertyStatus.deleted)
+                                            .length
+                                            .toString(),
+                                        'Total Listings',
+                                        const Color(0xFF3B82F6),
+                                        isDesktop,
+                                      ),
+                                      _buildStatCard(
+                                        Icons.check_circle_rounded,
+                                        propertyProvider.totalOccupiedRooms.toString(),
+                                        'Occupied Rooms',
+                                        const Color(0xFF10B981),
+                                        isDesktop,
+                                      ),
+                                      _buildStatCard(
+                                        Icons.home_outlined,
+                                        propertyProvider.totalAvailableRooms.toString(),
+                                        'Available Rooms',
+                                        const Color(0xFF8B5CF6),
+                                        isDesktop,
+                                      ),
+                                      _buildStatCard(
+                                        Icons.calendar_today_rounded,
+                                        pendingCount.toString(),
+                                        'Pending Requests',
+                                        const Color(0xFFF59E0B),
+                                        isDesktop,
+                                      ),
+                                    ],
+                                  );
+                                },
                               ),
                               const SizedBox(height: 32),
                               // Pending Requests Banner
@@ -221,17 +274,17 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                                           children: [
                                             Text(
                                               'You have $pendingCount pending booking request${pendingCount > 1 ? 's' : ''}',
-                                              style: const TextStyle(
-                                                fontSize: 18,
+                                              style: TextStyle(
+                                                fontSize: isDesktop ? 18 : 16,
                                                 fontWeight: FontWeight.bold,
-                                                color: Color(0xFF92400E),
+                                                color: const Color(0xFF92400E),
                                               ),
                                             ),
                                             const SizedBox(height: 4),
                                             Text(
                                               'Review and respond to booking requests to keep your tenants updated',
                                               style: TextStyle(
-                                                fontSize: 14,
+                                                fontSize: isDesktop ? 14 : 12,
                                                 color: const Color(0xFFB45309),
                                                 fontWeight: FontWeight.w400,
                                               ),
@@ -239,32 +292,37 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                                           ],
                                         ),
                                       ),
+                                      const SizedBox(width: 12),
                                       ElevatedButton(
                                         onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            FadePageRoute(
-                                              child: const OwnerBookingsScreen(),
-                                            ),
-                                          );
+                                          if (isDesktop) {
+                                            Navigator.push(
+                                              context,
+                                              FadePageRoute(
+                                                child: const OwnerBookingsScreen(),
+                                              ),
+                                            );
+                                          } else {
+                                            setState(() => _currentIndex = 1);
+                                          }
                                         },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: const Color(0xFFD97706),
                                           foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 24,
-                                            vertical: 18,
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: isDesktop ? 24 : 16,
+                                            vertical: isDesktop ? 18 : 12,
                                           ),
                                           elevation: 0,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(12),
                                           ),
                                         ),
-                                        child: const Text(
+                                        child: Text(
                                           'Review Now',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 15,
+                                            fontSize: isDesktop ? 15 : 13,
                                           ),
                                         ),
                                       ),
@@ -276,6 +334,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
+                               if (isDesktop) ...[
                                   const Text(
                                     'My Boarding Houses',
                                     style: TextStyle(
@@ -320,6 +379,50 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                                       ),
                                     ),
                                   ),
+                                ] else ...[
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'My Boarding Houses',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF1D1B16),
+                                          ),
+                                        ),
+                                        Text(
+                                          '${properties.length} Active Listings',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey[500],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton.filled(
+                                    onPressed: (authProvider.user?.isVerified ?? false)
+                                        ? () {
+                                            Navigator.push(
+                                              context,
+                                              FadePageRoute(
+                                                child: const CreatePropertyScreen(),
+                                              ),
+                                            );
+                                          }
+                                        : null,
+                                    icon: const Icon(Icons.add),
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: const Color(0xFF5287B2),
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                                 ],
                               ),
                               const SizedBox(height: 16),
@@ -354,53 +457,55 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     String value,
     String label,
     Color color,
+    bool isDesktop,
   ) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 20,
-              offset: const Offset(0, 4),
+    return Container(
+      padding: EdgeInsets.all(isDesktop ? 24 : 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: EdgeInsets.all(isDesktop ? 12 : 8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: isDesktop ? 24 : 20),
+          ),
+          SizedBox(height: isDesktop ? 20 : 12),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: isDesktop ? 32 : 24,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF1D1B16),
+              letterSpacing: -1,
             ),
-            const SizedBox(height: 20),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1D1B16),
-                letterSpacing: -1,
-              ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: isDesktop ? 14 : 12,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }

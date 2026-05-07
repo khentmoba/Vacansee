@@ -8,7 +8,8 @@ import '../../providers/booking_provider.dart';
 import '../../widgets/owner/owner_top_nav_bar.dart';
 
 class OwnerBookingsScreen extends StatefulWidget {
-  const OwnerBookingsScreen({super.key});
+  final bool showAppBar;
+  const OwnerBookingsScreen({super.key, this.showAppBar = true});
 
   @override
   State<OwnerBookingsScreen> createState() => _OwnerBookingsScreenState();
@@ -58,6 +59,58 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth >= 900;
 
+        final content = Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 1000),
+            child: bookingProvider.errorMessage != null
+                ? _buildErrorState(bookingProvider)
+                : bookingProvider.isLoading && bookings.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : SingleChildScrollView(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isDesktop ? 0 : 20,
+                          vertical: 32,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildHeader(),
+                            const SizedBox(height: 40),
+                            
+                            // Pending Requests Section
+                            _buildSectionTitle(
+                              'Pending Requests',
+                              badgeText: pendingBookings.isNotEmpty 
+                                  ? '${pendingBookings.length} Awaiting Response' 
+                                  : null,
+                            ),
+                            const SizedBox(height: 16),
+                            if (pendingBookings.isEmpty)
+                              _buildEmptyState('No pending requests')
+                            else
+                              ...pendingBookings.map((b) => _OwnerBookingCard(booking: b, isPending: true)),
+                              
+                            const SizedBox(height: 48),
+                            
+                            // Processed Requests Section
+                            _buildSectionTitle('Processed Requests'),
+                            const SizedBox(height: 16),
+                            if (processedBookings.isEmpty)
+                              _buildEmptyState('No processed requests yet')
+                            else
+                              ...processedBookings.map((b) => _OwnerBookingCard(booking: b, isPending: false)),
+                              
+                            const SizedBox(height: 40),
+                          ],
+                        ),
+                      ),
+          ),
+        );
+
+        if (!widget.showAppBar && !isDesktop) {
+          return content;
+        }
+
         return Scaffold(
           backgroundColor: const Color(0xFFF8FBFD),
           appBar: isDesktop
@@ -71,68 +124,23 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
                   foregroundColor: const Color(0xFF1D1B16),
                   elevation: 0,
                 ),
-          body: Center(
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 1000),
-              child: bookingProvider.errorMessage != null
-                  ? _buildErrorState(bookingProvider)
-                  : bookingProvider.isLoading && bookings.isEmpty
-                      ? const Center(child: CircularProgressIndicator())
-                      : SingleChildScrollView(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isDesktop ? 0 : 20,
-                            vertical: 32,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildHeader(),
-                              const SizedBox(height: 40),
-                              
-                              // Pending Requests Section
-                              _buildSectionTitle(
-                                'Pending Requests',
-                                badgeText: pendingBookings.isNotEmpty 
-                                    ? '${pendingBookings.length} Awaiting Response' 
-                                    : null,
-                              ),
-                              const SizedBox(height: 16),
-                              if (pendingBookings.isEmpty)
-                                _buildEmptyState('No pending requests')
-                              else
-                                ...pendingBookings.map((b) => _OwnerBookingCard(booking: b, isPending: true)),
-                                
-                              const SizedBox(height: 48),
-                              
-                              // Processed Requests Section
-                              _buildSectionTitle('Processed Requests'),
-                              const SizedBox(height: 16),
-                              if (processedBookings.isEmpty)
-                                _buildEmptyState('No processed requests yet')
-                              else
-                                ...processedBookings.map((b) => _OwnerBookingCard(booking: b, isPending: false)),
-                                
-                              const SizedBox(height: 40),
-                            ],
-                          ),
-                        ),
-            ),
-          ),
+          body: content,
         );
       },
     );
   }
 
   Widget _buildHeader() {
+    final isMobile = MediaQuery.of(context).size.width < 600;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Booking Requests',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: isMobile ? 28 : 32,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1D1B16),
+            color: const Color(0xFF1D1B16),
             letterSpacing: -0.5,
           ),
         ),
@@ -140,7 +148,7 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
         Text(
           'Review and manage tenant booking requests for your properties',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: isMobile ? 14 : 16,
             color: Colors.grey[600],
             fontWeight: FontWeight.w400,
           ),
@@ -230,6 +238,7 @@ class _OwnerBookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
     if (!isPending) return _buildProcessedCard(context);
 
     return Container(
@@ -266,16 +275,16 @@ class _OwnerBookingCard extends StatelessWidget {
                         children: [
                           Text(
                             booking.studentName,
-                            style: const TextStyle(
-                              fontSize: 18,
+                            style: TextStyle(
+                              fontSize: isMobile ? 16 : 18,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1D1B16),
+                              color: const Color(0xFF1D1B16),
                             ),
                           ),
                           Text(
                             'Booking Request #${booking.bookingId.substring(0, 5).toUpperCase()}',
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: isMobile ? 12 : 13,
                               color: Colors.grey[500],
                               fontWeight: FontWeight.w500,
                             ),
@@ -283,117 +292,230 @@ class _OwnerBookingCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFFBEB),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        'Pending Review',
-                        style: TextStyle(
-                          color: Color(0xFFD97706),
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                    if (!isMobile)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFFBEB),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          'Pending Review',
+                          style: TextStyle(
+                            color: Color(0xFFD97706),
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
-                const SizedBox(height: 32),
-                // Grid Info
-                Row(
-                  children: [
-                    _buildInfoItem(
-                      Icons.home_outlined,
-                      'Property',
-                      booking.propertyName,
+                if (isMobile) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFFBEB),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    _buildInfoItem(
-                      Icons.calendar_today_outlined,
-                      'Request Date',
-                      DateFormat('MMM d, yyyy').format(booking.requestedAt),
+                    child: const Text(
+                      'Pending Review',
+                      style: TextStyle(
+                        color: Color(0xFFD97706),
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    _buildInfoItem(
-                      Icons.payments_outlined,
-                      'Monthly Rate',
-                      '₱${NumberFormat('#,###').format(12345)}', // Mock value for rate, or get from room if available
-                    ),
-                    _buildInfoItem(
-                      Icons.person_search_outlined,
-                      'Tenant Info',
-                      'View Details',
-                      isLink: true,
-                      onTap: () => _showTenantDetails(context),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
+                // Info Grid/Row
+                if (isMobile)
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          _buildInfoItem(
+                            Icons.home_outlined,
+                            'Property',
+                            booking.propertyName,
+                          ),
+                          _buildInfoItem(
+                            Icons.calendar_today_outlined,
+                            'Requested',
+                            DateFormat('MMM d, yyyy').format(booking.requestedAt),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          _buildInfoItem(
+                            Icons.payments_outlined,
+                            'Monthly Rate',
+                            '₱${NumberFormat('#,###').format(12345)}',
+                          ),
+                          _buildInfoItem(
+                            Icons.person_search_outlined,
+                            'Tenant Info',
+                            'View Details',
+                            isLink: true,
+                            onTap: () => _showTenantDetails(context),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                else
+                  Row(
+                    children: [
+                      _buildInfoItem(
+                        Icons.home_outlined,
+                        'Property',
+                        booking.propertyName,
+                      ),
+                      _buildInfoItem(
+                        Icons.calendar_today_outlined,
+                        'Request Date',
+                        DateFormat('MMM d, yyyy').format(booking.requestedAt),
+                      ),
+                      _buildInfoItem(
+                        Icons.payments_outlined,
+                        'Monthly Rate',
+                        '₱${NumberFormat('#,###').format(12345)}',
+                      ),
+                      _buildInfoItem(
+                        Icons.person_search_outlined,
+                        'Tenant Info',
+                        'View Details',
+                        isLink: true,
+                        onTap: () => _showTenantDetails(context),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
           // Action Buttons
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _handleAction(context, true),
-                  child: Container(
-                    height: 56,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF10B981),
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.check, color: Colors.white, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Approve Booking',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
+                if (isMobile)
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () => _handleAction(context, true),
+                        child: Container(
+                          height: 52,
+                          width: double.infinity,
+                          color: const Color(0xFF10B981),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.check, color: Colors.white, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Approve Booking',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _handleAction(context, false),
-                  child: Container(
-                    height: 56,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFEF4444),
-                      borderRadius: BorderRadius.only(
-                        bottomRight: Radius.circular(20),
                       ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.close, color: Colors.white, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Reject Request',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
+                      GestureDetector(
+                        onTap: () => _handleAction(context, false),
+                        child: Container(
+                          height: 52,
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFEF4444),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(20),
+                              bottomRight: Radius.circular(20),
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.close, color: Colors.white, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Reject Request',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  )
+                else
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => _handleAction(context, true),
+                          child: Container(
+                            height: 56,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF10B981),
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(20),
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.check, color: Colors.white, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Approve Booking',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => _handleAction(context, false),
+                          child: Container(
+                            height: 56,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFEF4444),
+                              borderRadius: BorderRadius.only(
+                                bottomRight: Radius.circular(20),
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.close, color: Colors.white, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Reject Request',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );

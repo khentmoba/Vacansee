@@ -88,7 +88,7 @@ class MyBookingsScreen extends StatelessWidget {
                     padding: EdgeInsets.only(
                       left: isDesktop ? 60 : 24,
                       right: isDesktop ? 60 : 24,
-                      bottom: 100,
+                      bottom: isDesktop ? 40 : 140,
                     ),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
