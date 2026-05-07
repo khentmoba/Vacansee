@@ -142,6 +142,7 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> updateProfile({
     String? displayName,
     String? phoneNumber,
+    String? gender,
     String? firstName,
     String? lastName,
     String? address,
@@ -159,6 +160,7 @@ class AuthProvider extends ChangeNotifier {
         uid: _user!.uid,
         displayName: displayName,
         phoneNumber: phoneNumber,
+        gender: gender,
         firstName: firstName,
         lastName: lastName,
         address: address,
@@ -169,6 +171,7 @@ class AuthProvider extends ChangeNotifier {
       _user = _user!.copyWith(
         displayName: displayName ?? _user!.displayName,
         phoneNumber: phoneNumber ?? _user!.phoneNumber,
+        gender: gender ?? _user!.gender,
         firstName: firstName ?? _user!.firstName,
         lastName: lastName ?? _user!.lastName,
         address: address ?? _user!.address,

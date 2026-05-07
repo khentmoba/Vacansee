@@ -193,6 +193,7 @@ class AuthService {
     String? displayName,
     String? phoneNumber,
     UserRole? role,
+    String? gender,
     String? firstName,
     String? lastName,
     String? address,
@@ -203,6 +204,7 @@ class AuthService {
       final updates = <String, dynamic>{};
       if (displayName != null) updates['display_name'] = displayName;
       if (phoneNumber != null) updates['phone_number'] = phoneNumber;
+      if (gender != null) updates['gender'] = gender;
       if (firstName != null) updates['first_name'] = firstName;
       if (lastName != null) updates['last_name'] = lastName;
       if (address != null) updates['address'] = address;

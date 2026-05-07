@@ -1,0 +1,14 @@
+- [x] T001 [I] [Setup] Execute `flutter pub get` and verify project dependencies
+- [x] T002 [R] [Research] Identify all navigation headers and data tables in `lib/screens/admin/` and `lib/screens/property/`
+- [x] T003 [P] [US1] Update `TabBar` configuration in `lib/screens/admin/admin_dashboard.dart` to use consistent text styles and underline indicator
+- [x] T004 [P] [US1] Apply consistent fixed-height tab styling to `lib/screens/property/property_list_screen.dart` or relevant navigation bars
+- [x] T005 [P] [US2] Enforce standard padding and margins in `lib/screens/admin/widgets/admin_user_card.dart` and add `TextOverflow.ellipsis` to text
+- [x] T006 [P] [US2] Enforce standard padding and margins in `lib/screens/admin/widgets/admin_property_card.dart` and add `TextOverflow.ellipsis` to text
+- [x] T007 [P] [US2] Enforce standard padding and margins in `lib/screens/admin/widgets/pending_property_card.dart` and add `TextOverflow.ellipsis` to text
+- [x] T008 [P] [US2] Review and align layout constraints within `lib/screens/admin/admin_dashboard.dart` for the overall mobile grid
+- [x] T009 [P] [US3] Wrap list views in `lib/screens/admin/admin_dashboard.dart` with `SingleChildScrollView(scrollDirection: Axis.horizontal)` and `ConstrainedBox`
+- [x] T010 [P] [US3] Ensure desktop table width does not exceed 1200px and centers on screen
+- [x] T011 [P] [US4] Modify `lib/screens/admin/admin_dashboard.dart` to use `CheckboxListTile` for each permission in profile view
+- [x] T012 [P] [US4] Group permissions logically (e.g., Core Management, Administrative)
+- [x] T013 [V] [Verification] Perform manual validation on desktop and mobile layout as per `quickstart.md`
+- [x] T014 [V] [Verification] Run `flutter analyze` to ensure no UI regressions or linting errors

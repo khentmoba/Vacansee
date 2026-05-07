@@ -229,13 +229,13 @@ class _TopNavBar extends StatelessWidget {
                 color: isSelected ? const Color(0xFF1D1B16) : Colors.grey[600],
               ),
             ),
-            if (isSelected)
-              Container(
-                margin: const EdgeInsets.only(top: 4),
-                height: 2,
-                width: 20,
-                color: const Color(0xFF5287B2),
-              ),
+            const SizedBox(height: 4),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              height: 2,
+              width: isSelected ? 20 : 0,
+              color: isSelected ? const Color(0xFF5287B2) : Colors.transparent,
+            ),
           ],
         ),
       ),

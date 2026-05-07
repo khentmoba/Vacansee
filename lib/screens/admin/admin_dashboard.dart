@@ -89,10 +89,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
       ),
       body: adminProvider.isLoading && stats == null
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _refreshData,
-              child: _buildCurrentView(stats, bookingProvider, propertyProvider, adminProvider, authProvider),
-            ),
+            : RefreshIndicator(
+                onRefresh: _refreshData,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1200),
+                    child: _buildCurrentView(stats, bookingProvider, propertyProvider, adminProvider, authProvider),
+                  ),
+                ),
+              ),
     );
   }
 
@@ -289,22 +294,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
               ),
               const SizedBox(height: 24),
-              GridView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 24,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 5,
-                ),
-                children: const [
-                  _PermissionChip(label: 'Manage All Listings'),
-                  _PermissionChip(label: 'View All Bookings'),
-                  _PermissionChip(label: 'User Management'),
-                  _PermissionChip(label: 'System Settings'),
-                ],
-              ),
+              _buildPermissionSection('Core Management', [
+                _PermissionItem(label: 'Manage All Listings', isEnabled: true),
+                _PermissionItem(label: 'View All Bookings', isEnabled: true),
+              ]),
+              const SizedBox(height: 24),
+              _buildPermissionSection('Administrative', [
+                _PermissionItem(label: 'User Management', isEnabled: true),
+                _PermissionItem(label: 'System Settings', isEnabled: true),
+              ]),
             ],
           ),
         ),
@@ -460,21 +458,26 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
           )
         else
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 24,
-              mainAxisSpacing: 24,
-              childAspectRatio: 2.2,
-            ),
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              return AdminUserCard(
-                user: users[index],
-                onViewDetails: () {},
-                onEdit: () {},
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final crossAxisCount = constraints.maxWidth < 600 ? 1 : (constraints.maxWidth < 1200 ? 2 : 3);
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 24,
+                  mainAxisSpacing: 24,
+                  childAspectRatio: constraints.maxWidth < 600 ? 2.5 : 2.2,
+                ),
+                itemCount: users.length,
+                itemBuilder: (context, index) {
+                  return AdminUserCard(
+                    user: users[index],
+                    onViewDetails: () {},
+                    onEdit: () {},
+                  );
+                },
               );
             },
           ),
@@ -640,21 +643,26 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
           )
         else
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 24,
-              mainAxisSpacing: 24,
-              childAspectRatio: 0.85,
-            ),
-            itemCount: properties.length,
-            itemBuilder: (context, index) {
-              return AdminPropertyCard(
-                property: properties[index],
-                onTap: () {
-                  // TODO: Navigate to property detail/moderation
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final crossAxisCount = constraints.maxWidth < 600 ? 1 : (constraints.maxWidth < 1200 ? 2 : 3);
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 24,
+                  mainAxisSpacing: 24,
+                  childAspectRatio: constraints.maxWidth < 600 ? 0.75 : 0.85,
+                ),
+                itemCount: properties.length,
+                itemBuilder: (context, index) {
+                  return AdminPropertyCard(
+                    property: properties[index],
+                    onTap: () {
+                      // TODO: Navigate to property detail/moderation
+                    },
+                  );
                 },
               );
             },
@@ -870,36 +878,64 @@ class _AdminDashboardState extends State<AdminDashboard> {
       ],
     );
   }
+
+  Widget _buildPermissionSection(String title, List<_PermissionItem> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[600],
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey[100]!),
+          ),
+          child: Column(
+            children: items.map((item) => item).toList(),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
-class _PermissionChip extends StatelessWidget {
+class _PermissionItem extends StatelessWidget {
   final String label;
+  final bool isEnabled;
 
-  const _PermissionChip({required this.label});
+  const _PermissionItem({
+    required this.label,
+    required this.isEnabled,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFC8E6C9)),
+    return CheckboxListTile(
+      value: isEnabled,
+      onChanged: null, // Read-only in this view
+      title: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF1D1B16),
+        ),
       ),
-      child: Row(
-        children: [
-          const Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 20),
-          const SizedBox(width: 12),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF2E7D32),
-            ),
-          ),
-        ],
-      ),
+      activeColor: const Color(0xFF9C27B0),
+      checkColor: Colors.white,
+      dense: true,
+      controlAffinity: ListTileControlAffinity.leading,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     );
   }
 }

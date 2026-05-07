@@ -14,6 +14,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late TextEditingController _phoneController;
   bool _isSaved = false;
   String? _nameError;
+  String? _gender;
 
   @override
   void initState() {
@@ -23,6 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       text: user?.displayName ?? '',
     );
     _phoneController = TextEditingController(text: user?.phoneNumber ?? '');
+    _gender = user?.gender;
   }
 
   @override
@@ -46,6 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       phoneNumber: _phoneController.text.trim().isEmpty
           ? null
           : _phoneController.text.trim(),
+      gender: _gender,
     );
     if (success && mounted) {
       setState(() => _isSaved = true);
@@ -265,6 +268,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       hint: '09XXXXXXXXX (optional)',
                       icon: Icons.phone_outlined,
                     ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  _label('Gender Orientation'),
+                  DropdownButtonFormField<String>(
+                    initialValue: _gender,
+                    items: const [
+                      DropdownMenuItem(value: 'male', child: Text('Male')),
+                      DropdownMenuItem(value: 'female', child: Text('Female')),
+                    ],
+                    onChanged: (value) => setState(() => _gender = value),
+                    decoration: _inputDecoration(
+                      hint: 'Select gender',
+                      icon: Icons.people_outline,
+                    ),
+                    dropdownColor: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   const SizedBox(height: 20),
 

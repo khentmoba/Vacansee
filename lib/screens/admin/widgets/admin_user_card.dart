@@ -84,9 +84,13 @@ class AdminUserCard extends StatelessWidget {
             children: [
               Icon(Icons.phone_outlined, size: 16, color: Colors.grey[400]),
               const SizedBox(width: 12),
-              Text(
-                user.phoneNumber ?? 'No phone',
-                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              Expanded(
+                child: Text(
+                  user.phoneNumber ?? 'No phone',
+                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
@@ -112,13 +116,12 @@ class AdminUserCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              SizedBox(
-                width: 48,
+              Expanded(
                 child: OutlinedButton(
                   onPressed: onEdit,
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: Colors.grey[300]!),
-                    padding: EdgeInsets.zero,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -126,7 +129,7 @@ class AdminUserCard extends StatelessWidget {
                   child: const Text(
                     'Edit',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF1D1B16),
                     ),

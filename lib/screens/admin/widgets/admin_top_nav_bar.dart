@@ -131,15 +131,28 @@ class _NavButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Padding(
+      child: Container(
+        height: 70,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isActive ? const Color(0xFF1D1B16) : Colors.grey[600],
-            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-            fontSize: 14,
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: isActive ? const Color(0xFF1D1B16) : Colors.grey[600],
+                fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 4),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              height: 2,
+              width: isActive ? 20 : 0,
+              color: isActive ? const Color(0xFF5287B2) : Colors.transparent,
+            ),
+          ],
         ),
       ),
     );

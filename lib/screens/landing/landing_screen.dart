@@ -310,31 +310,60 @@ class LandingScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: isMobile ? 32 : 48),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 24,
-            runSpacing: 24,
-            children: [
-              _buildFeatureCard(
-                Icons.search,
-                'Easy Search',
-                'Find the perfect boarding house with powerful filters. Search by location, price, amenities, and availability in seconds.',
-                isMobile,
+          if (isMobile)
+            Column(
+              children: [
+                _buildFeatureCard(
+                  Icons.search,
+                  'Easy Search',
+                  'Find the perfect boarding house with powerful filters. Search by location, price, amenities, and availability in seconds.',
+                  isMobile,
+                ),
+                const SizedBox(height: 24),
+                _buildFeatureCard(
+                  Icons.check_circle_outline,
+                  'Quick Booking',
+                  'Book your ideal room with just a few clicks. Track your bookings, communicate with owners, and manage everything in one place.',
+                  isMobile,
+                ),
+                const SizedBox(height: 24),
+                _buildFeatureCard(
+                  Icons.star_border,
+                  'Verified Reviews',
+                  'Read honest reviews from real tenants. Make informed decisions based on ratings, photos, and detailed feedback.',
+                  isMobile,
+                ),
+              ],
+            )
+          else
+            IntrinsicHeight(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildFeatureCard(
+                    Icons.search,
+                    'Easy Search',
+                    'Find the perfect boarding house with powerful filters. Search by location, price, amenities, and availability in seconds.',
+                    isMobile,
+                  ),
+                  const SizedBox(width: 24),
+                  _buildFeatureCard(
+                    Icons.check_circle_outline,
+                    'Quick Booking',
+                    'Book your ideal room with just a few clicks. Track your bookings, communicate with owners, and manage everything in one place.',
+                    isMobile,
+                  ),
+                  const SizedBox(width: 24),
+                  _buildFeatureCard(
+                    Icons.star_border,
+                    'Verified Reviews',
+                    'Read honest reviews from real tenants. Make informed decisions based on ratings, photos, and detailed feedback.',
+                    isMobile,
+                  ),
+                ],
               ),
-              _buildFeatureCard(
-                Icons.check_circle_outline,
-                'Quick Booking',
-                'Book your ideal room with just a few clicks. Track your bookings, communicate with owners, and manage everything in one place.',
-                isMobile,
-              ),
-              _buildFeatureCard(
-                Icons.star_border,
-                'Verified Reviews',
-                'Read honest reviews from real tenants. Make informed decisions based on ratings, photos, and detailed feedback.',
-                isMobile,
-              ),
-            ],
-          ),
+            ),
         ],
       ),
     );
@@ -423,7 +452,6 @@ class LandingScreen extends StatelessWidget {
             buttonText: 'Sign Up as Tenant',
             isMobile: isMobile,
           ),
-          if (!isMobile) const SizedBox(width: 32),
           // Owner Card
           _buildRoleCard(
             context,

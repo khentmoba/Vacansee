@@ -66,6 +66,7 @@ class AdminPropertyCard extends StatelessWidget {
               Positioned(
                 top: 16,
                 left: 16,
+                right: 100, // Leave space for the status overlay
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
@@ -79,6 +80,8 @@ class AdminPropertyCard extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1D1B16),
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),

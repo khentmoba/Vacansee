@@ -37,6 +37,14 @@ CREATE TABLE IF NOT EXISTS public.users (
   display_name TEXT NOT NULL,
   role user_role, -- Nullable initially for role selection flow
   phone_number TEXT,
+  gender TEXT,
+  first_name TEXT,
+  last_name TEXT,
+  address TEXT,
+  business_name TEXT,
+  business_permit_no TEXT,
+  emergency_contact_name TEXT,
+  emergency_contact_phone TEXT,
   is_verified BOOLEAN NOT NULL DEFAULT false, -- true for verified owners; always true for students/admin
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_login_at TIMESTAMPTZ
