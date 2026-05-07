@@ -487,15 +487,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Image.network(
-                      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png',
+                    Image.asset(
+                      'assets/images/google_logo.png',
                       height: 24,
                       width: 24,
-                      errorBuilder: (context, error, stackTrace) => const Icon(
-                        Icons.g_mobiledata,
-                        size: 28,
-                        color: Color(0xFF4285F4),
-                      ),
                     ),
                   ],
                 ),
