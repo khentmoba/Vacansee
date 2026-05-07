@@ -660,19 +660,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.network(
-                  'https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png',
-                  height: 24,
-                  width: 24,
-                ),
-                const SizedBox(width: 12),
                 const Text(
-                  'Continue with Google',
+                  'Continue with',
                   style: TextStyle(
                     color: Color(0xFF1D1B16),
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
+                ),
+                const SizedBox(width: 10),
+                Image.network(
+                  'https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png',
+                  height: 22,
+                  width: 22,
                 ),
               ],
             ),
