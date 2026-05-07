@@ -92,7 +92,13 @@ class OwnerTopNavBar extends StatelessWidget {
               const SizedBox(width: 24),
               // Logout Button
               ElevatedButton.icon(
-                onPressed: () => authProvider.signOut(),
+                onPressed: () async {
+                  final navigator = Navigator.of(context);
+                  await authProvider.signOut();
+                  if (context.mounted) {
+                    navigator.popUntil((route) => route.isFirst);
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF5287B2),
                   foregroundColor: Colors.white,
@@ -133,13 +139,12 @@ class OwnerTopNavBar extends StatelessWidget {
                 color: isSelected ? const Color(0xFF1D1B16) : Colors.grey[600],
               ),
             ),
-            if (isSelected)
-              Container(
-                margin: const EdgeInsets.only(top: 4),
-                height: 2,
-                width: 20,
-                color: const Color(0xFF5287B2),
-              ),
+            const SizedBox(height: 4),
+            Container(
+              height: 2,
+              width: 20,
+              color: isSelected ? const Color(0xFF5287B2) : Colors.transparent,
+            ),
           ],
         ),
       ),

@@ -20,6 +20,7 @@ import 'widgets/admin_user_card.dart';
 import '../../models/admin_stats_model.dart';
 import '../../models/booking_model.dart';
 import '../../models/user_model.dart';
+import '../profile/profile_screen.dart';
 
 enum AdminView { dashboard, listings, bookings, users, profile }
 
@@ -87,6 +88,54 @@ class _AdminDashboardState extends State<AdminDashboard> {
           _refreshData();
         },
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Color(0xFF5287B2)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'VacanSee',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'Admin Portal',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            _buildDrawerItem(Icons.dashboard_rounded, 'Dashboard', AdminView.dashboard),
+            _buildDrawerItem(Icons.list_alt_rounded, 'All Listings', AdminView.listings),
+            _buildDrawerItem(Icons.calendar_month_rounded, 'All Bookings', AdminView.bookings),
+            _buildDrawerItem(Icons.people_rounded, 'User Management', AdminView.users),
+            _buildDrawerItem(Icons.person_rounded, 'Profile', AdminView.profile),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout_rounded, color: Colors.red),
+              title: const Text('Logout', style: TextStyle(color: Colors.red)),
+              onTap: () async {
+                final navigator = Navigator.of(context);
+                await authProvider.signOut();
+                if (mounted) {
+                  navigator.popUntil((route) => route.isFirst);
+                }
+              },
+            ),
+          ],
+        ),
+      ),
       body: adminProvider.isLoading && stats == null
           ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(
@@ -110,8 +159,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
   ) {
     switch (_currentView) {
       case AdminView.dashboard:
+        final isMobile = MediaQuery.of(context).size.width < 800;
         return ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 20 : 40,
+            vertical: isMobile ? 24 : 40,
+          ),
           children: [
             _buildHeader(),
             const SizedBox(height: 32),
@@ -238,26 +291,39 @@ class _AdminDashboardState extends State<AdminDashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Admin Information',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1D1B16),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF9C27B0),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  const Expanded(
+                    child: Text(
+                      'Personal Information',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1D1B16),
                       ),
                     ),
-                    child: const Text('Edit Profile', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF9C27B0).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ProfileScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        color: Color(0xFF9C27B0),
+                        size: 20,
+                      ),
+                      tooltip: 'Edit Profile',
+                      constraints: const BoxConstraints(),
+                      padding: const EdgeInsets.all(12),
+                    ),
                   ),
                 ],
               ),
@@ -700,13 +766,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildStatsGrid(dynamic stats) {
+    final isMobile = MediaQuery.of(context).size.width < 800;
     return GridView.count(
-      crossAxisCount: 4,
-      crossAxisSpacing: 24,
-      mainAxisSpacing: 24,
+      crossAxisCount: isMobile ? 2 : 4,
+      crossAxisSpacing: isMobile ? 16 : 24,
+      mainAxisSpacing: isMobile ? 16 : 24,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 1.6,
+      childAspectRatio: isMobile ? 1.4 : 1.6,
       children: [
         AdminStatCard(
           title: 'Total Listings',
@@ -741,13 +808,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildSolidStatsGrid(dynamic stats) {
+    final isMobile = MediaQuery.of(context).size.width < 800;
     return GridView.count(
-      crossAxisCount: 3,
-      crossAxisSpacing: 24,
-      mainAxisSpacing: 24,
+      crossAxisCount: isMobile ? 1 : 3,
+      crossAxisSpacing: isMobile ? 16 : 24,
+      mainAxisSpacing: isMobile ? 16 : 24,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 3.5,
+      childAspectRatio: isMobile ? 4.5 : 3.5,
       children: [
         AdminSolidStatCard(
           title: 'Active Tenants',
@@ -772,110 +840,157 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildBottomGrids(BookingProvider bookingProvider) {
+    final isMobile = MediaQuery.of(context).size.width < 800;
+    
+    if (isMobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildQuickActions(),
+          const SizedBox(height: 40),
+          _buildRecentBookings(bookingProvider),
+        ],
+      );
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Quick Actions
         Expanded(
           flex: 4,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Quick Actions',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1D1B16),
-                ),
-              ),
-              const SizedBox(height: 24),
-              GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  QuickActionCard(
-                    label: 'Manage Listings',
-                    icon: Icons.home_work_outlined,
-                    onTap: () => setState(() => _currentView = AdminView.listings),
-                  ),
-                  QuickActionCard(
-                    label: 'View Bookings',
-                    icon: Icons.calendar_month_outlined,
-                    onTap: () => setState(() => _currentView = AdminView.bookings),
-                  ),
-                  QuickActionCard(
-                    label: 'User Management',
-                    icon: Icons.group_outlined,
-                    onTap: () => setState(() => _currentView = AdminView.users),
-                  ),
-                  QuickActionCard(
-                    label: 'Admin Profile',
-                    icon: Icons.person_outline,
-                    onTap: () => setState(() => _currentView = AdminView.profile),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          child: _buildQuickActions(),
         ),
         const SizedBox(width: 48),
         // Recent Bookings
         Expanded(
           flex: 5,
-          child: Container(
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey[100]!),
+          child: _buildRecentBookings(bookingProvider),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickActions() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Quick Actions',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF1D1B16),
+          ),
+        ),
+        const SizedBox(height: 24),
+        GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            QuickActionCard(
+              label: 'Manage Listings',
+              icon: Icons.home_work_outlined,
+              onTap: () => setState(() => _currentView = AdminView.listings),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Recent Bookings',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF1D1B16),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('View All'),
-                    ),
-                  ],
+            QuickActionCard(
+              label: 'View Bookings',
+              icon: Icons.calendar_month_outlined,
+              onTap: () => setState(() => _currentView = AdminView.bookings),
+            ),
+            QuickActionCard(
+              label: 'User Management',
+              icon: Icons.group_outlined,
+              onTap: () => setState(() => _currentView = AdminView.users),
+            ),
+            QuickActionCard(
+              label: 'Admin Profile',
+              icon: Icons.person_outline,
+              onTap: () => setState(() => _currentView = AdminView.profile),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecentBookings(BookingProvider bookingProvider) {
+    final isMobile = MediaQuery.of(context).size.width < 800;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Recent Bookings',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF1D1B16),
+              ),
+            ),
+            TextButton(
+              onPressed: () => setState(() => _currentView = AdminView.bookings),
+              child: const Text('View All'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        Container(
+          padding: EdgeInsets.all(isMobile ? 20 : 32),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey[100]!),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (bookingProvider.isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (bookingProvider.bookings.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: Center(child: Text('No recent bookings')),
+                )
+              else
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: bookingProvider.bookings.length > 4 ? 4 : bookingProvider.bookings.length,
+                  separatorBuilder: (context, index) => Divider(color: Colors.grey[50]!),
+                  itemBuilder: (context, index) {
+                    return RecentBookingRow(booking: bookingProvider.bookings[index]);
+                  },
                 ),
-                const SizedBox(height: 24),
-                if (bookingProvider.isLoading)
-                  const Center(child: CircularProgressIndicator())
-                else if (bookingProvider.bookings.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 40),
-                    child: Center(child: Text('No recent bookings')),
-                  )
-                else
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: bookingProvider.bookings.length,
-                    separatorBuilder: (context, index) => Divider(color: Colors.grey[50]!),
-                    itemBuilder: (context, index) {
-                      return RecentBookingRow(booking: bookingProvider.bookings[index]);
-                    },
-                  ),
-              ],
-            ),
+            ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildDrawerItem(IconData icon, String label, AdminView view) {
+    final isSelected = _currentView == view;
+    return ListTile(
+      leading: Icon(icon, color: isSelected ? const Color(0xFF5287B2) : Colors.grey[600]),
+      title: Text(
+        label,
+        style: TextStyle(
+          color: isSelected ? const Color(0xFF5287B2) : Colors.grey[800],
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+      selected: isSelected,
+      onTap: () {
+        setState(() => _currentView = view);
+        _refreshData();
+        Navigator.pop(context); // Close drawer
+      },
     );
   }
 

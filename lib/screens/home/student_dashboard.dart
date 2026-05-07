@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import '../booking/my_bookings_screen.dart';
 import '../property/property_list_screen.dart';
 import '../rating/ratings_screen.dart';
+import '../profile/profile_screen.dart';
 
 class StudentDashboard extends StatefulWidget {
   final int initialIndex;
@@ -183,7 +184,13 @@ class _TopNavBar extends StatelessWidget {
           const SizedBox(width: 24),
           // Logout Button
           ElevatedButton(
-            onPressed: () => authProvider.signOut(),
+            onPressed: () async {
+              final navigator = Navigator.of(context);
+              await authProvider.signOut();
+              if (context.mounted) {
+                navigator.popUntil((route) => route.isFirst);
+              }
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF5287B2),
               foregroundColor: Colors.white,
@@ -233,7 +240,7 @@ class _TopNavBar extends StatelessWidget {
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               height: 2,
-              width: isSelected ? 20 : 0,
+              width: 20,
               color: isSelected ? const Color(0xFF5287B2) : Colors.transparent,
             ),
           ],
@@ -345,14 +352,17 @@ class _ProfileTab extends StatelessWidget {
     final user = authProvider.user;
     final isDesktop = MediaQuery.of(context).size.width >= 800;
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 60 : 24,
-        vertical: isDesktop ? 48 : 32,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1000),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: isDesktop ? 40 : 20,
+            vertical: 32,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
           // Back Button
           TextButton.icon(
             onPressed: onBack,
@@ -442,25 +452,39 @@ class _ProfileTab extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Personal Information',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1D1B16),
+                          const Expanded(
+                            child: Text(
+                              'Personal Information',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1D1B16),
+                              ),
                             ),
                           ),
-                          ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF5287B2),
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              elevation: 0,
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF5287B2).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Text('Edit Profile'),
+                            child: IconButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const ProfileScreen(),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.edit_outlined,
+                                color: Color(0xFF5287B2),
+                                size: 20,
+                              ),
+                              tooltip: 'Edit Profile',
+                              constraints: const BoxConstraints(),
+                              padding: const EdgeInsets.all(12),
+                            ),
                           ),
                         ],
                       ),
@@ -545,6 +569,8 @@ class _ProfileTab extends StatelessWidget {
             ),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

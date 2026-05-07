@@ -18,8 +18,9 @@ class AdminStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isSmall = MediaQuery.of(context).size.width < 500;
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(isSmall ? 16 : 24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -45,10 +46,10 @@ class AdminStatCard extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 28,
+            style: TextStyle(
+              fontSize: isSmall ? 22 : 28,
               fontWeight: FontWeight.w900,
-              color: Color(0xFF1D1B16),
+              color: const Color(0xFF1D1B16),
             ),
           ),
           const SizedBox(height: 4),
@@ -82,8 +83,9 @@ class AdminSolidStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isSmall = MediaQuery.of(context).size.width < 500;
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(isSmall ? 16 : 24),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(16),
@@ -116,8 +118,8 @@ class AdminSolidStatCard extends StatelessWidget {
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 48,
+            style: TextStyle(
+              fontSize: isSmall ? 32 : 48,
               fontWeight: FontWeight.w900,
               color: Colors.white,
             ),
