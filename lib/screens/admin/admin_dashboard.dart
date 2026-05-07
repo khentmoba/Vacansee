@@ -18,7 +18,6 @@ import 'widgets/admin_user_stats.dart';
 import 'widgets/admin_user_card.dart';
 
 import '../../models/admin_stats_model.dart';
-import '../../models/property_model.dart';
 import '../../models/booking_model.dart';
 import '../../models/user_model.dart';
 
@@ -126,8 +125,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
         return _buildUsersView(adminProvider);
       case AdminView.profile:
         return _buildProfileView(authProvider);
-      default:
-        return const Center(child: Text('View under construction'));
     }
   }
 
@@ -164,7 +161,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF9C27B0).withOpacity(0.3),
+                color: const Color(0xFF9C27B0).withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -199,14 +196,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     'Administrator',
                     style: TextStyle(
                       fontSize: 18,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                   Text(
                     'Super Admin',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -224,7 +221,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 15,
                 offset: const Offset(0, 5),
               ),
@@ -396,7 +393,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -666,94 +663,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Widget _buildModerationQueue({required String title, required Widget child}) {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
-      children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 24),
-        child,
-      ],
-    );
-  }
 
-  Widget _buildPropertyQueue() {
-    final propertyProvider = context.watch<PropertyProvider>();
-    final pending = propertyProvider.properties.where((p) => p.status == PropertyStatus.pending).toList();
-    
-    if (pending.isEmpty) {
-      return const Center(child: Text('No pending properties'));
-    }
-
-    return Column(
-      children: pending.map((p) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: ListTile(
-          tileColor: Colors.white,
-          title: Text(p.name),
-          subtitle: Text(p.address),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(icon: const Icon(Icons.check, color: Colors.green), onPressed: () => _handlePropertyVerification(p)),
-              IconButton(icon: const Icon(Icons.close, color: Colors.red), onPressed: () => _handlePropertyRejection(p)),
-            ],
-          ),
-        ),
-      )).toList(),
-    );
-  }
-
-  Widget _buildOwnerQueue() {
-    final authProvider = context.watch<AuthProvider>();
-    final pending = authProvider.pendingOwners;
-
-    if (pending.isEmpty) {
-      return const Center(child: Text('No pending owners'));
-    }
-
-    return Column(
-      children: pending.map((u) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: ListTile(
-          tileColor: Colors.white,
-          title: Text(u.displayName),
-          subtitle: Text(u.email),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(icon: const Icon(Icons.check, color: Colors.green), onPressed: () => _handleOwnerVerification(u)),
-              IconButton(icon: const Icon(Icons.close, color: Colors.red), onPressed: () => _handleOwnerRejection(u)),
-            ],
-          ),
-        ),
-      )).toList(),
-    );
-  }
-
-  Future<void> _handlePropertyVerification(dynamic property) async {
-    await context.read<PropertyProvider>().moderateProperty(propertyId: property.propertyId, status: PropertyStatus.verified);
-    _refreshData();
-  }
-
-  Future<void> _handlePropertyRejection(dynamic property) async {
-    // Simplified for now
-    await context.read<PropertyProvider>().moderateProperty(propertyId: property.propertyId, status: PropertyStatus.rejected);
-    _refreshData();
-  }
-
-  Future<void> _handleOwnerVerification(dynamic user) async {
-    await context.read<AuthProvider>().verifyOwner(user.uid);
-    _refreshData();
-  }
-
-  Future<void> _handleOwnerRejection(dynamic user) async {
-    await context.read<AuthProvider>().rejectOwner(user.uid);
-    _refreshData();
-  }
 
   Widget _buildHeader() {
     return Column(

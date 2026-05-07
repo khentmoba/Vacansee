@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../models/property_model.dart';
 import '../../models/room_model.dart';
 import '../../providers/property_provider.dart';
-import '../../widgets/booking/booking_dialog.dart';
 import '../booking/booking_screen.dart';
 import '../../utils/transitions.dart';
 
