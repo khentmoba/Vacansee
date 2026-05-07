@@ -646,7 +646,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         // Google Sign In Button
         SizedBox(
           width: double.infinity,
-          height: 52,
+          height: 60,
           child: OutlinedButton(
             onPressed: authProvider.isLoading
                 ? null
@@ -654,28 +654,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: Colors.grey[300]!, width: 1.5),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
             child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Continue with',
-                      style: TextStyle(
-                        color: Color(0xFF1D1B16),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Image.asset(
-                      'assets/images/google_logo.png',
-                      height: 24,
-                      width: 24,
-                    ),
-                  ],
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Continue with',
+                  style: TextStyle(
+                    color: Color(0xFF1D1B16),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
+                const SizedBox(width: 16),
+                Image.asset(
+                  'assets/images/google_logo.png',
+                  height: 32,
+                  width: 32,
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 24),
