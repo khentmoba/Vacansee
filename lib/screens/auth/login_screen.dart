@@ -476,24 +476,29 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Continue with',
-                  style: TextStyle(
-                    color: Color(0xFF1D1B16),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Continue with',
+                      style: TextStyle(
+                        color: Color(0xFF1D1B16),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Image.network(
+                      'https://developers.google.com/static/identity/images/g-logo.png',
+                      height: 22,
+                      width: 22,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.g_mobiledata,
+                        size: 24,
+                        color: Color(0xFF4285F4),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 10),
-                Image.network(
-                  'https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png',
-                  height: 22,
-                  width: 22,
-                ),
-              ],
-            ),
           ),
         ),
         const SizedBox(height: 24),
