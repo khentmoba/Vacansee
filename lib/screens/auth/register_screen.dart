@@ -231,8 +231,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           'Welcome to\nVacanSee',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 56,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
                             color: Color(0xFF1D1B16),
                             height: 1.2,
                           ),
@@ -267,7 +267,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const Text(
                   'Sign Up',
                   style: TextStyle(
-                    fontSize: 42,
+                    fontSize: 48,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1D1B16),
                   ),
@@ -309,7 +309,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Center(
-                        child: Icon(Icons.home_work, color: Colors.white, size: 28),
+                        child: Icon(
+                          Icons.home_work,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -325,34 +329,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 40),
                 const Text(
-                  'Welcome to\nVacanSee',
+                  'Sign Up',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 40,
+                    fontSize: 36,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1D1B16),
-                    height: 1.2,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'To keep connected with us please sign up with your personal information',
+                  'Welcome to VacanSee! Please sign up with your personal information',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Color(0xFF666666)),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 40),
-          const Text(
-            'Sign Up',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1D1B16),
-            ),
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           _buildForm(authProvider),
         ],
       ),
@@ -523,12 +517,78 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         // Role Selector (Button tabs - Tenant/Owner only)
         _buildLabel('I am a:'),
-        Row(
-          children: [
-            Expanded(child: _buildRoleButton('Tenant', UserRole.student)),
-            const SizedBox(width: 16),
-            Expanded(child: _buildRoleButton('Owner', UserRole.owner)),
-          ],
+        Container(
+          height: 52,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F7FA),
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+          ),
+          padding: const EdgeInsets.all(4),
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedRole = UserRole.student;
+                      _clearError('role');
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      color: _selectedRole == UserRole.student
+                          ? const Color(0xFF5287B2)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Tenant',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: _selectedRole == UserRole.student
+                            ? Colors.white
+                            : const Color(0xFF7A7A7A),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedRole = UserRole.owner;
+                      _clearError('role');
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      color: _selectedRole == UserRole.owner
+                          ? const Color(0xFF5287B2)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Owner',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: _selectedRole == UserRole.owner
+                            ? Colors.white
+                            : const Color(0xFF7A7A7A),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         if (_errors['role'] != null)
           Padding(
@@ -544,20 +604,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: Checkbox(
-                value: _agreedToTerms,
-                onChanged: (v) {
-                  setState(() {
-                    _agreedToTerms = v ?? false;
-                    _clearError('terms');
-                  });
-                },
-                activeColor: const Color(0xFF5287B2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
+            Padding(
+              padding: const EdgeInsets.only(top: 3),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: Checkbox(
+                  value: _agreedToTerms,
+                  onChanged: (v) {
+                    setState(() {
+                      _agreedToTerms = v ?? false;
+                      _clearError('terms');
+                    });
+                  },
+                  activeColor: const Color(0xFF5287B2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
               ),
             ),
@@ -671,24 +734,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
             child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Continue with',
-                      style: TextStyle(
-                        color: Color(0xFF1D1B16),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Image.asset(
-                      'assets/images/google_logo.png',
-                      height: 24,
-                      width: 24,
-                    ),
-                  ],
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Continue with',
+                  style: TextStyle(
+                    color: Color(0xFF1D1B16),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
+                const SizedBox(width: 12),
+                Image.asset(
+                  'assets/images/google_logo.png',
+                  height: 24,
+                  width: 24,
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 24),
@@ -725,40 +788,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildRoleButton(String label, UserRole role) {
-    final isSelected = _selectedRole == role;
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedRole = role;
-          _clearError('role');
-        });
-      },
-      child: Container(
-        height: 52,
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF5287B2) : Colors.white,
-          border: Border.all(
-            color: isSelected
-                ? const Color(0xFF5287B2)
-                : const Color(0xFFE0E0E0),
-            width: 1.5,
-          ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: isSelected ? Colors.white : const Color(0xFF1D1B16),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+
 
   Widget _buildLabel(String text) {
     return Padding(

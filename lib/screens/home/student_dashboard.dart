@@ -57,7 +57,10 @@ class _StudentDashboardState extends State<StudentDashboard> {
               return FadeTransition(
                 opacity: animation,
                 child: ScaleTransition(
-                  scale: Tween<double>(begin: 0.98, end: 1.0).animate(animation),
+                  scale: Tween<double>(
+                    begin: 0.98,
+                    end: 1.0,
+                  ).animate(animation),
                   child: child,
                 ),
               );
@@ -70,8 +73,11 @@ class _StudentDashboardState extends State<StudentDashboard> {
           bottomNavigationBar: !isDesktop
               ? SafeArea(
                   child: Padding(
-                    padding:
-                        const EdgeInsets.only(left: 24, right: 24, bottom: 24),
+                    padding: const EdgeInsets.only(
+                      left: 24,
+                      right: 24,
+                      bottom: 24,
+                    ),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -159,11 +165,7 @@ class _TopNavBar extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
-                width: 1,
-                height: 24,
-                color: Colors.grey[300],
-              ),
+              Container(width: 1, height: 24, color: Colors.grey[300]),
               const SizedBox(width: 8),
               Text(
                 'Tenant Dashboard',
@@ -279,7 +281,7 @@ class _AnimatedNavItemState extends State<_AnimatedNavItem> {
   Color get iconColor {
     if (widget.isSelected) return Colors.white;
     if (isHovered) return const Color(0xFF5287B2);
-    return Colors.grey[500]!;
+    return Colors.white.withValues(alpha: 0.65);
   }
 
   @override
@@ -365,222 +367,297 @@ class _ProfileTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-          // Back Button
-          TextButton.icon(
-            onPressed: onBack,
-            icon: const Icon(Icons.arrow_back_rounded, size: 18),
-            label: const Text('Back to Dashboard'),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.grey[600],
-              textStyle: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Main Profile Card
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
+              // Back Button
+              TextButton.icon(
+                onPressed: onBack,
+                icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                label: const Text('Back to Dashboard'),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey[600],
+                  textStyle: const TextStyle(fontWeight: FontWeight.w500),
                 ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header Banner
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(32),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF5287B2),
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.person_outline_rounded,
-                          size: 40,
-                          color: Color(0xFF5287B2),
+              ),
+              const SizedBox(height: 24),
+
+              // Main Profile Card
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header Banner
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(32),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF5287B2),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(16),
                         ),
                       ),
-                      const SizedBox(width: 24),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              user?.displayName ?? 'Student Name',
-                              style: const TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Tenant Account',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white70,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Personal Information Section
-                Padding(
-                  padding: const EdgeInsets.all(32),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Row(
                         children: [
-                          const Expanded(
-                            child: Text(
-                              'Personal Information',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF1D1B16),
-                              ),
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.person_outline_rounded,
+                              size: 40,
+                              color: Color(0xFF5287B2),
                             ),
                           ),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF5287B2).withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const ProfileScreen(),
+                          const SizedBox(width: 24),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  user?.displayName ?? 'Student Name',
+                                  style: const TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
-                                );
-                              },
-                              icon: const Icon(
-                                Icons.edit_outlined,
-                                color: Color(0xFF5287B2),
-                                size: 20,
-                              ),
-                              tooltip: 'Edit Profile',
-                              constraints: const BoxConstraints(),
-                              padding: const EdgeInsets.all(12),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  'Tenant Account',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 32),
+                    ),
 
-                      // Fields Grid
-                      if (isDesktop) ...[
-                        Row(
-                          children: [
-                            Expanded(child: _buildProfileField('First Name', user?.firstName ?? 'First Name')),
-                            const SizedBox(width: 24),
-                            Expanded(child: _buildProfileField('Last Name', user?.lastName ?? 'Last Name')),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          children: [
-                            Expanded(child: _buildProfileField('Gender', user?.gender?.toUpperCase() ?? 'Not Set', icon: Icons.people_outline)),
-                            const SizedBox(width: 24),
-                            Expanded(child: _buildProfileField('Phone Number', user?.phoneNumber ?? 'Phone', icon: Icons.phone_outlined)),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          children: [
-                            Expanded(child: _buildProfileField('Email Address', user?.email ?? 'Email', icon: Icons.email_outlined)),
-                            const SizedBox(width: 24),
-                            const Spacer(), // Keep it two-column aligned
-                          ],
-                        ),
-                      ] else ...[
-                        _buildProfileField('First Name', user?.firstName ?? 'First Name'),
-                        const SizedBox(height: 24),
-                        _buildProfileField('Last Name', user?.lastName ?? 'Last Name'),
-                        const SizedBox(height: 24),
-                        _buildProfileField('Gender', user?.gender?.toUpperCase() ?? 'Not Set', icon: Icons.people_outline),
-                        const SizedBox(height: 24),
-                        _buildProfileField('Phone Number', user?.phoneNumber ?? 'Phone', icon: Icons.phone_outlined),
-                        const SizedBox(height: 24),
-                        _buildProfileField('Email Address', user?.email ?? 'Email', icon: Icons.email_outlined),
-                      ],
-                      const SizedBox(height: 24),
-                      _buildProfileField('Address', user?.address ?? 'Your Address'),
+                    // Personal Information Section
+                    Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Expanded(
+                                child: Text(
+                                  'Personal Information',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1D1B16),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFF5287B2,
+                                  ).withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: IconButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const ProfileScreen(),
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.edit_outlined,
+                                    color: Color(0xFF5287B2),
+                                    size: 20,
+                                  ),
+                                  tooltip: 'Edit Profile',
+                                  constraints: const BoxConstraints(),
+                                  padding: const EdgeInsets.all(12),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 32),
 
-                      const SizedBox(height: 48),
-
-                      // Emergency Contact Section
-                      const Text(
-                        'Emergency Contact',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1D1B16),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      if (isDesktop)
-                        Row(
-                          children: [
-                            Expanded(child: _buildProfileField('Contact Name', user?.emergencyContactName ?? 'Emergency Contact Name')),
-                            const SizedBox(width: 24),
-                            Expanded(child: _buildProfileField('Contact Number', user?.emergencyContactPhone ?? 'Emergency Contact Number')),
+                          // Fields Grid
+                          if (isDesktop) ...[
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildProfileField(
+                                    'First Name',
+                                    user?.firstName ?? 'First Name',
+                                  ),
+                                ),
+                                const SizedBox(width: 24),
+                                Expanded(
+                                  child: _buildProfileField(
+                                    'Last Name',
+                                    user?.lastName ?? 'Last Name',
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildProfileField(
+                                    'Gender',
+                                    user?.gender?.toUpperCase() ?? 'Not Set',
+                                    icon: Icons.people_outline,
+                                  ),
+                                ),
+                                const SizedBox(width: 24),
+                                Expanded(
+                                  child: _buildProfileField(
+                                    'Phone Number',
+                                    user?.phoneNumber ?? 'Phone',
+                                    icon: Icons.phone_outlined,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildProfileField(
+                                    'Email Address',
+                                    user?.email ?? 'Email',
+                                    icon: Icons.email_outlined,
+                                  ),
+                                ),
+                                const SizedBox(width: 24),
+                                const Spacer(), // Keep it two-column aligned
+                              ],
+                            ),
+                          ] else ...[
+                            _buildProfileField(
+                              'First Name',
+                              user?.firstName ?? 'First Name',
+                            ),
+                            const SizedBox(height: 24),
+                            _buildProfileField(
+                              'Last Name',
+                              user?.lastName ?? 'Last Name',
+                            ),
+                            const SizedBox(height: 24),
+                            _buildProfileField(
+                              'Gender',
+                              user?.gender?.toUpperCase() ?? 'Not Set',
+                              icon: Icons.people_outline,
+                            ),
+                            const SizedBox(height: 24),
+                            _buildProfileField(
+                              'Phone Number',
+                              user?.phoneNumber ?? 'Phone',
+                              icon: Icons.phone_outlined,
+                            ),
+                            const SizedBox(height: 24),
+                            _buildProfileField(
+                              'Email Address',
+                              user?.email ?? 'Email',
+                              icon: Icons.email_outlined,
+                            ),
                           ],
-                        )
-                      else ...[
-                        _buildProfileField('Contact Name', user?.emergencyContactName ?? 'Emergency Contact Name'),
-                        const SizedBox(height: 24),
-                        _buildProfileField('Contact Number', user?.emergencyContactPhone ?? 'Emergency Contact Number'),
-                      ],
-                      
-                      const SizedBox(height: 48),
-                      // Sign Out Button (Optional, keeping it for utility)
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          onPressed: () => authProvider.signOut(),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.red,
-                            side: const BorderSide(color: Colors.red),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                          const SizedBox(height: 24),
+                          _buildProfileField(
+                            'Address',
+                            user?.address ?? 'Your Address',
+                          ),
+
+                          const SizedBox(height: 48),
+
+                          // Emergency Contact Section
+                          const Text(
+                            'Emergency Contact',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1D1B16),
                             ),
                           ),
-                          child: const Text('Sign Out'),
-                        ),
+                          const SizedBox(height: 32),
+                          if (isDesktop)
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildProfileField(
+                                    'Contact Name',
+                                    user?.emergencyContactName ??
+                                        'Emergency Contact Name',
+                                  ),
+                                ),
+                                const SizedBox(width: 24),
+                                Expanded(
+                                  child: _buildProfileField(
+                                    'Contact Number',
+                                    user?.emergencyContactPhone ??
+                                        'Emergency Contact Number',
+                                  ),
+                                ),
+                              ],
+                            )
+                          else ...[
+                            _buildProfileField(
+                              'Contact Name',
+                              user?.emergencyContactName ??
+                                  'Emergency Contact Name',
+                            ),
+                            const SizedBox(height: 24),
+                            _buildProfileField(
+                              'Contact Number',
+                              user?.emergencyContactPhone ??
+                                  'Emergency Contact Number',
+                            ),
+                          ],
+
+                          const SizedBox(height: 48),
+                          // Sign Out Button (Optional, keeping it for utility)
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => authProvider.signOut(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red,
+                                side: const BorderSide(color: Colors.red),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text('Sign Out'),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ],
+              ),
+            ],
           ),
         ),
       ),
@@ -591,41 +668,41 @@ class _ProfileTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1D1B16),
-            ),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1D1B16),
           ),
-          const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFBFBFB),
-              border: Border.all(color: Colors.grey[200]!),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                if (icon != null) ...[
-                  Icon(icon, size: 18, color: Colors.grey[400]),
-                  const SizedBox(width: 12),
-                ],
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    color: Color(0xFF1D1B16),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFBFBFB),
+            border: Border.all(color: Colors.grey[200]!),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 18, color: Colors.grey[400]),
+                const SizedBox(width: 12),
               ],
-            ),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Color(0xFF1D1B16),
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
+      ],
     );
   }
 }

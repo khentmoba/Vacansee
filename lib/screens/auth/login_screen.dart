@@ -190,8 +190,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           'Welcome Back',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 56,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
                             color: Color(0xFF1D1B16),
                           ),
                         ),
@@ -225,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Text(
                   'Login',
                   style: TextStyle(
-                    fontSize: 42,
+                    fontSize: 48,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1D1B16),
                   ),
@@ -267,7 +267,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Center(
-                        child: Icon(Icons.home_work, color: Colors.white, size: 28),
+                        child: Icon(
+                          Icons.home_work,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -283,33 +287,24 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 40),
                 const Text(
-                  'Welcome Back',
+                  'Login',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 40,
+                    fontSize: 36,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1D1B16),
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'To keep connected with us please login with your personal information',
+                  'Welcome Back! Please login with your personal information',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Color(0xFF666666)),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 40),
-          const Text(
-            'Login',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1D1B16),
-            ),
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           _buildForm(authProvider),
         ],
       ),
@@ -489,24 +484,24 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Continue with',
-                      style: TextStyle(
-                        color: Color(0xFF1D1B16),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Image.asset(
-                      'assets/images/google_logo.png',
-                      height: 24,
-                      width: 24,
-                    ),
-                  ],
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Continue with',
+                  style: TextStyle(
+                    color: Color(0xFF1D1B16),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
+                const SizedBox(width: 12),
+                Image.asset(
+                  'assets/images/google_logo.png',
+                  height: 24,
+                  width: 24,
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 24),

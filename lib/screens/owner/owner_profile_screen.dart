@@ -34,8 +34,12 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
     _emailController = TextEditingController(text: user?.email ?? '');
     _phoneController = TextEditingController(text: user?.phoneNumber ?? '');
     _addressController = TextEditingController(text: user?.address ?? '');
-    _businessNameController = TextEditingController(text: user?.businessName ?? '');
-    _businessPermitController = TextEditingController(text: user?.businessPermitNo ?? '');
+    _businessNameController = TextEditingController(
+      text: user?.businessName ?? '',
+    );
+    _businessPermitController = TextEditingController(
+      text: user?.businessPermitNo ?? '',
+    );
   }
 
   @override
@@ -64,7 +68,8 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
         address: _addressController.text.trim(),
         businessName: _businessNameController.text.trim(),
         businessPermitNo: _businessPermitController.text.trim(),
-        displayName: '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}',
+        displayName:
+            '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}',
       );
 
       if (mounted) {
@@ -74,9 +79,9 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -95,9 +100,11 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1000),
             child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: isDesktop ? 40 : 20,
-                vertical: 32,
+              padding: EdgeInsets.only(
+                left: isDesktop ? 40 : 20,
+                right: isDesktop ? 40 : 20,
+                top: 32,
+                bottom: isDesktop ? 32 : 140,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,7 +202,11 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                     color: Colors.white,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.business_rounded, size: 35, color: Color(0xFF5287B2)),
+                  child: const Icon(
+                    Icons.business_rounded,
+                    size: 35,
+                    color: Color(0xFF5287B2),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Text(
@@ -225,7 +236,11 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                     color: Colors.white,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.business_rounded, size: 40, color: Color(0xFF5287B2)),
+                  child: const Icon(
+                    Icons.business_rounded,
+                    size: 40,
+                    color: Color(0xFF5287B2),
+                  ),
                 ),
                 const SizedBox(width: 24),
                 Column(
@@ -247,7 +262,8 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    if (user?.businessName != null && user!.businessName!.isNotEmpty)
+                    if (user?.businessName != null &&
+                        user!.businessName!.isNotEmpty)
                       Text(
                         user.businessName!,
                         style: const TextStyle(
@@ -293,10 +309,19 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                   backgroundColor: const Color(0xFF5287B2),
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 child: _isSaving
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
                     : const Text('Edit Profile'),
               ),
             ],

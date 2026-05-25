@@ -64,7 +64,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Discover comfortable and affordable boarding houses in Metro Manila',
+                        'Discover comfortable and affordable boarding houses in Cagayan de Oro',
                         style: TextStyle(
                           fontSize: 18,
                           color: Colors.grey[600],
@@ -110,26 +110,24 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                     ? SliverToBoxAdapter(child: _buildEmptyState())
                     : SliverGrid(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: isDesktop ? 3 : (constraints.maxWidth > 600 ? 2 : 1),
+                          crossAxisCount: isDesktop
+                              ? 3
+                              : (constraints.maxWidth > 600 ? 2 : 1),
                           crossAxisSpacing: 24,
                           mainAxisSpacing: 24,
                           childAspectRatio: 0.82,
                         ),
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final property = propertyProvider.properties[index];
-                            final isLiveVacant = roomProvider.hasVacancyForProperty(
-                              property.propertyId,
-                            );
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final property = propertyProvider.properties[index];
+                          final isLiveVacant = roomProvider
+                              .hasVacancyForProperty(property.propertyId);
 
-                            return _PropertyCard(
-                              property: property,
-                              liveVacancy: isLiveVacant,
-                              lastUpdate: 'Live',
-                            );
-                          },
-                          childCount: propertyProvider.properties.length,
-                        ),
+                          return _PropertyCard(
+                            property: property,
+                            liveVacancy: isLiveVacant,
+                            lastUpdate: 'Live',
+                          );
+                        }, childCount: propertyProvider.properties.length),
                       ),
               ),
             ],
@@ -224,7 +222,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 24),
           Row(
             children: [
               Expanded(
@@ -273,10 +271,15 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
           keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: icon != null ? Icon(icon, size: 20, color: Colors.grey[400]) : null,
+            prefixIcon: icon != null
+                ? Icon(icon, size: 20, color: Colors.grey[400])
+                : null,
             filled: true,
             fillColor: const Color(0xFFFBFBFB),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(color: Colors.grey[200]!),
@@ -287,7 +290,10 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
+              borderSide: const BorderSide(
+                color: Color(0xFF5287B2),
+                width: 1.5,
+              ),
             ),
           ),
         ),
@@ -901,14 +907,14 @@ class _PropertyCardState extends State<_PropertyCard> {
                           children: [
                             const Icon(
                               Icons.star_rounded,
-                              size: 14,
+                              size: 18,
                               color: Color(0xFFFFB800),
                             ),
                             const SizedBox(width: 4),
                             Text(
                               widget.property.averageRating.toStringAsFixed(1),
                               style: const TextStyle(
-                                fontSize: 13,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -916,7 +922,7 @@ class _PropertyCardState extends State<_PropertyCard> {
                             Text(
                               '(${widget.property.reviewsCount})',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 13,
                                 color: Colors.grey[500],
                               ),
                             ),
@@ -931,7 +937,8 @@ class _PropertyCardState extends State<_PropertyCard> {
                             text: TextSpan(
                               children: [
                                 TextSpan(
-                                  text: '₱${widget.property.priceRange.min.toString().replaceAllMapped(RegExp(r"\B(?=(\d{3})+(?!\d))"), (match) => ",")}',
+                                  text:
+                                      '₱${widget.property.priceRange.min.toString().replaceAllMapped(RegExp(r"\B(?=(\d{3})+(?!\d))"), (match) => ",")}',
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
