@@ -21,6 +21,7 @@ DO NOT delete historical context if it is still relevant. Compress older complet
 - [2026-05-25] - **Sign-Out Route Sanitization**: Converted root `AuthWrapper` to a StatefulWidget to pop all sub-routes back to root when transitioning from authenticated to unauthenticated state. Changed top nav bar navigation from replacement named routing to popping to root to prevent stack pollution.
 - [2026-05-25] - **Rich Booking Notifications**: Added `metadata` JSONB column to `notifications` table, populated by booking trigger functions. Updated Deno Edge Function to send high-fidelity HTML emails detailing booking requests, approvals, and rejections. Fixed booking screen form submission bug.
 - [2026-05-25] - **UI/UX Refactoring & Visual Hierarchy**: Refactored typography hierarchies (making Login/SignUp primary H1s and Welcome subtitle), converted role selectors to segmented toggle switches, left-aligned dashboard metrics cards, unified mobile bottom navigation with higher icon contrast, and improved listings star size and spacing. Pushed to GitHub and deployed to Vercel production.
+- [2026-05-25] - **Landing Page Footer Interactivity**: Replaced all 9 empty footer link buttons (Search Listings, How It Works, Safety Tips, List Your Property, Owner Resources, Pricing, About Us, Contact, Privacy Policy) with premium, responsive, interactive dialog modals containing detailed flows, custom list items, and Call to Actions linking back to the registration flow. Created full widget test suites covering all modal interaction flows.
 
 ## 🐛 Known Issues & Quirks
 ...
