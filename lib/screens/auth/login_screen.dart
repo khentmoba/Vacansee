@@ -217,26 +217,28 @@ class _LoginScreenState extends State<LoginScreen> {
         Expanded(
           child: Container(
             color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 48),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Spacer(),
-                const Text(
-                  'Login',
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1D1B16),
+            alignment: Alignment.center,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 48),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1D1B16),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 40),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 450),
-                  child: _buildForm(authProvider),
-                ),
-                const Spacer(),
-              ],
+                  const SizedBox(height: 40),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 450),
+                    child: _buildForm(authProvider),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
