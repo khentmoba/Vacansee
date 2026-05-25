@@ -20,6 +20,7 @@ DO NOT delete historical context if it is still relevant. Compress older complet
 - [2026-05-25] - **Lease Lifecycle Flow**: Added check-in and checkout transitions for approved bookings. Checking in marks the room occupied. Checking out returns the room to vacant and sets the booking to completed.
 - [2026-05-25] - **Sign-Out Route Sanitization**: Converted root `AuthWrapper` to a StatefulWidget to pop all sub-routes back to root when transitioning from authenticated to unauthenticated state. Changed top nav bar navigation from replacement named routing to popping to root to prevent stack pollution.
 - [2026-05-25] - **Rich Booking Notifications**: Added `metadata` JSONB column to `notifications` table, populated by booking trigger functions. Updated Deno Edge Function to send high-fidelity HTML emails detailing booking requests, approvals, and rejections. Fixed booking screen form submission bug.
+- [2026-05-25] - **UI/UX Refactoring & Visual Hierarchy**: Refactored typography hierarchies (making Login/SignUp primary H1s and Welcome subtitle), converted role selectors to segmented toggle switches, left-aligned dashboard metrics cards, unified mobile bottom navigation with higher icon contrast, and improved listings star size and spacing. Pushed to GitHub and deployed to Vercel production.
 
 ## 🐛 Known Issues & Quirks
 ...
