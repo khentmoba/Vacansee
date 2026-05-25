@@ -443,3 +443,178 @@ JOIN public.properties p ON r.property_id = p.id;
 GRANT SELECT ON TABLE public.room_vacancies TO anon;
 GRANT SELECT ON TABLE public.room_vacancies TO authenticated;
 GRANT SELECT ON TABLE public.room_vacancies TO service_role;
+
+-- 10. Notifications and Webhooks Setup (consolidated from migrations)
+
+CREATE TABLE IF NOT EXISTS public.notifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    type TEXT NOT NULL, -- booking_request, booking_accepted, booking_declined, booking_expired, system
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    metadata JSONB
+);
+
+-- Enable RLS for notifications
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view their own notifications" ON public.notifications;
+CREATE POLICY "Users can view their own notifications"
+ON public.notifications FOR SELECT
+USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "System can insert notifications" ON public.notifications;
+CREATE POLICY "System can insert notifications"
+ON public.notifications FOR INSERT
+WITH CHECK (true);
+
+-- Real-time publication for notifications table
+DO $$ 
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'notifications') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
+  END IF;
+END $$;
+
+-- Triggers and Functions for Bookings
+
+-- Booking status sync trigger (handle_booking_acceptance)
+CREATE OR REPLACE FUNCTION public.handle_booking_acceptance()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- If booking is approved
+    IF NEW.status = 'approved' AND OLD.status = 'pending' THEN
+        -- Mark room as occupied
+        UPDATE public.rooms 
+        SET status = 'occupied', last_updated = NOW()
+        WHERE id = NEW.room_id;
+
+        -- Decline all other pending requests for the same room
+        UPDATE public.bookings
+        SET status = 'rejected', owner_notes = 'Room already taken', responded_at = NOW()
+        WHERE room_id = NEW.room_id AND id <> NEW.id AND status = 'pending';
+
+        -- Notify student with metadata
+        INSERT INTO public.notifications (user_id, title, message, type, metadata)
+        VALUES (
+          NEW.student_id, 
+          'Booking Approved!', 
+          'Your booking for ' || NEW.property_name || ' has been approved.', 
+          'booking_accepted',
+          jsonb_build_object(
+            'booking_id', NEW.id,
+            'property_name', NEW.property_name,
+            'room_description', NEW.room_description,
+            'owner_notes', NEW.owner_notes,
+            'status', NEW.status
+          )
+        );
+    
+    ELSIF NEW.status = 'rejected' AND OLD.status = 'pending' THEN
+        -- Notify student of rejection with metadata
+        INSERT INTO public.notifications (user_id, title, message, type, metadata)
+        VALUES (
+          NEW.student_id, 
+          'Booking Declined', 
+          'Your booking request for ' || NEW.property_name || ' was declined.', 
+          'booking_declined',
+          jsonb_build_object(
+            'booking_id', NEW.id,
+            'property_name', NEW.property_name,
+            'room_description', NEW.room_description,
+            'owner_notes', NEW.owner_notes,
+            'status', NEW.status
+          )
+        );
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS on_booking_status_change ON public.bookings;
+CREATE TRIGGER on_booking_status_change
+    AFTER UPDATE ON public.bookings
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_booking_acceptance();
+
+
+-- Booking Request Notification Trigger
+CREATE OR REPLACE FUNCTION public.notify_owner_on_booking()
+RETURNS TRIGGER AS $$
+DECLARE
+    owner_id UUID;
+    room_rate INTEGER;
+BEGIN
+    -- Get owner_id from property
+    SELECT p.owner_id INTO owner_id FROM public.properties p WHERE p.id = NEW.property_id;
+    
+    -- Get monthly rate from room
+    SELECT r.monthly_rate INTO room_rate FROM public.rooms r WHERE r.id = NEW.room_id;
+
+    -- Notify owner with detailed metadata
+    INSERT INTO public.notifications (user_id, title, message, type, metadata)
+    VALUES (
+      owner_id, 
+      'New Booking Request', 
+      'You have a new booking request for ' || NEW.property_name || ' from ' || NEW.student_name || '.', 
+      'booking_request',
+      jsonb_build_object(
+        'booking_id', NEW.id,
+        'property_id', NEW.property_id,
+        'room_id', NEW.room_id,
+        'property_name', NEW.property_name,
+        'room_description', NEW.room_description,
+        'monthly_rate', COALESCE(room_rate, 0),
+        'student_name', NEW.student_name,
+        'student_email', NEW.student_email,
+        'student_phone', NEW.student_phone,
+        'student_notes', NEW.student_notes,
+        'move_in_date', NEW.move_in_date,
+        'duration_months', NEW.duration_months
+      )
+    );
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS on_booking_created ON public.bookings;
+CREATE TRIGGER on_booking_created
+    AFTER INSERT ON public.bookings
+    FOR EACH ROW
+    EXECUTE FUNCTION public.notify_owner_on_booking();
+
+
+-- Webhook trigger to send emails via pg_net calling Edge Function
+CREATE OR REPLACE FUNCTION public.trigger_notification_email()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  PERFORM
+    net.http_post(
+      url := 'https://hzelyxvecggwormsoesa.supabase.co/functions/v1/send-notification-email',
+      headers := jsonb_build_object(
+        'Content-Type', 'application/json',
+        'Authorization', 'Bearer ' || COALESCE(
+          current_setting('vault.service_role_key', true), 
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6ZWx5eHZlY2dnd29ybXNvZXNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMTk0NzIsImV4cCI6MjA5MTg5NTQ3Mn0.GInyDYoBe3Tu8aJQ0nOmEVS1mmRNIAYSGW_VmClc2o0'
+        )
+      ),
+      body := jsonb_build_object('record', row_to_json(NEW))
+    );
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_notification_inserted ON public.notifications;
+CREATE TRIGGER on_notification_inserted
+  AFTER INSERT ON public.notifications
+  FOR EACH ROW
+  EXECUTE FUNCTION public.trigger_notification_email();
+

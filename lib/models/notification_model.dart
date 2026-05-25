@@ -31,6 +31,7 @@ class NotificationModel with _$NotificationModel {
     required NotificationType type,
     @JsonKey(name: 'is_read') @Default(false) bool isRead,
     @JsonKey(name: 'created_at') required DateTime createdAt,
+    Map<String, dynamic>? metadata,
   }) = _NotificationModel;
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) =>

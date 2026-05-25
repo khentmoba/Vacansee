@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../models/booking_model.dart';
+import '../../models/room_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/property_provider.dart';
 import '../../providers/booking_provider.dart';
@@ -522,8 +523,47 @@ class _OwnerBookingCard extends StatelessWidget {
   }
 
   Widget _buildProcessedCard(BuildContext context) {
-    final isApproved = booking.status == BookingStatus.approved;
+    final status = booking.status;
     
+    IconData statusIcon;
+    Color badgeBgColor;
+    Color badgeTextColor;
+
+    switch (status) {
+      case BookingStatus.approved:
+        statusIcon = Icons.check_circle;
+        badgeBgColor = const Color(0xFFECFDF5);
+        badgeTextColor = const Color(0xFF10B981);
+        break;
+      case BookingStatus.completed:
+        statusIcon = Icons.done_all;
+        badgeBgColor = const Color(0xFFEFF6FF);
+        badgeTextColor = const Color(0xFF3B82F6);
+        break;
+      case BookingStatus.rejected:
+        statusIcon = Icons.cancel;
+        badgeBgColor = const Color(0xFFFEF2F2);
+        badgeTextColor = const Color(0xFFEF4444);
+        break;
+      case BookingStatus.cancelled:
+        statusIcon = Icons.cancel_outlined;
+        badgeBgColor = const Color(0xFFF3F4F6);
+        badgeTextColor = const Color(0xFF6B7280);
+        break;
+      case BookingStatus.expired:
+        statusIcon = Icons.history;
+        badgeBgColor = const Color(0xFFFFFBEB);
+        badgeTextColor = const Color(0xFFD97706);
+        break;
+      default:
+        statusIcon = Icons.help_outline;
+        badgeBgColor = const Color(0xFFF3F4F6);
+        badgeTextColor = const Color(0xFF6B7280);
+    }
+
+    final propertyProvider = context.watch<PropertyProvider>();
+    final roomStatus = propertyProvider.getRoomStatusFromCache(booking.roomId);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
@@ -532,73 +572,115 @@ class _OwnerBookingCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFF1F5F9)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: isApproved ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
-            child: Icon(
-              isApproved ? Icons.check_circle : Icons.cancel,
-              color: isApproved ? const Color(0xFF10B981) : const Color(0xFFEF4444),
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  booking.studentName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1D1B16),
-                  ),
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: badgeBgColor,
+                child: Icon(
+                  statusIcon,
+                  color: badgeTextColor,
+                  size: 20,
                 ),
-                Text(
-                  booking.propertyName,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[500],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.calendar_today_outlined, size: 12, color: Colors.grey[400]),
-                    const SizedBox(width: 4),
                     Text(
-                      DateFormat('MMM d, yyyy').format(booking.requestedAt),
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                      booking.studentName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1D1B16),
+                      ),
                     ),
-                    const SizedBox(width: 16),
-                    Icon(Icons.payments_outlined, size: 12, color: Colors.grey[400]),
-                    const SizedBox(width: 4),
                     Text(
-                      '₱5,500/month', // Mock rate
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                      booking.propertyName,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.calendar_today_outlined, size: 12, color: Colors.grey[400]),
+                        const SizedBox(width: 4),
+                        Text(
+                          DateFormat('MMM d, yyyy').format(booking.requestedAt),
+                          style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                        ),
+                        const SizedBox(width: 16),
+                        Icon(Icons.payments_outlined, size: 12, color: Colors.grey[400]),
+                        const SizedBox(width: 4),
+                        Text(
+                          '₱${NumberFormat('#,###').format(booking.monthlyRate != 0 ? booking.monthlyRate : 5500)}/month',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                        ),
+                      ],
                     ),
                   ],
                 ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: badgeBgColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  booking.statusLabel,
+                  style: TextStyle(
+                    color: badgeTextColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (status == BookingStatus.approved) ...[
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (roomStatus != RoomStatus.occupied)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: OutlinedButton.icon(
+                      onPressed: () => _handleCheckIn(context),
+                      icon: const Icon(Icons.login_rounded, size: 16),
+                      label: const Text('Check-In Student'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF10B981),
+                        side: const BorderSide(color: Color(0xFF10B981)),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                  ),
+                ElevatedButton.icon(
+                  onPressed: () => _handleCheckOut(context),
+                  icon: const Icon(Icons.logout_rounded, size: 16),
+                  label: const Text('Complete Stay (Check-Out)'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3B82F6),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
               ],
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: isApproved ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              isApproved ? 'Approved' : 'Rejected',
-              style: TextStyle(
-                color: isApproved ? const Color(0xFF10B981) : const Color(0xFFEF4444),
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+          ],
         ],
       ),
     );
@@ -706,6 +788,100 @@ class _OwnerBookingCard extends StatelessWidget {
         await bookingProvider.approveBooking(booking.bookingId);
       } else {
         await bookingProvider.rejectBooking(booking.bookingId);
+      }
+    }
+  }
+
+  Future<void> _handleCheckIn(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Student Check-In'),
+        content: const Text(
+            'Are you sure you want to mark this student as checked in? This will set the room status to Occupied.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'Check-In',
+              style: TextStyle(color: Color(0xFF10B981)),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final bookingProvider = context.read<BookingProvider>();
+      final propertyProvider = context.read<PropertyProvider>();
+      
+      final success = await bookingProvider.checkInBooking(booking.bookingId);
+      if (success && context.mounted) {
+        await propertyProvider.updateRoomStatus(
+          booking.propertyId,
+          booking.roomId,
+          RoomStatus.occupied,
+        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Student checked in successfully.')),
+          );
+        }
+      } else if (context.mounted && bookingProvider.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(bookingProvider.errorMessage!)),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleCheckOut(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Check-Out / Complete Stay'),
+        content: const Text(
+            'Are you sure you want to complete this booking stay? This will set the room status back to Vacant and mark the booking as Completed.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'Complete Stay',
+              style: TextStyle(color: Color(0xFF3B82F6)),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final bookingProvider = context.read<BookingProvider>();
+      final propertyProvider = context.read<PropertyProvider>();
+
+      final success = await bookingProvider.completeBooking(booking.bookingId);
+      if (success && context.mounted) {
+        await propertyProvider.updateRoomStatus(
+          booking.propertyId,
+          booking.roomId,
+          RoomStatus.vacant,
+        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Booking stay completed successfully.')),
+          );
+        }
+      } else if (context.mounted && bookingProvider.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(bookingProvider.errorMessage!)),
+        );
       }
     }
   }

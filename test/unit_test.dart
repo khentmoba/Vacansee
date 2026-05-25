@@ -165,5 +165,27 @@ void main() {
       expect(json['student_email'], 'juan@example.com');
       expect(json['student_phone'], '09123456789');
     });
+
+    test('can serialize and deserialize completed status', () {
+      final booking = BookingModel(
+        bookingId: 'book-1',
+        studentId: 'student-1',
+        propertyId: 'prop-1',
+        roomId: 'room-1',
+        propertyName: 'Test Prop',
+        roomDescription: 'Test Room',
+        studentName: 'Juan Dela Cruz',
+        studentEmail: 'juan@example.com',
+        status: BookingStatus.completed,
+        requestedAt: DateTime(2025, 1, 1),
+      );
+
+      final json = booking.toJson();
+      expect(json['status'], 'completed');
+
+      final fromJson = BookingModel.fromJson(json);
+      expect(fromJson.status, BookingStatus.completed);
+      expect(fromJson.statusLabel, 'Completed');
+    });
   });
 }

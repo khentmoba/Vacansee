@@ -75,20 +75,42 @@ class VacanSeeApp extends StatelessWidget {
 }
 
 /// Wrapper that handles auth state and redirects accordingly
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  AuthStatus? _previousStatus;
 
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    final currentStatus = authProvider.status;
 
-    switch (authProvider.status) {
+    if (_previousStatus != null &&
+        _previousStatus != AuthStatus.unauthenticated &&
+        currentStatus == AuthStatus.unauthenticated) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      });
+    }
+
+    _previousStatus = currentStatus;
+
+    switch (currentStatus) {
       case AuthStatus.uninitialized:
         return const _LoadingScreen();
       case AuthStatus.authenticated:
         // Initialize notification listener when authenticated
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.read<NotificationProvider>().initialize(authProvider.user!.uid);
+          if (mounted) {
+            context.read<NotificationProvider>().initialize(authProvider.user!.uid);
+          }
         });
         return const HomeScreen();
       case AuthStatus.needsRole:

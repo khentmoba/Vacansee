@@ -5,7 +5,7 @@ DO NOT delete historical context if it is still relevant. Compress older complet
 -->
 
 ## 🏗️ Active Phase & Goal
-**Current Task:** Phase 5 - CI/CD Stabilization & Final Schema Sync
+**Current Task:** Phase 7 - Booking Lifecycle Actions (Check-In & Check-Out)
 **Next Steps:**
 1. Verify automated deployment via GitHub Actions
 2. Add comprehensive widget tests for booking flows
@@ -17,6 +17,9 @@ DO NOT delete historical context if it is still relevant. Compress older complet
 - [2026-04-17] - **Auto-Expiration Logic**: Scheduled `pg_cron` hourly job to transition 'pending' bookings to 'expired' status after 48 hours.
 - [2026-05-07] - **UI Modernization**: Refactored Admin Dashboard, Owner Dashboard, and Tenant Dashboard for high-fidelity responsiveness. Implemented a floating bottom navigation bar for mobile students and a tab-based navigation for owners.
 - [2026-05-07] - **Mobile Accessibility**: Optimized form layouts and booking action buttons to stack vertically on mobile to prevent layout overflows and improve touch interaction. Added adaptive bottom padding (140px) to all Tenant tabs to clear the floating bottom bar.
+- [2026-05-25] - **Lease Lifecycle Flow**: Added check-in and checkout transitions for approved bookings. Checking in marks the room occupied. Checking out returns the room to vacant and sets the booking to completed.
+- [2026-05-25] - **Sign-Out Route Sanitization**: Converted root `AuthWrapper` to a StatefulWidget to pop all sub-routes back to root when transitioning from authenticated to unauthenticated state. Changed top nav bar navigation from replacement named routing to popping to root to prevent stack pollution.
+- [2026-05-25] - **Rich Booking Notifications**: Added `metadata` JSONB column to `notifications` table, populated by booking trigger functions. Updated Deno Edge Function to send high-fidelity HTML emails detailing booking requests, approvals, and rejections. Fixed booking screen form submission bug.
 
 ## 🐛 Known Issues & Quirks
 ...
@@ -34,3 +37,5 @@ DO NOT delete historical context if it is still relevant. Compress older complet
 - [x] Phase 5b: Self-cleaning Booking Expiration (pg_cron)
 - [x] Phase 6a: UI Modernization & Premium Mobile Optimization (Responsive Dashboards)
 - [x] Phase 6b: Auth Branding (Standardized Google Auth UI)
+- [x] Phase 7: Booking Lifecycle Actions (Check-In & Check-Out)
+

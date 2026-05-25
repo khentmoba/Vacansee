@@ -58,6 +58,17 @@ class PropertyProvider extends ChangeNotifier {
   Map<String, DateTime> get lastVacancyUpdate => _lastVacancyUpdate;
 
   // Stats getters
+  RoomStatus? getRoomStatusFromCache(String roomId) {
+    for (final rooms in _propertyRoomsMap.values) {
+      for (final r in rooms) {
+        if (r.roomId == roomId) {
+          return r.status;
+        }
+      }
+    }
+    return null;
+  }
+
   int get totalOccupiedRooms {
     int count = 0;
     for (final rooms in _propertyRoomsMap.values) {
@@ -604,6 +615,10 @@ class PropertyProvider extends ChangeNotifier {
         description: description,
       );
       _rooms.add(room);
+      final cachedRooms = _propertyRoomsMap[propertyId];
+      if (cachedRooms != null) {
+        cachedRooms.add(room);
+      }
       _isLoading = false;
       notifyListeners();
       return true;
@@ -626,8 +641,15 @@ class PropertyProvider extends ChangeNotifier {
       final index = _rooms.indexWhere((r) => r.roomId == roomId);
       if (index != -1) {
         _rooms[index] = _rooms[index].copyWith(status: status);
-        notifyListeners();
       }
+      final cachedRooms = _propertyRoomsMap[propertyId];
+      if (cachedRooms != null) {
+        final cachedIndex = cachedRooms.indexWhere((r) => r.roomId == roomId);
+        if (cachedIndex != -1) {
+          cachedRooms[cachedIndex] = cachedRooms[cachedIndex].copyWith(status: status);
+        }
+      }
+      notifyListeners();
       return true;
     } catch (e) {
       _errorMessage = 'Failed to update room: $e';
@@ -636,14 +658,20 @@ class PropertyProvider extends ChangeNotifier {
     }
   }
 
+
   /// Delete a room
   Future<bool> deleteRoom(String propertyId, String roomId) async {
     try {
       await _propertyService.deleteRoom(propertyId, roomId);
       _rooms.removeWhere((r) => r.roomId == roomId);
+      final cachedRooms = _propertyRoomsMap[propertyId];
+      if (cachedRooms != null) {
+        cachedRooms.removeWhere((r) => r.roomId == roomId);
+      }
       notifyListeners();
       return true;
     } catch (e) {
+
       _errorMessage = 'Failed to delete room: $e';
       notifyListeners();
       return false;

@@ -70,7 +70,7 @@ class OwnerTopNavBar extends StatelessWidget {
               // Nav Items
               _buildTopNavItem(context, 'Dashboard', currentRoute == 'Dashboard', onTap: () {
                 if (currentRoute != 'Dashboard') {
-                  Navigator.pushReplacementNamed(context, '/home');
+                  Navigator.popUntil(context, (route) => route.isFirst);
                 }
               }),
               _buildTopNavItem(context, 'Booking Requests', currentRoute == 'Booking Requests', onTap: () {

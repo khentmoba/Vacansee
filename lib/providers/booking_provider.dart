@@ -224,6 +224,53 @@ class BookingProvider extends ChangeNotifier {
     }
   }
 
+  /// Check in a booking
+  Future<bool> checkInBooking(String bookingId) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _bookingService.checkInBooking(bookingId);
+      // Room status change is dynamic in DB, but let's notify list updates
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to check in booking: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Complete a booking
+  Future<bool> completeBooking(String bookingId) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _bookingService.completeBooking(bookingId);
+      final index = _bookings.indexWhere((b) => b.bookingId == bookingId);
+      if (index != -1) {
+        _bookings[index] = _bookings[index].copyWith(
+          status: BookingStatus.completed,
+          respondedAt: DateTime.now(),
+        );
+      }
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to complete booking: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+
   /// Select a booking
   void selectBooking(BookingModel? booking) {
     _selectedBooking = booking;

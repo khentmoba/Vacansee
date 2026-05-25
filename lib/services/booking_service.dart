@@ -206,6 +206,53 @@ class BookingService {
     }
   }
 
+  /// Check in a booking (sets room status to occupied)
+  Future<void> checkInBooking(String bookingId) async {
+    try {
+      final booking = await _supabase
+          .from('bookings')
+          .select('room_id')
+          .eq('id', bookingId)
+          .single();
+      final roomId = booking['room_id'] as String;
+
+      await _supabase
+          .from('rooms')
+          .update({'status': 'occupied'})
+          .eq('id', roomId);
+    } catch (e) {
+      throw BookingException('Failed to check in booking: $e');
+    }
+  }
+
+  /// Complete a booking (sets room status to vacant and booking status to completed)
+  Future<void> completeBooking(String bookingId) async {
+    try {
+      final booking = await _supabase
+          .from('bookings')
+          .select('room_id')
+          .eq('id', bookingId)
+          .single();
+      final roomId = booking['room_id'] as String;
+
+      await _supabase
+          .from('bookings')
+          .update({
+            'status': BookingStatus.completed.name,
+            'responded_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', bookingId);
+
+      await _supabase
+          .from('rooms')
+          .update({'status': 'vacant'})
+          .eq('id', roomId);
+    } catch (e) {
+      throw BookingException('Failed to complete booking: $e');
+    }
+  }
+
+
   /// Get all bookings (for admin)
   Stream<List<BookingModel>> getAllBookings() {
     return _supabase

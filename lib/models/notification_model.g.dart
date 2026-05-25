@@ -16,6 +16,7 @@ _$NotificationModelImpl _$$NotificationModelImplFromJson(
   type: $enumDecode(_$NotificationTypeEnumMap, json['type']),
   isRead: json['is_read'] as bool? ?? false,
   createdAt: DateTime.parse(json['created_at'] as String),
+  metadata: json['metadata'] as Map<String, dynamic>?,
 );
 
 Map<String, dynamic> _$$NotificationModelImplToJson(
@@ -28,6 +29,7 @@ Map<String, dynamic> _$$NotificationModelImplToJson(
   'type': _$NotificationTypeEnumMap[instance.type]!,
   'is_read': instance.isRead,
   'created_at': instance.createdAt.toIso8601String(),
+  'metadata': instance.metadata,
 };
 
 const _$NotificationTypeEnumMap = {

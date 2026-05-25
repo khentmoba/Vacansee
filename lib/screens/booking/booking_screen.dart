@@ -11,11 +11,7 @@ class BookingScreen extends StatefulWidget {
   final PropertyModel property;
   final RoomModel room;
 
-  const BookingScreen({
-    super.key,
-    required this.property,
-    required this.room,
-  });
+  const BookingScreen({super.key, required this.property, required this.room});
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -28,7 +24,7 @@ class _BookingScreenState extends State<BookingScreen> {
   late final TextEditingController _phoneController;
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
-  
+
   DateTime? _selectedDate;
   int _selectedDuration = 1;
   bool _isSubmitting = false;
@@ -38,7 +34,7 @@ class _BookingScreenState extends State<BookingScreen> {
     super.initState();
     final authProvider = context.read<AuthProvider>();
     final user = authProvider.user;
-    
+
     _nameController = TextEditingController(text: user?.displayName ?? '');
     _emailController = TextEditingController(text: user?.email ?? '');
     _phoneController = TextEditingController(text: user?.phoneNumber ?? '');
@@ -108,24 +104,24 @@ class _BookingScreenState extends State<BookingScreen> {
         studentEmail: _emailController.text.trim(),
         studentPhone: _phoneController.text.trim(),
         studentNotes: _notesController.text.trim(),
-        // Note: You might want to add move-in date and duration to your createBooking method/model
+        moveInDate: _selectedDate,
+        durationMonths: _selectedDuration,
       );
 
       if (mounted) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => BookingSuccessScreen(
-              propertyName: widget.property.name,
-            ),
+            builder: (context) =>
+                BookingSuccessScreen(propertyName: widget.property.name),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to submit booking: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to submit booking: $e')));
       }
     } finally {
       if (mounted) {
@@ -149,7 +145,10 @@ class _BookingScreenState extends State<BookingScreen> {
         ),
         title: const Text(
           'Booking Request',
-          style: TextStyle(color: Color(0xFF1D1B16), fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Color(0xFF1D1B16),
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -298,7 +297,8 @@ class _BookingScreenState extends State<BookingScreen> {
                       child: Text('$value Month${value > 1 ? 's' : ''}'),
                     );
                   }).toList(),
-                  onChanged: (value) => setState(() => _selectedDuration = value!),
+                  onChanged: (value) =>
+                      setState(() => _selectedDuration = value!),
                 ),
               ),
             ),
@@ -329,7 +329,10 @@ class _BookingScreenState extends State<BookingScreen> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
                         'Confirm Booking Request',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
               ),
             ),
@@ -450,9 +453,15 @@ class _BookingScreenState extends State<BookingScreen> {
           const SizedBox(height: 24),
 
           // Price Details
-          _buildSummaryRow('Monthly Rate:', '₱${NumberFormat('#,###').format(monthlyRate)}'),
+          _buildSummaryRow(
+            'Monthly Rate:',
+            '₱${NumberFormat('#,###').format(monthlyRate)}',
+          ),
           const SizedBox(height: 16),
-          _buildSummaryRow('Duration:', '$_selectedDuration Month${_selectedDuration > 1 ? 's' : ''}'),
+          _buildSummaryRow(
+            'Duration:',
+            '$_selectedDuration Month${_selectedDuration > 1 ? 's' : ''}',
+          ),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -485,7 +494,11 @@ class _BookingScreenState extends State<BookingScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.info_outline_rounded, color: Colors.amber[900], size: 20),
+                Icon(
+                  Icons.info_outline_rounded,
+                  color: Colors.amber[900],
+                  size: 20,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -510,10 +523,7 @@ class _BookingScreenState extends State<BookingScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-        ),
+        Text(label, style: TextStyle(fontSize: 16, color: Colors.grey[600])),
         Text(
           value,
           style: const TextStyle(

@@ -32,6 +32,7 @@ mixin _$NotificationModel {
   bool get isRead => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
+  Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
 
   /// Serializes this NotificationModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -58,6 +59,7 @@ abstract class $NotificationModelCopyWith<$Res> {
     NotificationType type,
     @JsonKey(name: 'is_read') bool isRead,
     @JsonKey(name: 'created_at') DateTime createdAt,
+    Map<String, dynamic>? metadata,
   });
 }
 
@@ -83,6 +85,7 @@ class _$NotificationModelCopyWithImpl<$Res, $Val extends NotificationModel>
     Object? type = null,
     Object? isRead = null,
     Object? createdAt = null,
+    Object? metadata = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -114,6 +117,10 @@ class _$NotificationModelCopyWithImpl<$Res, $Val extends NotificationModel>
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
                       as DateTime,
+            metadata: freezed == metadata
+                ? _value.metadata
+                : metadata // ignore: cast_nullable_to_non_nullable
+                      as Map<String, dynamic>?,
           )
           as $Val,
     );
@@ -137,6 +144,7 @@ abstract class _$$NotificationModelImplCopyWith<$Res>
     NotificationType type,
     @JsonKey(name: 'is_read') bool isRead,
     @JsonKey(name: 'created_at') DateTime createdAt,
+    Map<String, dynamic>? metadata,
   });
 }
 
@@ -161,6 +169,7 @@ class __$$NotificationModelImplCopyWithImpl<$Res>
     Object? type = null,
     Object? isRead = null,
     Object? createdAt = null,
+    Object? metadata = freezed,
   }) {
     return _then(
       _$NotificationModelImpl(
@@ -192,6 +201,10 @@ class __$$NotificationModelImplCopyWithImpl<$Res>
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
                   as DateTime,
+        metadata: freezed == metadata
+            ? _value._metadata
+            : metadata // ignore: cast_nullable_to_non_nullable
+                  as Map<String, dynamic>?,
       ),
     );
   }
@@ -208,7 +221,9 @@ class _$NotificationModelImpl extends _NotificationModel {
     required this.type,
     @JsonKey(name: 'is_read') this.isRead = false,
     @JsonKey(name: 'created_at') required this.createdAt,
-  }) : super._();
+    final Map<String, dynamic>? metadata,
+  }) : _metadata = metadata,
+       super._();
 
   factory _$NotificationModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$NotificationModelImplFromJson(json);
@@ -231,10 +246,19 @@ class _$NotificationModelImpl extends _NotificationModel {
   @override
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
+  final Map<String, dynamic>? _metadata;
+  @override
+  Map<String, dynamic>? get metadata {
+    final value = _metadata;
+    if (value == null) return null;
+    if (_metadata is EqualUnmodifiableMapView) return _metadata;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'NotificationModel(notificationId: $notificationId, userId: $userId, title: $title, message: $message, type: $type, isRead: $isRead, createdAt: $createdAt)';
+    return 'NotificationModel(notificationId: $notificationId, userId: $userId, title: $title, message: $message, type: $type, isRead: $isRead, createdAt: $createdAt, metadata: $metadata)';
   }
 
   @override
@@ -250,7 +274,8 @@ class _$NotificationModelImpl extends _NotificationModel {
             (identical(other.type, type) || other.type == type) &&
             (identical(other.isRead, isRead) || other.isRead == isRead) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            const DeepCollectionEquality().equals(other._metadata, _metadata));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -264,6 +289,7 @@ class _$NotificationModelImpl extends _NotificationModel {
     type,
     isRead,
     createdAt,
+    const DeepCollectionEquality().hash(_metadata),
   );
 
   /// Create a copy of NotificationModel
@@ -292,6 +318,7 @@ abstract class _NotificationModel extends NotificationModel {
     required final NotificationType type,
     @JsonKey(name: 'is_read') final bool isRead,
     @JsonKey(name: 'created_at') required final DateTime createdAt,
+    final Map<String, dynamic>? metadata,
   }) = _$NotificationModelImpl;
   const _NotificationModel._() : super._();
 
@@ -316,6 +343,8 @@ abstract class _NotificationModel extends NotificationModel {
   @override
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
+  @override
+  Map<String, dynamic>? get metadata;
 
   /// Create a copy of NotificationModel
   /// with the given fields replaced by the non-null parameter values.
