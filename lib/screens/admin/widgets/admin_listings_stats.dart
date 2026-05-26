@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 
 class AdminListingStats extends StatelessWidget {
   final int total;
@@ -30,22 +31,22 @@ class AdminListingStats extends StatelessWidget {
             _StatCard(
               label: 'Total Listings',
               value: total.toString(),
-              color: const Color(0xFF5287B2),
+              color: AppColors.primary,
             ),
             _StatCard(
               label: 'Available',
               value: available.toString(),
-              color: const Color(0xFF4CAF50),
+              color: AppColors.success,
             ),
             _StatCard(
               label: 'Full',
               value: full.toString(),
-              color: const Color(0xFFF44336),
+              color: AppColors.error,
             ),
             _StatCard(
               label: 'Available Rooms',
               value: availableRooms.toString(),
-              color: const Color(0xFF9C27B0),
+              color: AppColors.secondary,
             ),
           ],
         );

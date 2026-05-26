@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../models/booking_model.dart';
 
 class AdminBookingCard extends StatelessWidget {
@@ -44,7 +45,7 @@ class AdminBookingCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: const BoxDecoration(
-                    color: Color(0xFF5287B2),
+                    color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.person, color: Colors.white, size: 24),
@@ -61,7 +62,7 @@ class AdminBookingCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1D1B16),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -96,7 +97,7 @@ class AdminBookingCard extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1D1B16),
+                                color: AppColors.textPrimary,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -131,7 +132,7 @@ class AdminBookingCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1D1B16),
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ],
@@ -159,7 +160,7 @@ class AdminBookingCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1D1B16),
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ],
@@ -192,20 +193,20 @@ class _StatusChip extends StatelessWidget {
 
     switch (status) {
       case BookingStatus.pending:
-        bgColor = const Color(0xFFFFF9C4);
-        textColor = const Color(0xFFFBC02D);
+        bgColor = AppColors.warning.withValues(alpha: 0.1);
+        textColor = AppColors.warning;
         icon = Icons.access_time_filled;
         label = 'Pending';
         break;
       case BookingStatus.approved:
-        bgColor = const Color(0xFFE8F5E9);
-        textColor = const Color(0xFF4CAF50);
+        bgColor = AppColors.success.withValues(alpha: 0.1);
+        textColor = AppColors.success;
         icon = Icons.check_circle;
         label = 'Approved';
         break;
       case BookingStatus.rejected:
-        bgColor = const Color(0xFFFFEBEE);
-        textColor = const Color(0xFFF44336);
+        bgColor = AppColors.error.withValues(alpha: 0.1);
+        textColor = AppColors.error;
         icon = Icons.cancel;
         label = 'Rejected';
         break;

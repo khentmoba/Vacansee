@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme/app_theme.dart';
 import '../../models/property_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/booking_provider.dart';
@@ -62,7 +63,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
 
         return Scaffold(
           extendBody: !isDesktop,
-          backgroundColor: const Color(0xFFF8FBFD),
+          backgroundColor: AppColors.background,
           appBar: isDesktop
               ? const PreferredSize(
                   preferredSize: Size.fromHeight(80),
@@ -71,7 +72,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
               : AppBar(
                   title: Text(_mobileTitles[_currentIndex]),
                   backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFF1D1B16),
+                  foregroundColor: AppColors.textPrimary,
                   elevation: 0,
                   automaticallyImplyLeading: false,
                   actions: [
@@ -109,7 +110,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1D1B16).withValues(alpha: 0.95),
+                        color: AppColors.textPrimary.withValues(alpha: 0.95),
                         borderRadius: BorderRadius.circular(32),
                         boxShadow: [
                           BoxShadow(
@@ -163,7 +164,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                               style: TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1D1B16),
+                                color: AppColors.textPrimary,
                                 letterSpacing: -0.5,
                               ),
                             ),
@@ -383,15 +384,13 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                                         }
                                       : null,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF5287B2),
+                                    backgroundColor: AppColors.primary,
                                     foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 20,
                                       vertical: 16,
                                     ),
-                                    disabledBackgroundColor: const Color(
-                                      0xFF5287B2,
-                                    ).withValues(alpha: 0.4),
+                                    disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
                                     elevation: 0,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -447,7 +446,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                                       : null,
                                   icon: const Icon(Icons.add),
                                   style: IconButton.styleFrom(
-                                    backgroundColor: const Color(0xFF5287B2),
+                                    backgroundColor: AppColors.primary,
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -521,10 +520,10 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
           SizedBox(height: isDesktop ? 20 : 12),
           Text(
             value,
-            style: TextStyle(
-              fontSize: isDesktop ? 32 : 24,
+            style: const TextStyle(
+              fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
               letterSpacing: -1,
             ),
           ),
@@ -620,7 +619,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1D1B16),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ),
@@ -637,8 +636,8 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     ),
                     decoration: BoxDecoration(
                       color: property.hasVacancy
-                          ? const Color(0xFF10B981)
-                          : const Color(0xFFEF4444),
+                           ? AppColors.success
+                           : AppColors.error,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -665,7 +664,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1D1B16),
+                    color: AppColors.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -710,13 +709,13 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
             width: 140,
             height: 140,
             decoration: BoxDecoration(
-              color: const Color(0xFF5287B2).withValues(alpha: 0.08),
+              color: AppColors.primary.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.home_work_outlined,
               size: 80,
-              color: const Color(0xFF5287B2).withValues(alpha: 0.4),
+              color: AppColors.primary.withValues(alpha: 0.4),
             ),
           ),
           const SizedBox(height: 32),
@@ -725,7 +724,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
               letterSpacing: -0.5,
             ),
           ),
@@ -757,12 +756,10 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   }
                 : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF5287B2),
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-              disabledBackgroundColor: const Color(
-                0xFF5287B2,
-              ).withValues(alpha: 0.4),
+              disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -813,14 +810,14 @@ class _AnimatedNavItemState extends State<_AnimatedNavItem> {
   bool isHovered = false;
 
   Color get backgroundColor {
-    if (widget.isSelected) return const Color(0xFF5287B2);
-    if (isHovered) return const Color(0xFF5287B2).withValues(alpha: 0.15);
+    if (widget.isSelected) return AppColors.primary;
+    if (isHovered) return AppColors.primary.withValues(alpha: 0.15);
     return Colors.transparent;
   }
 
   Color get iconColor {
     if (widget.isSelected) return Colors.white;
-    if (isHovered) return const Color(0xFF5287B2);
+    if (isHovered) return AppColors.primary;
     return Colors.white.withValues(alpha: 0.65);
   }
 

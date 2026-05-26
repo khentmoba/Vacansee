@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../models/user_model.dart';
 import '../../auth/widgets/status_badge.dart';
 
@@ -21,7 +22,7 @@ class PendingOwnerCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,11 +34,11 @@ class PendingOwnerCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: const Color(0xFF5287B2).withValues(alpha: 0.1),
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                   child: Text(
                     user.displayName[0].toUpperCase(),
                     style: const TextStyle(
-                      color: Color(0xFF5287B2),
+                      color: AppColors.primary,
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                     ),
@@ -57,7 +58,7 @@ class PendingOwnerCard extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1D1B16),
+                                color: AppColors.textPrimary,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -122,7 +123,7 @@ class PendingOwnerCard extends StatelessWidget {
                     icon: const Icon(Icons.check, size: 18),
                     label: const Text('Approve Owner'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF5287B2),
+                      backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       elevation: 0,

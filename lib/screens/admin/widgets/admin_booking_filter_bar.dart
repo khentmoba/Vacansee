@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../models/booking_model.dart';
 
 class AdminBookingFilterBar extends StatelessWidget {
@@ -93,7 +94,7 @@ class _FilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: isSelected ? const Color(0xFF5287B2) : const Color(0xFFF1F5F9),
+      color: isSelected ? AppColors.primary : const Color(0xFFF1F5F9),
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,

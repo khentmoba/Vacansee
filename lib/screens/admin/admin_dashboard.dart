@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/property_provider.dart';
 import '../../providers/booking_provider.dart';
@@ -80,7 +81,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final stats = adminProvider.stats;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FBFD),
+      backgroundColor: AppColors.background,
       appBar: AdminTopNavBar(
         currentView: _currentView,
         onViewChanged: (view) {
@@ -93,7 +94,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFF5287B2)),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppColors.primary, AppColors.secondary],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -219,11 +226,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: const Color(0xFF9C27B0),
+            gradient: const LinearGradient(
+              colors: [AppColors.primary, AppColors.secondary],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF9C27B0).withValues(alpha: 0.3),
+                color: AppColors.primary.withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -240,7 +251,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.shield_outlined, color: Color(0xFF9C27B0), size: 40),
+                      child: const Icon(Icons.shield_outlined, color: AppColors.primary, size: 40),
                     ),
                     const SizedBox(height: 24),
                     Text(
@@ -271,7 +282,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.shield_outlined, color: Color(0xFF9C27B0), size: 50),
+                      child: const Icon(Icons.shield_outlined, color: AppColors.primary, size: 50),
                     ),
                     const SizedBox(width: 32),
                     Column(
@@ -333,13 +344,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       style: TextStyle(
                         fontSize: isMobile ? 18 : 22,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1D1B16),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFF9C27B0).withValues(alpha: 0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: IconButton(
@@ -353,7 +364,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       },
                       icon: const Icon(
                         Icons.edit_outlined,
-                        color: Color(0xFF9C27B0),
+                        color: AppColors.primary,
                         size: 20,
                       ),
                       tooltip: 'Edit Profile',
@@ -402,7 +413,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1D1B16),
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 24),
@@ -455,7 +466,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             value,
             style: const TextStyle(
               fontSize: 16,
-              color: Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -479,7 +490,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           style: TextStyle(
             fontSize: isMobile ? 24 : 32,
             fontWeight: FontWeight.w900,
-            color: const Color(0xFF1D1B16),
+            color: AppColors.textPrimary,
             letterSpacing: -0.5,
           ),
         ),
@@ -647,7 +658,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         setState(() => _userRoleFilter = role);
         adminProvider.setRoleFilter(role);
       },
-      selectedColor: const Color(0xFF5287B2),
+      selectedColor: AppColors.primary,
       labelStyle: TextStyle(
         color: isSelected ? Colors.white : Colors.grey[700],
         fontWeight: FontWeight.bold,
@@ -670,7 +681,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           style: TextStyle(
             fontSize: isMobile ? 24 : 32,
             fontWeight: FontWeight.w900,
-            color: const Color(0xFF1D1B16),
+            color: AppColors.textPrimary,
             letterSpacing: -0.5,
           ),
         ),
@@ -746,7 +757,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           style: TextStyle(
             fontSize: isMobile ? 24 : 32,
             fontWeight: FontWeight.w900,
-            color: const Color(0xFF1D1B16),
+            color: AppColors.textPrimary,
             letterSpacing: -0.5,
           ),
         ),
@@ -843,7 +854,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           style: TextStyle(
             fontSize: 36,
             fontWeight: FontWeight.w900,
-            color: Color(0xFF1D1B16),
+            color: AppColors.textPrimary,
             letterSpacing: -1,
           ),
         ),
@@ -874,8 +885,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
           title: 'Total Listings',
           value: stats?.totalProperties.toString() ?? '0',
           icon: Icons.home_outlined,
-          iconColor: const Color(0xFF5287B2),
-          iconBgColor: const Color(0xFFEEF5FB),
+          iconColor: AppColors.primary,
+          iconBgColor: AppColors.primaryContainer,
         ),
         AdminStatCard(
           title: 'Occupancy Rate',
@@ -975,7 +986,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF1D1B16),
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 24),
@@ -1025,7 +1036,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF1D1B16),
+                color: AppColors.textPrimary,
               ),
             ),
             TextButton(
@@ -1072,11 +1083,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget _buildDrawerItem(IconData icon, String label, AdminView view) {
     final isSelected = _currentView == view;
     return ListTile(
-      leading: Icon(icon, color: isSelected ? const Color(0xFF5287B2) : Colors.grey[600]),
+      leading: Icon(icon, color: isSelected ? AppColors.primary : Colors.grey[600]),
       title: Text(
         label,
         style: TextStyle(
-          color: isSelected ? const Color(0xFF5287B2) : Colors.grey[800],
+          color: isSelected ? AppColors.primary : AppColors.textSecondary,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
       ),
@@ -1137,10 +1148,10 @@ class _PermissionItem extends StatelessWidget {
         style: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w500,
-          color: Color(0xFF1D1B16),
+          color: AppColors.textPrimary,
         ),
       ),
-      activeColor: const Color(0xFF9C27B0),
+      activeColor: AppColors.primary,
       checkColor: Colors.white,
       dense: true,
       controlAffinity: ListTileControlAffinity.leading,

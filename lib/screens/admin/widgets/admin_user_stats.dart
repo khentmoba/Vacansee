@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 
 class AdminUserStats extends StatelessWidget {
   final int total;
@@ -31,25 +32,25 @@ class AdminUserStats extends StatelessWidget {
               label: 'Total Users',
               value: total.toString(),
               icon: Icons.person_outline,
-              iconColor: const Color(0xFF5287B2),
+              iconColor: AppColors.primary,
             ),
             _UserStatCard(
               label: 'Tenants',
               value: tenants.toString(),
               icon: Icons.person_search_outlined,
-              iconColor: const Color(0xFF4CAF50),
+              iconColor: AppColors.success,
             ),
             _UserStatCard(
               label: 'Owners',
               value: owners.toString(),
               icon: Icons.home_work_outlined,
-              iconColor: const Color(0xFF0288D1),
+              iconColor: AppColors.secondary,
             ),
             _UserStatCard(
               label: 'Admins',
               value: admins.toString(),
               icon: Icons.admin_panel_settings_outlined,
-              iconColor: const Color(0xFF9C27B0),
+              iconColor: const Color(0xFF9C27B0), // admin color can stay purple or we can use another shade
             ),
           ],
         );
@@ -103,7 +104,7 @@ class _UserStatCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),

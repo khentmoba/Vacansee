@@ -40,3 +40,5 @@ app.*.map.json
 
 .vercel
 .env
+.agent/
+*.docx

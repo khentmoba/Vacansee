@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 
 class AdminStatCard extends StatelessWidget {
   final String title;
@@ -49,7 +50,7 @@ class AdminStatCard extends StatelessWidget {
             style: TextStyle(
               fontSize: isSmall ? 22 : 28,
               fontWeight: FontWeight.w900,
-              color: const Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),

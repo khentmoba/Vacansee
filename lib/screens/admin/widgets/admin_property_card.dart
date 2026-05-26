@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../models/property_model.dart';
 
 class AdminPropertyCard extends StatelessWidget {
@@ -15,7 +16,7 @@ class AdminPropertyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(symbol: '₱', decimalDigits: 0);
-    final statusColor = property.hasVacancy ? const Color(0xFF00C853) : const Color(0xFFFF1744);
+    final statusColor = property.hasVacancy ? AppColors.success : AppColors.error;
     final statusText = property.hasVacancy ? 'Available' : 'Full';
 
     return Container(
@@ -78,7 +79,7 @@ class AdminPropertyCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1D1B16),
+                      color: AppColors.textPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -117,7 +118,7 @@ class AdminPropertyCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1D1B16),
+                    color: AppColors.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -152,7 +153,7 @@ class AdminPropertyCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
-                              color: Color(0xFF5287B2),
+                              color: AppColors.primary,
                             ),
                           ),
                           TextSpan(
@@ -169,7 +170,7 @@ class AdminPropertyCard extends StatelessWidget {
                     ElevatedButton(
                       onPressed: onTap,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF5287B2),
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(

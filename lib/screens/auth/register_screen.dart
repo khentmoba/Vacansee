@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
 import 'login_screen.dart';
@@ -136,8 +137,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            const Color(0xFF5287B2).withValues(alpha: 0.6),
-                            const Color(0xFF5287B2).withValues(alpha: 0.2),
+                            AppColors.primary.withValues(alpha: 0.6),
+                            AppColors.primary.withValues(alpha: 0.2),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(4),
@@ -159,8 +160,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            const Color(0xFF5287B2).withValues(alpha: 0.4),
-                            const Color(0xFF5287B2).withValues(alpha: 0.1),
+                            AppColors.primary.withValues(alpha: 0.4),
+                            AppColors.primary.withValues(alpha: 0.1),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(4),
@@ -180,8 +181,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          const Color(0xFF5287B2).withValues(alpha: 0.5),
-                          const Color(0xFF5287B2).withValues(alpha: 0.2),
+                          AppColors.primary.withValues(alpha: 0.5),
+                          AppColors.primary.withValues(alpha: 0.2),
                         ],
                       ),
                       shape: BoxShape.circle,
@@ -204,7 +205,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF5287B2),
+                                color: AppColors.primary,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Center(
@@ -221,7 +222,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               style: TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1D1B16),
+                                color: AppColors.textPrimary,
                               ),
                             ),
                           ],
@@ -233,7 +234,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF1D1B16),
+                            color: AppColors.textPrimary,
                             height: 1.2,
                           ),
                         ),
@@ -243,7 +244,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 18,
-                            color: Color(0xFF666666),
+                            color: AppColors.textSecondary,
                             height: 1.6,
                           ),
                         ),
@@ -271,7 +272,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: TextStyle(
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1D1B16),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -307,7 +308,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF5287B2),
+                        color: AppColors.primary,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Center(
@@ -324,7 +325,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1D1B16),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ],
@@ -336,14 +337,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1D1B16),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Welcome to VacanSee! Please sign up with your personal information',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: Color(0xFF666666)),
+                  style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -500,7 +501,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 _obscurePassword
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
-                color: const Color(0xFF5287B2),
+                color: AppColors.primary,
               ),
               onPressed: () =>
                   setState(() => _obscurePassword = !_obscurePassword),
@@ -524,7 +525,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           decoration: BoxDecoration(
             color: const Color(0xFFF5F7FA),
             borderRadius: BorderRadius.circular(26),
-            border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+            border: Border.all(color: AppColors.border, width: 1),
           ),
           padding: const EdgeInsets.all(4),
           child: Row(
@@ -541,7 +542,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
                       color: _selectedRole == UserRole.student
-                          ? const Color(0xFF5287B2)
+                          ? AppColors.primary
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(22),
                     ),
@@ -571,7 +572,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
                       color: _selectedRole == UserRole.owner
-                          ? const Color(0xFF5287B2)
+                          ? AppColors.primary
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(22),
                     ),
@@ -619,7 +620,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       _clearError('terms');
                     });
                   },
-                  activeColor: const Color(0xFF5287B2),
+                  activeColor: AppColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -641,7 +642,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     TextSpan(
                       text: 'Terms of Use',
                       style: const TextStyle(
-                        color: Color(0xFF5287B2),
+                        color: AppColors.primary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -649,7 +650,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     TextSpan(
                       text: 'Privacy Policy',
                       style: const TextStyle(
-                        color: Color(0xFF5287B2),
+                        color: AppColors.primary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -677,11 +678,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: ElevatedButton(
             onPressed: authProvider.isLoading ? null : _validateAndSubmit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF5287B2),
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
             child: authProvider.isLoading
@@ -732,7 +733,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: Colors.grey[300]!, width: 1.5),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
             child: Row(
@@ -765,7 +766,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               const Text(
                 "Already have an account? ",
-                style: TextStyle(fontSize: 14, color: Color(0xFF666666)),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
               ),
               TextButton(
                 onPressed: () => Navigator.pushReplacement(
@@ -773,7 +774,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   MaterialPageRoute(builder: (_) => const LoginScreen()),
                 ),
                 style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF5287B2),
+                  foregroundColor: AppColors.primary,
                   padding: EdgeInsets.zero,
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -800,7 +801,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF1D1B16),
+          color: AppColors.textPrimary,
         ),
       ),
     );
@@ -831,8 +832,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(6),
-        borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
       ),
       suffixIcon: suffixIcon,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

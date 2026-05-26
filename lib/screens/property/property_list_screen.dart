@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../core/theme/app_theme.dart';
 import '../../models/property_model.dart';
 import '../../providers/providers.dart';
 import 'property_detail_screen.dart';
@@ -34,7 +35,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
     final roomProvider = context.watch<RoomProvider>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FBFD),
+      backgroundColor: AppColors.background,
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isDesktop = constraints.maxWidth >= 800;
@@ -58,7 +59,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                         style: TextStyle(
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1D1B16),
+                          color: AppColors.textPrimary,
                           height: 1.1,
                         ),
                       ),
@@ -91,7 +92,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1D1B16),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -232,9 +233,9 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                   label: const Text('Filters'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF1D1B16),
+                    foregroundColor: AppColors.textPrimary,
                     elevation: 0,
-                    side: BorderSide(color: Colors.grey[300]!),
+                    side: const BorderSide(color: AppColors.border),
                   ),
                 ),
               ),
@@ -291,7 +292,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(
-                color: Color(0xFF5287B2),
+                color: AppColors.primary,
                 width: 1.5,
               ),
             ),
@@ -461,9 +462,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                                       vertical: 8,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: const Color(
-                                        0xFF5287B2,
-                                      ).withValues(alpha: 0.1),
+                                      color: AppColors.primary.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
@@ -471,7 +470,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
-                                        color: Color(0xFF5287B2),
+                                        color: AppColors.primary,
                                       ),
                                     ),
                                   ),
@@ -481,9 +480,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                                       vertical: 8,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: const Color(
-                                        0xFF5287B2,
-                                      ).withValues(alpha: 0.1),
+                                      color: AppColors.primary.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
@@ -491,7 +488,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
-                                        color: Color(0xFF5287B2),
+                                        color: AppColors.primary,
                                       ),
                                     ),
                                   ),
@@ -500,12 +497,10 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                               const SizedBox(height: 8),
                               SliderTheme(
                                 data: SliderTheme.of(context).copyWith(
-                                  activeTrackColor: const Color(0xFF5287B2),
+                                  activeTrackColor: AppColors.primary,
                                   inactiveTrackColor: Colors.grey[300],
-                                  thumbColor: const Color(0xFF5287B2),
-                                  overlayColor: const Color(
-                                    0xFF5287B2,
-                                  ).withValues(alpha: 0.2),
+                                  thumbColor: AppColors.primary,
+                                  overlayColor: AppColors.primary.withValues(alpha: 0.2),
                                   trackHeight: 6,
                                   rangeThumbShape:
                                       const RoundRangeSliderThumbShape(
@@ -574,10 +569,10 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF5287B2),
+                            backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
                           child: const Text(
@@ -682,13 +677,13 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: const Color(0xFF5287B2).withValues(alpha: 0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.home_work_outlined,
               size: 64,
-              color: const Color(0xFF5287B2).withValues(alpha: 0.5),
+              color: AppColors.primary.withValues(alpha: 0.5),
             ),
           ),
           const SizedBox(height: 24),
@@ -697,7 +692,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -733,14 +728,12 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                   1.0,
                 ),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF5287B2) : Colors.grey[100],
+                color: isSelected ? AppColors.primary : Colors.grey[100],
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: isSelected || isHovered
                     ? [
                         BoxShadow(
-                          color: const Color(
-                            0xFF5287B2,
-                          ).withValues(alpha: isSelected ? 0.3 : 0.15),
+                          color: AppColors.primary.withValues(alpha: isSelected ? 0.3 : 0.15),
                           blurRadius: isSelected ? 8 : 4,
                           offset: const Offset(0, 2),
                         ),
@@ -802,11 +795,12 @@ class _PropertyCardState extends State<_PropertyCard> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border),
               boxShadow: [
                 BoxShadow(
                   color: _isHovered
-                      ? const Color(0xFF5287B2).withValues(alpha: 0.15)
-                      : Colors.black.withValues(alpha: 0.05),
+                      ? AppColors.primary.withValues(alpha: 0.15)
+                      : Colors.black.withValues(alpha: 0.03),
                   blurRadius: _isHovered ? 24 : 10,
                   offset: Offset(0, _isHovered ? 8 : 2),
                 ),
@@ -847,8 +841,8 @@ class _PropertyCardState extends State<_PropertyCard> {
                           ),
                           decoration: BoxDecoration(
                             color: widget.liveVacancy
-                                ? const Color(0xFF00D27B)
-                                : const Color(0xFFFF3B30),
+                                ? AppColors.success
+                                : AppColors.error,
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Text(
@@ -874,7 +868,7 @@ class _PropertyCardState extends State<_PropertyCard> {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1D1B16),
+                          color: AppColors.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -942,7 +936,7 @@ class _PropertyCardState extends State<_PropertyCard> {
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF5287B2),
+                                    color: AppColors.primary,
                                   ),
                                 ),
                                 TextSpan(
@@ -962,7 +956,7 @@ class _PropertyCardState extends State<_PropertyCard> {
                               vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF5D95C2),
+                              color: AppColors.secondary,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Text(
@@ -994,8 +988,8 @@ class _PropertyCardState extends State<_PropertyCard> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFF5287B2).withValues(alpha: 0.3),
-            const Color(0xFF5287B2).withValues(alpha: 0.1),
+            AppColors.primary.withValues(alpha: 0.3),
+            AppColors.primary.withValues(alpha: 0.1),
           ],
         ),
       ),
@@ -1006,13 +1000,13 @@ class _PropertyCardState extends State<_PropertyCard> {
             Icon(
               Icons.home_work_outlined,
               size: 56,
-              color: const Color(0xFF5287B2).withValues(alpha: 0.5),
+              color: AppColors.primary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 12),
             Text(
               'No Image Available',
               style: TextStyle(
-                color: const Color(0xFF5287B2).withValues(alpha: 0.6),
+                color: AppColors.primary.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w500,
               ),
             ),

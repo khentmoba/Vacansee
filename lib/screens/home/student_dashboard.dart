@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../booking/my_bookings_screen.dart';
 import '../property/property_list_screen.dart';
@@ -38,7 +39,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
         return Scaffold(
           extendBody: !isDesktop,
-          backgroundColor: const Color(0xFFF8FBFD),
+          backgroundColor: AppColors.background,
           appBar: isDesktop
               ? PreferredSize(
                   preferredSize: const Size.fromHeight(80),
@@ -84,7 +85,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1D1B16).withValues(alpha: 0.95),
+                        color: AppColors.textPrimary.withValues(alpha: 0.95),
                         borderRadius: BorderRadius.circular(32),
                         boxShadow: [
                           BoxShadow(
@@ -161,7 +162,7 @@ class _TopNavBar extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1D1B16),
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(width: 8),
@@ -194,7 +195,7 @@ class _TopNavBar extends StatelessWidget {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF5287B2),
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
               shape: RoundedRectangleBorder(
@@ -235,7 +236,7 @@ class _TopNavBar extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? const Color(0xFF1D1B16) : Colors.grey[600],
+                color: isSelected ? AppColors.textPrimary : Colors.grey[600],
               ),
             ),
             const SizedBox(height: 4),
@@ -243,7 +244,7 @@ class _TopNavBar extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               height: 2,
               width: 20,
-              color: isSelected ? const Color(0xFF5287B2) : Colors.transparent,
+              color: isSelected ? AppColors.primary : Colors.transparent,
             ),
           ],
         ),
@@ -273,14 +274,14 @@ class _AnimatedNavItemState extends State<_AnimatedNavItem> {
   bool isHovered = false;
 
   Color get backgroundColor {
-    if (widget.isSelected) return const Color(0xFF5287B2);
-    if (isHovered) return const Color(0xFF5287B2).withValues(alpha: 0.15);
+    if (widget.isSelected) return AppColors.primary;
+    if (isHovered) return AppColors.primary.withValues(alpha: 0.15);
     return Colors.transparent;
   }
 
   Color get iconColor {
     if (widget.isSelected) return Colors.white;
-    if (isHovered) return const Color(0xFF5287B2);
+    if (isHovered) return AppColors.primary;
     return Colors.white.withValues(alpha: 0.65);
   }
 
@@ -400,7 +401,7 @@ class _ProfileTab extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(32),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF5287B2),
+                        color: AppColors.primary,
                         borderRadius: BorderRadius.vertical(
                           top: Radius.circular(16),
                         ),
@@ -417,7 +418,7 @@ class _ProfileTab extends StatelessWidget {
                             child: const Icon(
                               Icons.person_outline_rounded,
                               size: 40,
-                              color: Color(0xFF5287B2),
+                              color: AppColors.primary,
                             ),
                           ),
                           const SizedBox(width: 24),
@@ -464,15 +465,13 @@ class _ProfileTab extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1D1B16),
+                                    color: AppColors.textPrimary,
                                   ),
                                 ),
                               ),
                               Container(
                                 decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xFF5287B2,
-                                  ).withValues(alpha: 0.1),
+                                  color: AppColors.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: IconButton(
@@ -486,7 +485,7 @@ class _ProfileTab extends StatelessWidget {
                                   },
                                   icon: const Icon(
                                     Icons.edit_outlined,
-                                    color: Color(0xFF5287B2),
+                                    color: AppColors.primary,
                                     size: 20,
                                   ),
                                   tooltip: 'Edit Profile',
@@ -594,7 +593,7 @@ class _ProfileTab extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1D1B16),
+                              color: AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 32),
@@ -673,7 +672,7 @@ class _ProfileTab extends StatelessWidget {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1D1B16),
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
@@ -695,7 +694,7 @@ class _ProfileTab extends StatelessWidget {
                 value,
                 style: const TextStyle(
                   fontSize: 15,
-                  color: Color(0xFF1D1B16),
+                  color: AppColors.textPrimary,
                   fontWeight: FontWeight.w400,
                 ),
               ),

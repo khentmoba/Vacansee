@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 
 class StatsCard extends StatelessWidget {
   final String title;
@@ -53,7 +54,7 @@ class StatsCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),

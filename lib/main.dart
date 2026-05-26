@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/theme/app_theme.dart';
 import 'providers/providers.dart';
 import 'screens/screens.dart';
 import 'screens/landing/landing_screen.dart';
@@ -33,36 +34,7 @@ class VacanSeeApp extends StatelessWidget {
       child: MaterialApp(
         title: 'VacanSee',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF5287B2), // Primary blue from Figma
-            secondary: const Color(0xFF1D1B16), // Dark secondary
-            error: const Color(0xFFEF4444), // Red for occupied status
-          ),
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(centerTitle: false, elevation: 0),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-          inputDecorationTheme: InputDecorationTheme(
-            filled: true,
-            fillColor: Colors.grey[50],
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: const Color(0xFF5287B2), width: 2),
-            ),
-          ),
-        ),
+        theme: AppTheme.lightTheme,
         home: const AuthWrapper(),
         routes: {
           '/login': (context) => const LoginScreen(),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../models/user_model.dart';
 
 class AdminUserCard extends StatelessWidget {
@@ -37,7 +38,7 @@ class AdminUserCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF5287B2),
+                  color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.person, color: Colors.white, size: 24),
@@ -52,7 +53,7 @@ class AdminUserCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1D1B16),
+                        color: AppColors.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -101,7 +102,7 @@ class AdminUserCard extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: onViewDetails,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5287B2),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -131,7 +132,7 @@ class AdminUserCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1D1B16),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -158,14 +159,14 @@ class _RoleBadge extends StatelessWidget {
 
     switch (role) {
       case UserRole.student:
-        bgColor = const Color(0xFFE8F5E9);
-        textColor = const Color(0xFF4CAF50);
+        bgColor = AppColors.success.withValues(alpha: 0.1);
+        textColor = AppColors.success;
         icon = Icons.person_search;
         label = 'Tenant';
         break;
       case UserRole.owner:
-        bgColor = const Color(0xFFE3F2FD);
-        textColor = const Color(0xFF1976D2);
+        bgColor = AppColors.secondary.withValues(alpha: 0.1);
+        textColor = AppColors.secondary;
         icon = Icons.home_work;
         label = 'Owner';
         break;

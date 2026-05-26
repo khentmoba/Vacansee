@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
+import '../../widgets/common/interactive_hover.dart';
 import '../auth/login_screen.dart';
 import '../auth/register_screen.dart';
 
@@ -45,7 +47,7 @@ class LandingScreen extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF5287B2),
+                  color: AppColors.primary,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Center(
@@ -58,7 +60,7 @@ class LandingScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1D1B16),
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -73,7 +75,7 @@ class LandingScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (_) => const LoginScreen()),
                   ),
                   style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF1D1B16),
+                    foregroundColor: AppColors.textPrimary,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
                       vertical: 12,
@@ -86,26 +88,34 @@ class LandingScreen extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
               ],
-              ElevatedButton(
-                onPressed: () => Navigator.push(
+              InteractiveHover(
+                onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const RegisterScreen()),
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF5287B2),
-                  foregroundColor: Colors.white,
+                child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: isMobile ? 16 : 24,
                     vertical: 12,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  isMobile ? 'Join' : 'Sign Up',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  child: Text(
+                    isMobile ? 'Join' : 'Sign Up',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -144,8 +154,8 @@ class LandingScreen extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF5287B2).withValues(alpha: 0.15),
-                      const Color(0xFF5287B2).withValues(alpha: 0.05),
+                      AppColors.primary.withValues(alpha: 0.15),
+                      AppColors.primary.withValues(alpha: 0.05),
                     ],
                   ),
                   shape: BoxShape.circle,
@@ -164,109 +174,107 @@ class LandingScreen extends StatelessWidget {
                 // Title
                 RichText(
                   textAlign: TextAlign.center,
-                  text: TextSpan(
+                  text: const TextSpan(
                     style: TextStyle(
-                      fontSize: isMobile ? 40 : 72,
+                      fontSize: 40, // Let size adjust cleanly or clamp
                       fontWeight: FontWeight.bold,
                       height: 1.1,
+                      fontFamily: 'sans-serif', // cleaner fallback
                     ),
-                    children: const [
+                    children: [
                       TextSpan(
                         text: 'Find Your Perfect\n',
-                        style: TextStyle(color: Color(0xFF1D1B16)),
+                        style: TextStyle(color: AppColors.textPrimary),
                       ),
                       TextSpan(
                         text: 'Boarding House',
-                        style: TextStyle(color: Color(0xFF5287B2)),
+                        style: TextStyle(color: AppColors.primary),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: isMobile ? 16 : 24),
+                const SizedBox(height: 24),
                 // Subtitle
                 Text(
-                  isMobile
-                      ? "Discover, book, and manage boarding houses. Whether you're searching for a place to stay or managing properties, we've got you covered."
-                      : "VacanSee makes it easy to discover, book, and manage\nboarding houses. Whether you're searching for a place to stay or managing\nproperties, we've got you covered.",
+                  "Discover, book, and manage boarding houses in real-time. Whether you're searching for a place to stay or managing properties, VacanSee makes it seamless.",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: isMobile ? 16 : 18,
-                    color: const Color(0xFF666666),
+                    color: AppColors.textSecondary,
                     height: 1.6,
                   ),
                 ),
-                SizedBox(height: isMobile ? 32 : 40),
+                const SizedBox(height: 40),
                 // Buttons
-                Flex(
-                  direction: isMobile ? Axis.vertical : Axis.horizontal,
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      width: isMobile ? double.infinity : null,
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const RegisterScreen(),
-                          ),
+                    InteractiveHover(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const RegisterScreen(),
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF5287B2),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                            vertical: 16,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.transparent,
+                            width: 1.5,
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          elevation: 0,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.25),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: const Text(
                           'Get Started',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: isMobile ? 12 : 0,
-                      width: isMobile ? 0 : 16,
-                    ),
-                    SizedBox(
-                      width: isMobile ? double.infinity : null,
-                      child: OutlinedButton(
-                        onPressed: () {
-                          if (isMobile) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const LoginScreen(),
-                              ),
-                            );
-                          }
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF5287B2),
-                          side: const BorderSide(
-                            color: Color(0xFF5287B2),
+                    const SizedBox(width: 16),
+                    InteractiveHover(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.primary,
                             width: 1.5,
                           ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                            vertical: 16,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
                         ),
-                        child: Text(
-                          isMobile ? 'Sign In' : 'Learn More',
-                          style: const TextStyle(
+                        child: const Text(
+                          'Sign In',
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
@@ -288,50 +296,56 @@ class LandingScreen extends StatelessWidget {
         horizontal: padding,
         vertical: isMobile ? 40 : 80,
       ),
-      color: const Color(0xFFF8FBFD),
+      color: AppColors.background,
       child: Column(
         children: [
-          Text(
+          const Text(
             'Why Choose VacanSee?',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: isMobile ? 32 : 42,
+              fontSize: 36,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
-          Text(
+          const Text(
             'Everything you need to find or manage boarding houses in one place',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: isMobile ? 14 : 16,
-              color: const Color(0xFF666666),
+              fontSize: 16,
+              color: AppColors.textSecondary,
             ),
           ),
           SizedBox(height: isMobile ? 32 : 48),
           if (isMobile)
             Column(
               children: [
-                _buildFeatureCard(
-                  Icons.search,
-                  'Easy Search',
-                  'Find the perfect boarding house with powerful filters. Search by location, price, amenities, and availability in seconds.',
-                  isMobile,
+                InteractiveHover(
+                  child: _buildFeatureCard(
+                    Icons.search,
+                    'Easy Search',
+                    'Find the perfect boarding house with powerful filters. Search by location, price, amenities, and availability in seconds.',
+                    isMobile,
+                  ),
                 ),
                 const SizedBox(height: 24),
-                _buildFeatureCard(
-                  Icons.check_circle_outline,
-                  'Quick Booking',
-                  'Book your ideal room with just a few clicks. Track your bookings, communicate with owners, and manage everything in one place.',
-                  isMobile,
+                InteractiveHover(
+                  child: _buildFeatureCard(
+                    Icons.check_circle_outline,
+                    'Quick Booking',
+                    'Book your ideal room with just a few clicks. Track your bookings, communicate with owners, and manage everything in one place.',
+                    isMobile,
+                  ),
                 ),
                 const SizedBox(height: 24),
-                _buildFeatureCard(
-                  Icons.star_border,
-                  'Verified Reviews',
-                  'Read honest reviews from real tenants. Make informed decisions based on ratings, photos, and detailed feedback.',
-                  isMobile,
+                InteractiveHover(
+                  child: _buildFeatureCard(
+                    Icons.star_border,
+                    'Verified Reviews',
+                    'Read honest reviews from real tenants. Make informed decisions based on ratings, photos, and detailed feedback.',
+                    isMobile,
+                  ),
                 ),
               ],
             )
@@ -341,25 +355,31 @@ class LandingScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildFeatureCard(
-                    Icons.search,
-                    'Easy Search',
-                    'Find the perfect boarding house with powerful filters. Search by location, price, amenities, and availability in seconds.',
-                    isMobile,
+                  InteractiveHover(
+                    child: _buildFeatureCard(
+                      Icons.search,
+                      'Easy Search',
+                      'Find the perfect boarding house with powerful filters. Search by location, price, amenities, and availability in seconds.',
+                      isMobile,
+                    ),
                   ),
                   const SizedBox(width: 24),
-                  _buildFeatureCard(
-                    Icons.check_circle_outline,
-                    'Quick Booking',
-                    'Book your ideal room with just a few clicks. Track your bookings, communicate with owners, and manage everything in one place.',
-                    isMobile,
+                  InteractiveHover(
+                    child: _buildFeatureCard(
+                      Icons.check_circle_outline,
+                      'Quick Booking',
+                      'Book your ideal room with just a few clicks. Track your bookings, communicate with owners, and manage everything in one place.',
+                      isMobile,
+                    ),
                   ),
                   const SizedBox(width: 24),
-                  _buildFeatureCard(
-                    Icons.star_border,
-                    'Verified Reviews',
-                    'Read honest reviews from real tenants. Make informed decisions based on ratings, photos, and detailed feedback.',
-                    isMobile,
+                  InteractiveHover(
+                    child: _buildFeatureCard(
+                      Icons.star_border,
+                      'Verified Reviews',
+                      'Read honest reviews from real tenants. Make informed decisions based on ratings, photos, and detailed feedback.',
+                      isMobile,
+                    ),
                   ),
                 ],
               ),
@@ -381,10 +401,11 @@ class LandingScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
@@ -396,10 +417,10 @@ class LandingScreen extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: const Color(0xFF5287B2).withValues(alpha: 0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 28, color: const Color(0xFF5287B2)),
+            child: Icon(icon, size: 28, color: AppColors.primary),
           ),
           const SizedBox(height: 20),
           Text(
@@ -407,7 +428,7 @@ class LandingScreen extends StatelessWidget {
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -415,7 +436,7 @@ class LandingScreen extends StatelessWidget {
             description,
             style: const TextStyle(
               fontSize: 14,
-              color: Color(0xFF666666),
+              color: AppColors.textSecondary,
               height: 1.6,
             ),
           ),
@@ -438,34 +459,38 @@ class LandingScreen extends StatelessWidget {
         runSpacing: 32,
         children: [
           // Tenant Card
-          _buildRoleCard(
-            context,
-            isTenant: true,
-            icon: Icons.people_outline,
-            title: 'For Tenants',
-            features: [
-              'Browse hundreds of verified boarding houses',
-              'Filter by price, location, and amenities',
-              'Book rooms instantly with owner approval',
-              'Leave reviews and ratings to help others',
-            ],
-            buttonText: 'Sign Up as Tenant',
-            isMobile: isMobile,
+          InteractiveHover(
+            child: _buildRoleCard(
+              context,
+              isTenant: true,
+              icon: Icons.people_outline,
+              title: 'For Tenants',
+              features: [
+                'Browse hundreds of verified boarding houses',
+                'Filter by price, location, and amenities',
+                'Book rooms instantly with owner approval',
+                'Leave reviews and ratings to help others',
+              ],
+              buttonText: 'Sign Up as Tenant',
+              isMobile: isMobile,
+            ),
           ),
           // Owner Card
-          _buildRoleCard(
-            context,
-            isTenant: false,
-            icon: Icons.business,
-            title: 'For Owners',
-            features: [
-              'List your boarding house for free',
-              'Manage all your units in one dashboard',
-              'Review and approve booking requests',
-              'Track occupancy and income analytics',
-            ],
-            buttonText: 'Sign Up as Owner',
-            isMobile: isMobile,
+          InteractiveHover(
+            child: _buildRoleCard(
+              context,
+              isTenant: false,
+              icon: Icons.business,
+              title: 'For Owners',
+              features: [
+                'List your boarding house for free',
+                'Manage all your units in one dashboard',
+                'Review and approve booking requests',
+                'Track occupancy and income analytics',
+              ],
+              buttonText: 'Sign Up as Owner',
+              isMobile: isMobile,
+            ),
           ),
         ],
       ),
@@ -485,7 +510,7 @@ class LandingScreen extends StatelessWidget {
       width: isMobile ? double.infinity : 480,
       padding: EdgeInsets.all(isMobile ? 24 : 40),
       decoration: BoxDecoration(
-        color: isTenant ? const Color(0xFF5287B2) : const Color(0xFF1D1B16),
+        color: isTenant ? AppColors.primary : AppColors.textPrimary,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -546,8 +571,8 @@ class LandingScreen extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: isTenant
-                    ? const Color(0xFF5287B2)
-                    : const Color(0xFF1D1B16),
+                    ? AppColors.primary
+                    : AppColors.textPrimary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 14,
@@ -582,7 +607,7 @@ class LandingScreen extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF5287B2), Color(0xFF3D6A8C)],
+          colors: [AppColors.primary, AppColors.secondary],
         ),
       ),
       child: Stack(
@@ -623,73 +648,77 @@ class LandingScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
+              const Text(
                 'Join thousands of tenants and owners using VacanSee today',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: isMobile ? 14 : 16,
+                  fontSize: 16,
                   color: Colors.white70,
                 ),
               ),
               const SizedBox(height: 32),
-              Flex(
-                direction: isMobile ? Axis.vertical : Axis.horizontal,
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    width: isMobile ? double.infinity : null,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const RegisterScreen(),
-                        ),
+                  InteractiveHover(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const RegisterScreen(),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF5287B2),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 16,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.transparent,
+                          width: 1.5,
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 0,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: const Text(
                         'Create Account',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: isMobile ? 12 : 0, width: isMobile ? 0 : 16),
-                  SizedBox(
-                    width: isMobile ? double.infinity : null,
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  const SizedBox(width: 16),
+                  InteractiveHover(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16,
                       ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: Colors.white, width: 1.5),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.white, width: 1.5),
                       ),
                       child: const Text(
                         'Sign In',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -706,7 +735,7 @@ class LandingScreen extends StatelessWidget {
   Widget _buildFooter(BuildContext context, bool isMobile, double padding) {
     return Container(
       width: double.infinity,
-      color: const Color(0xFF1D1B16),
+      color: AppColors.textPrimary,
       padding: EdgeInsets.symmetric(
         horizontal: padding,
         vertical: isMobile ? 40 : 60,
@@ -730,7 +759,7 @@ class LandingScreen extends StatelessWidget {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF5287B2),
+                            color: AppColors.primary,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Center(
@@ -1016,13 +1045,13 @@ class LandingScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF5287B2).withValues(alpha: 0.08),
+                color: AppColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF5287B2).withValues(alpha: 0.2)),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.check_circle_outline, color: Color(0xFF5287B2), size: 36),
+                  Icon(Icons.check_circle_outline, color: AppColors.primary, size: 36),
                   SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -1030,7 +1059,7 @@ class LandingScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Community Plan - ₱0 / month',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1D1B16)),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                         ),
                         SizedBox(height: 4),
                         Text(
@@ -1063,7 +1092,7 @@ class LandingScreen extends StatelessWidget {
           children: [
             const Text(
               'VacanSee is a real-time boarding house vacancy tracker designed for university students in Cagayan de Oro City.',
-              style: TextStyle(fontSize: 15, color: Color(0xFF1D1B16), fontWeight: FontWeight.w600, height: 1.5),
+              style: TextStyle(fontSize: 15, color: AppColors.textPrimary, fontWeight: FontWeight.w600, height: 1.5),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -1073,7 +1102,7 @@ class LandingScreen extends StatelessWidget {
             const SizedBox(height: 16),
             const Text(
               'Target launch: Academic Year 2025-2026.',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF5287B2)),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primary),
             ),
           ],
         );
@@ -1093,7 +1122,7 @@ class LandingScreen extends StatelessWidget {
                   Text('Thank you! Your message has been sent successfully.'),
                 ],
               ),
-              backgroundColor: const Color(0xFF5287B2),
+              backgroundColor: AppColors.primary,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
@@ -1153,10 +1182,10 @@ class LandingScreen extends StatelessWidget {
             // Header
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              color: const Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
               child: Row(
                 children: [
-                  Icon(icon, color: const Color(0xFF5287B2), size: 28),
+                  Icon(icon, color: AppColors.primary, size: 28),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(
@@ -1197,7 +1226,7 @@ class LandingScreen extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: onActionPressed,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5287B2),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -1229,10 +1258,10 @@ class LandingScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF5287B2).withValues(alpha: 0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: const Color(0xFF5287B2), size: 20),
+            child: Icon(icon, color: AppColors.primary, size: 20),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -1244,7 +1273,7 @@ class LandingScreen extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1D1B16),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -1275,7 +1304,7 @@ class LandingScreen extends StatelessWidget {
             height: 32,
             alignment: Alignment.center,
             decoration: const BoxDecoration(
-              color: Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
               shape: BoxShape.circle,
             ),
             child: Text(
@@ -1297,7 +1326,7 @@ class LandingScreen extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1D1B16),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -1322,7 +1351,7 @@ class LandingScreen extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF5287B2), size: 24),
+          Icon(icon, color: AppColors.primary, size: 24),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -1342,7 +1371,7 @@ class LandingScreen extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1D1B16),
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -1362,8 +1391,8 @@ class _HeroPolygonPainter extends CustomPainter {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          const Color(0xFF5287B2).withValues(alpha: 0.2),
-          const Color(0xFF5287B2).withValues(alpha: 0.05),
+          AppColors.primary.withValues(alpha: 0.2),
+          AppColors.primary.withValues(alpha: 0.05),
         ],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 

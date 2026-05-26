@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../providers/auth_provider.dart';
 
 import '../admin_dashboard.dart';
@@ -33,7 +34,7 @@ class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.menu_rounded, color: Color(0xFF1D1B16)),
+                  icon: const Icon(Icons.menu_rounded, color: AppColors.textPrimary),
                   onPressed: () => Scaffold.of(context).openDrawer(),
                 ),
                 const SizedBox(width: 8),
@@ -42,7 +43,7 @@ class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF1D1B16),
+                    color: AppColors.textPrimary,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -82,7 +83,7 @@ class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF1D1B16),
+                        color: AppColors.textPrimary,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -144,7 +145,7 @@ class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
                 icon: const Icon(Icons.logout, size: 18),
                 label: const Text('Logout'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF5287B2),
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -188,7 +189,7 @@ class _NavButton extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: isActive ? const Color(0xFF1D1B16) : Colors.grey[600],
+                color: isActive ? AppColors.textPrimary : Colors.grey[600],
                 fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
                 fontSize: 14,
               ),
@@ -198,7 +199,7 @@ class _NavButton extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               height: 2,
               width: 20,
-              color: isActive ? const Color(0xFF5287B2) : Colors.transparent,
+              color: isActive ? AppColors.primary : Colors.transparent,
             ),
           ],
         ),

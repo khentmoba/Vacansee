@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../models/booking_model.dart';
 
 class RecentBookingRow extends StatelessWidget {
@@ -21,7 +22,7 @@ class RecentBookingRow extends StatelessWidget {
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
-                    color: Color(0xFF1D1B16),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 Text(

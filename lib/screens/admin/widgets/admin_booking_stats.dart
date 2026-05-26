@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 
 class AdminBookingStats extends StatelessWidget {
   final int total;
@@ -31,25 +32,25 @@ class AdminBookingStats extends StatelessWidget {
               label: 'Total Bookings',
               value: total.toString(),
               icon: Icons.calendar_today_outlined,
-              iconColor: const Color(0xFF5287B2),
+              iconColor: AppColors.primary,
             ),
             _BookingStatCard(
               label: 'Pending',
               value: pending.toString(),
               icon: Icons.access_time_outlined,
-              iconColor: const Color(0xFFFFA000),
+              iconColor: AppColors.warning,
             ),
             _BookingStatCard(
               label: 'Approved',
               value: approved.toString(),
               icon: Icons.check_circle_outline,
-              iconColor: const Color(0xFF4CAF50),
+              iconColor: AppColors.success,
             ),
             _BookingStatCard(
               label: 'Rejected',
               value: rejected.toString(),
               icon: Icons.cancel_outlined,
-              iconColor: const Color(0xFFF44336),
+              iconColor: AppColors.error,
             ),
           ],
         );
@@ -103,7 +104,7 @@ class _BookingStatCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
