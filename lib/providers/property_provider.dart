@@ -22,8 +22,10 @@ class PropertyProvider extends ChangeNotifier {
   PropertyModel? _selectedProperty;
   List<RoomModel> _rooms = [];
   List<RatingModel> _studentRatings = [];
+  List<Map<String, dynamic>> _propertyReviews = [];
   final Map<String, List<RoomModel>> _propertyRoomsMap = {}; // Cache rooms per property
   bool _isLoading = false;
+  bool _isLoadingReviews = false;
   String? _errorMessage;
 
   // Real-time vacancy tracking across all properties
@@ -47,7 +49,9 @@ class PropertyProvider extends ChangeNotifier {
   PropertyModel? get selectedProperty => _selectedProperty;
   List<RoomModel> get rooms => _rooms;
   List<RatingModel> get studentRatings => _studentRatings;
+  List<Map<String, dynamic>> get propertyReviews => _propertyReviews;
   bool get isLoading => _isLoading;
+  bool get isLoadingReviews => _isLoadingReviews;
   String? get errorMessage => _errorMessage;
   String? get searchQuery => _searchQuery;
   GenderOrientation? get genderFilter => _genderFilter;
@@ -733,6 +737,23 @@ class PropertyProvider extends ChangeNotifier {
         notifyListeners();
       },
     );
+  }
+
+  /// Load ratings/reviews for a specific property
+  Future<void> loadPropertyReviews(String propertyId) async {
+    _isLoadingReviews = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _propertyReviews = await _propertyService.getPropertyReviews(propertyId);
+      _isLoadingReviews = false;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = 'Failed to load property reviews: $e';
+      _isLoadingReviews = false;
+      notifyListeners();
+    }
   }
 }
 

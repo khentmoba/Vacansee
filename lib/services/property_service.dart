@@ -399,4 +399,18 @@ class PropertyService {
         .order('created_at', ascending: false)
         .map((data) => data.map((json) => RatingModel.fromJson(json)).toList());
   }
+
+  /// Get ratings/reviews for a specific property with user details
+  Future<List<Map<String, dynamic>>> getPropertyReviews(String propertyId) async {
+    try {
+      final response = await _supabase
+          .from('ratings')
+          .select('*, users!student_id(display_name)')
+          .eq('property_id', propertyId)
+          .order('created_at', ascending: false);
+      return List<Map<String, dynamic>>.from(response);
+    } catch (e) {
+      throw PropertyException('Failed to fetch property reviews: $e');
+    }
+  }
 }

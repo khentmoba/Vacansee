@@ -138,82 +138,143 @@ class _TopNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    final user = authProvider.user;
+    final displayName = user?.displayName;
+    final ownerInit = (displayName != null && displayName.isNotEmpty)
+        ? displayName[0].toUpperCase()
+        : 'S';
 
     return Container(
       height: 80,
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(horizontal: 60),
+      decoration: const BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border(bottom: BorderSide(color: AppColors.border, width: 0.8)),
       ),
       child: Row(
         children: [
           // Logo
+          InkWell(
+            onTap: () => onItemSelected(0),
+            borderRadius: BorderRadius.circular(8),
+            child: const Row(
+              children: [
+                Icon(Icons.home_work_rounded, color: AppColors.primary, size: 28),
+                SizedBox(width: 8),
+                Text(
+                  'VacanSee',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                    letterSpacing: -0.6,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Spacer(),
+          // Center Nav Tabs
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'VacanSee',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(width: 1, height: 24, color: Colors.grey[300]),
-              const SizedBox(width: 8),
-              Text(
-                'Tenant Dashboard',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              _buildTopNavItem('Home', 0),
+              _buildTopNavItem('Bookings', 1),
+              _buildTopNavItem('Ratings', 2),
+              _buildTopNavItem('Profile', 3),
             ],
           ),
           const Spacer(),
-          // Nav Items
-          _buildTopNavItem('Home', 0),
-          _buildTopNavItem('My Bookings', 1),
-          _buildTopNavItem('Ratings', 2),
-          _buildTopNavItem('Profile', 3),
-          const SizedBox(width: 24),
-          // Logout Button
-          ElevatedButton(
-            onPressed: () async {
-              final navigator = Navigator.of(context);
-              await authProvider.signOut();
-              if (context.mounted) {
-                navigator.popUntil((route) => route.isFirst);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              elevation: 0,
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Logout',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          // Right Controls
+          Row(
+            children: [
+              TextButton(
+                onPressed: () {},
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.textPrimary,
+                  textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                 ),
-                SizedBox(width: 8),
-                Icon(Icons.logout_rounded, size: 18),
-              ],
-            ),
+                child: const Text('Become a Host'),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: const Icon(Icons.language_rounded, size: 20, color: AppColors.textPrimary),
+                onPressed: () {},
+                style: IconButton.styleFrom(
+                  padding: const EdgeInsets.all(12),
+                  shape: const CircleBorder(),
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Profile Menu
+              PopupMenuButton<String>(
+                offset: const Offset(0, 52),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: const BorderSide(color: AppColors.border, width: 0.8),
+                ),
+                onSelected: (value) async {
+                  if (value == 'logout') {
+                    final navigator = Navigator.of(context);
+                    await authProvider.signOut();
+                    navigator.popUntil((route) => route.isFirst);
+                  } else if (value == 'bookings') {
+                    onItemSelected(1);
+                  } else if (value == 'ratings') {
+                    onItemSelected(2);
+                  } else if (value == 'profile') {
+                    onItemSelected(3);
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'profile',
+                    child: Text('My Profile', style: TextStyle(fontWeight: FontWeight.w600)),
+                  ),
+                  const PopupMenuItem(
+                    value: 'bookings',
+                    child: Text('My Bookings'),
+                  ),
+                  const PopupMenuItem(
+                    value: 'ratings',
+                    child: Text('My Ratings'),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(
+                    value: 'logout',
+                    child: Text('Log Out', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: AppColors.border, width: 1),
+                    color: Colors.white,
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.menu_rounded, size: 20, color: AppColors.textSecondary),
+                      const SizedBox(width: 12),
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundColor: AppColors.primaryContainer,
+                        child: Text(
+                          ownerInit,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
