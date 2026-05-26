@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme/app_theme.dart';
 import '../../models/property_model.dart';
 import '../../models/room_model.dart';
 import '../../providers/property_provider.dart';
@@ -149,7 +150,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF5287B2) : Colors.transparent,
+                        color: isSelected ? AppColors.primary : Colors.transparent,
                         width: 2,
                       ),
                       image: DecorationImage(
@@ -277,20 +278,20 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFFBFBFB),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!, width: 0.8),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 20, color: const Color(0xFF5287B2)),
+          Icon(icon, size: 20, color: AppColors.primary),
           const SizedBox(width: 12),
           Text(
             amenity,
             style: const TextStyle(
               fontSize: 15,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF1D1B16),
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
             ),
           ),
         ],
@@ -303,12 +304,13 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border, width: 0.8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -320,7 +322,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
+              letterSpacing: -0.5,
             ),
           ),
           const SizedBox(height: 12),
@@ -337,7 +340,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          const Divider(),
+          const Divider(height: 1, color: AppColors.border),
           const SizedBox(height: 24),
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -348,7 +351,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                 style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF5287B2),
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(width: 4),
@@ -364,7 +367,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           _buildSidebarRow(
             'Status:',
             vacantRooms > 0 ? 'Available' : 'Fully Occupied',
-            valueColor: vacantRooms > 0 ? const Color(0xFF10B981) : Colors.red,
+            valueColor: vacantRooms > 0 ? AppColors.success : AppColors.error,
           ),
           const SizedBox(height: 16),
           _buildSidebarRow('Owner:', 'Owner Name'), // Replace with actual owner name if available
@@ -390,11 +393,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     }
                   : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF5287B2),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.grey[300],
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 0,
               ),

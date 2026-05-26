@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../widgets/common/interactive_hover.dart';
@@ -35,92 +36,112 @@ class LandingScreen extends StatelessWidget {
 
   Widget _buildNavbar(BuildContext context, bool isMobile, double padding) {
     return Container(
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: padding, vertical: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Logo
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Center(
-                  child: Icon(Icons.home_work, color: Colors.white, size: 24),
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'VacanSee',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ],
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.8),
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey[100]!,
+            width: 1,
           ),
-          // Nav buttons
-          Row(
-            children: [
-              if (!isMobile) ...[
-                TextButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  ),
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppColors.textPrimary,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                  ),
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                ),
-                const SizedBox(width: 12),
-              ],
-              InteractiveHover(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const RegisterScreen()),
-                ),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 16 : 24,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+        ),
+      ),
+      child: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: padding, vertical: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Logo
+                Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [AppColors.primary, AppColors.secondary],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ],
-                  ),
-                  child: Text(
-                    isMobile ? 'Join' : 'Sign Up',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
+                      child: const Center(
+                        child: Icon(Icons.home_work_rounded, color: Colors.white, size: 24),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'VacanSee',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                // Nav buttons
+                Row(
+                  children: [
+                    if (!isMobile) ...[
+                      TextButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        ),
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.textPrimary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: const Text(
+                          'Login',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                    ],
+                    InteractiveHover(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                      ),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 18 : 28,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.25),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          isMobile ? 'Join' : 'Sign Up',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -396,17 +417,17 @@ class LandingScreen extends StatelessWidget {
     bool isMobile,
   ) {
     return Container(
-      width: isMobile ? double.infinity : 320,
-      padding: const EdgeInsets.all(32),
+      width: isMobile ? double.infinity : 340,
+      padding: const EdgeInsets.all(36),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border, width: 0.8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -414,21 +435,22 @@ class LandingScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.primary.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, size: 28, color: AppColors.primary),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           Text(
             title,
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
+              letterSpacing: -0.3,
             ),
           ),
           const SizedBox(height: 12),
@@ -463,7 +485,7 @@ class LandingScreen extends StatelessWidget {
             child: _buildRoleCard(
               context,
               isTenant: true,
-              icon: Icons.people_outline,
+              icon: Icons.people_outline_rounded,
               title: 'For Tenants',
               features: [
                 'Browse hundreds of verified boarding houses',
@@ -480,7 +502,7 @@ class LandingScreen extends StatelessWidget {
             child: _buildRoleCard(
               context,
               isTenant: false,
-              icon: Icons.business,
+              icon: Icons.business_rounded,
               title: 'For Owners',
               features: [
                 'List your boarding house for free',
@@ -508,40 +530,49 @@ class LandingScreen extends StatelessWidget {
   }) {
     return Container(
       width: isMobile ? double.infinity : 480,
-      padding: EdgeInsets.all(isMobile ? 24 : 40),
+      padding: EdgeInsets.all(isMobile ? 28 : 44),
       decoration: BoxDecoration(
         color: isTenant ? AppColors.primary : AppColors.textPrimary,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: (isTenant ? AppColors.primary : AppColors.textPrimary)
+                .withValues(alpha: 0.15),
+            blurRadius: 25,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 40, color: Colors.white),
-          const SizedBox(height: 24),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: 32, color: Colors.white),
+          ),
+          const SizedBox(height: 28),
           Text(
             title,
             style: TextStyle(
-              fontSize: isMobile ? 24 : 28,
+              fontSize: isMobile ? 24 : 30,
               fontWeight: FontWeight.bold,
               color: Colors.white,
+              letterSpacing: -0.5,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           ...features.map(
             (feature) => Padding(
-              padding: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.only(bottom: 18),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(
-                    Icons.check_circle,
+                    Icons.check_circle_rounded,
                     size: 20,
                     color: Colors.white70,
                   ),
@@ -550,7 +581,7 @@ class LandingScreen extends StatelessWidget {
                     child: Text(
                       feature,
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 14.5,
                         color: Colors.white,
                         height: 1.5,
                       ),
@@ -560,7 +591,7 @@ class LandingScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           SizedBox(
             width: isMobile ? double.infinity : null,
             child: ElevatedButton(
@@ -574,19 +605,19 @@ class LandingScreen extends StatelessWidget {
                     ? AppColors.primary
                     : AppColors.textPrimary,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 14,
+                  horizontal: 28,
+                  vertical: 16,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 elevation: 0,
               ),
               child: Text(
                 buttonText,
                 style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -601,7 +632,7 @@ class LandingScreen extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(
         horizontal: padding,
-        vertical: isMobile ? 60 : 80,
+        vertical: isMobile ? 60 : 100,
       ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -642,9 +673,10 @@ class LandingScreen extends StatelessWidget {
                 'Ready to Get Started?',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: isMobile ? 32 : 42,
+                  fontSize: isMobile ? 32 : 46,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
+                  letterSpacing: -1,
                 ),
               ),
               const SizedBox(height: 16),
@@ -652,11 +684,11 @@ class LandingScreen extends StatelessWidget {
                 'Join thousands of tenants and owners using VacanSee today',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 17,
                   color: Colors.white70,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -669,21 +701,17 @@ class LandingScreen extends StatelessWidget {
                     ),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
+                        horizontal: 36,
+                        vertical: 18,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: Colors.transparent,
-                          width: 1.5,
-                        ),
+                        borderRadius: BorderRadius.circular(10),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            blurRadius: 15,
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
@@ -691,7 +719,7 @@ class LandingScreen extends StatelessWidget {
                         'Create Account',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
                           color: AppColors.primary,
                         ),
                       ),
@@ -705,19 +733,19 @@ class LandingScreen extends StatelessWidget {
                     ),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
+                        horizontal: 36,
+                        vertical: 18,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: Colors.white, width: 1.5),
                       ),
                       child: const Text(
                         'Sign In',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),

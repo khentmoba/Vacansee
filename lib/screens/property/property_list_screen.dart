@@ -141,18 +141,18 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
   Widget _buildFilterBar(bool isDesktop, PropertyProvider provider) {
     if (isDesktop) {
       return Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 20,
-              offset: const Offset(0, 4),
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
             ),
           ],
-          border: Border.all(color: Colors.grey[100]!),
+          border: Border.all(color: Colors.grey[100]!, width: 0.8),
         ),
         child: Row(
           children: [
@@ -162,14 +162,14 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
               child: _buildFilterField(
                 label: 'Search Location or Name',
                 hint: 'Search boarding houses...',
-                icon: Icons.search,
+                icon: Icons.search_rounded,
                 onChanged: (val) {
                   provider.setSearchQuery(val);
                   provider.loadProperties();
                 },
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 20),
             // Min Price
             Expanded(
               flex: 1,
@@ -183,7 +183,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                 },
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 20),
             // Max Price
             Expanded(
               flex: 1,
@@ -197,7 +197,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                 },
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 24),
             // Available Only Toggle
             _buildAvailableOnlyToggle(provider),
           ],
@@ -214,28 +214,36 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
             },
             decoration: InputDecoration(
               hintText: 'Search boarding houses...',
-              prefixIcon: const Icon(Icons.search),
+              prefixIcon: const Icon(Icons.search_rounded, color: Colors.grey),
               filled: true,
-              fillColor: Colors.grey[100],
+              fillColor: Colors.grey[50],
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: Colors.grey[100]!, width: 0.8),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: Colors.grey[100]!, width: 0.8),
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () => _showFilterSheet(context),
-                  icon: const Icon(Icons.filter_list),
+                  icon: const Icon(Icons.filter_list_rounded, size: 18),
                   label: const Text('Filters'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: AppColors.textPrimary,
                     elevation: 0,
-                    side: const BorderSide(color: AppColors.border),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    side: const BorderSide(color: AppColors.border, width: 0.8),
                   ),
                 ),
               ),
@@ -262,8 +270,9 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
           label,
           style: TextStyle(
             fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[600],
+            fontWeight: FontWeight.w700,
+            color: Colors.grey[700],
+            letterSpacing: 0.3,
           ),
         ),
         const SizedBox(height: 8),
@@ -276,24 +285,24 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                 ? Icon(icon, size: 20, color: Colors.grey[400])
                 : null,
             filled: true,
-            fillColor: const Color(0xFFFBFBFB),
+            fillColor: const Color(0xFFF8FAFC),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
-              vertical: 16,
+              vertical: 14,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[200]!),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[200]!, width: 0.8),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[200]!),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[200]!, width: 0.8),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
                 color: AppColors.primary,
-                width: 1.5,
+                width: 1.2,
               ),
             ),
           ),
@@ -305,16 +314,16 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
   Widget _buildAvailableOnlyToggle(PropertyProvider provider) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFE5E7EB),
-        borderRadius: BorderRadius.circular(10),
+        color: const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: () {},
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -324,7 +333,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                   'Available Only',
                   style: TextStyle(
                     color: Colors.grey[800],
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     fontSize: 14,
                   ),
                 ),
@@ -790,19 +799,22 @@ class _PropertyCardState extends State<_PropertyCard> {
             );
           },
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 250),
             curve: Curves.easeOutCubic,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: _isHovered ? AppColors.primary.withValues(alpha: 0.3) : AppColors.border,
+                width: 0.8,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: _isHovered
-                      ? AppColors.primary.withValues(alpha: 0.15)
-                      : Colors.black.withValues(alpha: 0.03),
-                  blurRadius: _isHovered ? 24 : 10,
-                  offset: Offset(0, _isHovered ? 8 : 2),
+                      ? AppColors.primary.withValues(alpha: 0.08)
+                      : Colors.black.withValues(alpha: 0.02),
+                  blurRadius: _isHovered ? 24 : 12,
+                  offset: Offset(0, _isHovered ? 8 : 4),
                 ),
               ],
             ),
@@ -812,46 +824,76 @@ class _PropertyCardState extends State<_PropertyCard> {
                 // Image with status badge
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
+                    top: Radius.circular(20),
                   ),
                   child: Stack(
                     children: [
-                      Container(
-                        height: 200,
-                        width: double.infinity,
-                        color: Colors.grey[200],
-                        child: widget.property.coverImageUrl != null
-                            ? Image.network(
-                                widget.property.coverImageUrl!,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                errorBuilder: (_, _, _) =>
-                                    _buildGradientPlaceholder(),
-                              )
-                            : _buildGradientPlaceholder(),
+                      AnimatedScale(
+                        scale: _isHovered ? 1.04 : 1.0,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOutCubic,
+                        child: Container(
+                          height: 200,
+                          width: double.infinity,
+                          color: Colors.grey[100],
+                          child: widget.property.coverImageUrl != null
+                              ? Image.network(
+                                  widget.property.coverImageUrl!,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  errorBuilder: (_, _, _) =>
+                                      _buildGradientPlaceholder(),
+                                )
+                              : _buildGradientPlaceholder(),
+                        ),
                       ),
                       // Status Pill
                       Positioned(
-                        top: 12,
-                        right: 12,
+                        top: 14,
+                        right: 14,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 8,
+                            horizontal: 12,
+                            vertical: 6,
                           ),
                           decoration: BoxDecoration(
                             color: widget.liveVacancy
                                 ? AppColors.success
                                 : AppColors.error,
                             borderRadius: BorderRadius.circular(30),
+                            boxShadow: [
+                              BoxShadow(
+                                color: (widget.liveVacancy ? AppColors.success : AppColors.error)
+                                    .withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              )
+                            ]
                           ),
-                          child: Text(
-                            widget.liveVacancy ? 'Available' : 'Full',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (widget.liveVacancy) ...[
+                                Container(
+                                  width: 6,
+                                  height: 6,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                              ],
+                              Text(
+                                widget.liveVacancy ? 'Available' : 'Full',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -859,27 +901,77 @@ class _PropertyCardState extends State<_PropertyCard> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(18),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        widget.property.name,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      // Title & Star Rating Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              widget.property.name,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                                letterSpacing: -0.3,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          if (widget.property.reviewsCount > 0)
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.star_rounded,
+                                  size: 18,
+                                  color: Color(0xFFFFB800),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  widget.property.averageRating.toStringAsFixed(1),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            )
+                          else
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.star_outline_rounded,
+                                  size: 16,
+                                  color: Colors.grey[400],
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'New',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey[500],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 6),
+                      // Location
                       Row(
                         children: [
                           Icon(
                             Icons.location_on_outlined,
                             size: 14,
-                            color: Colors.grey[500],
+                            color: Colors.grey[400],
                           ),
                           const SizedBox(width: 4),
                           Expanded(
@@ -887,7 +979,7 @@ class _PropertyCardState extends State<_PropertyCard> {
                               widget.property.address,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey[600],
+                                color: Colors.grey[500],
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -895,35 +987,8 @@ class _PropertyCardState extends State<_PropertyCard> {
                           ),
                         ],
                       ),
-                      if (widget.property.reviewsCount > 0) ...[
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.star_rounded,
-                              size: 18,
-                              color: Color(0xFFFFB800),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              widget.property.averageRating.toStringAsFixed(1),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '(${widget.property.reviewsCount})',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 18),
+                      // Pricing & View Button Row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -934,17 +999,17 @@ class _PropertyCardState extends State<_PropertyCard> {
                                   text:
                                       '₱${widget.property.priceRange.min.toString().replaceAllMapped(RegExp(r"\B(?=(\d{3})+(?!\d))"), (match) => ",")}',
                                   style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.w800,
                                     color: AppColors.primary,
                                   ),
                                 ),
                                 TextSpan(
                                   text: ' /month',
                                   style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey[500],
-                                    fontWeight: FontWeight.w400,
+                                    fontSize: 12.5,
+                                    color: Colors.grey[400],
+                                    fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               ],
@@ -952,19 +1017,19 @@ class _PropertyCardState extends State<_PropertyCard> {
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
+                              horizontal: 16,
+                              vertical: 10,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.secondary,
+                              color: _isHovered ? AppColors.primary : AppColors.primaryContainer,
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Text(
+                            child: Text(
                               'View Details',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: _isHovered ? Colors.white : AppColors.primary,
                               ),
                             ),
                           ),
