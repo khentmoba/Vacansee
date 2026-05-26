@@ -121,7 +121,7 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
           ),
         );
 
-        if (!widget.showAppBar && !isDesktop) {
+        if (!widget.showAppBar) {
           return content;
         }
 

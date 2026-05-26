@@ -132,7 +132,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
           ),
         );
 
-        if (!widget.showAppBar && !isDesktop) {
+        if (!widget.showAppBar) {
           return content;
         }
 
