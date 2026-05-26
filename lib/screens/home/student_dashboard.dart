@@ -188,26 +188,6 @@ class _TopNavBar extends StatelessWidget {
           // Right Controls
           Row(
             children: [
-              TextButton(
-                onPressed: () {},
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.textPrimary,
-                  textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                ),
-                child: const Text('Become a Host'),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(Icons.language_rounded, size: 20, color: AppColors.textPrimary),
-                onPressed: () {},
-                style: IconButton.styleFrom(
-                  padding: const EdgeInsets.all(12),
-                  shape: const CircleBorder(),
-                ),
-              ),
-              const SizedBox(width: 16),
               // Profile Menu
               PopupMenuButton<String>(
                 offset: const Offset(0, 52),

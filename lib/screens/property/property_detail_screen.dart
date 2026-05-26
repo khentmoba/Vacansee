@@ -375,7 +375,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           imageUrl: allImages[0],
           height: 400,
           width: double.infinity,
-          fit: BoxFit.cover,
+          fit: BoxFit.contain,
           placeholder: (context, url) => _buildShimmerBox(height: 400),
           errorWidget: (context, url, error) => _buildPlaceholder(),
         ),
@@ -550,7 +550,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
               }
               return CachedNetworkImage(
                 imageUrl: imgUrl,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
                 placeholder: (context, url) => _buildShimmerBox(height: 280),
                 errorWidget: (context, url, error) => Container(
                   color: Colors.grey[200],

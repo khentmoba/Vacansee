@@ -10,9 +10,16 @@ import '../owner/edit_property_screen.dart';
 import '../property/create_property_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../../widgets/notifications/notification_badge.dart';
-import '../../widgets/owner/owner_top_nav_bar.dart';
 import '../owner/owner_profile_screen.dart';
 import '../../core/utils/fade_page_route.dart';
+
+// Import New Redesigned Widgets/Screens
+import '../../widgets/owner/owner_side_nav.dart';
+import '../../widgets/owner/owner_revenue_chart.dart';
+import '../../widgets/owner/owner_recent_booking_requests.dart';
+import '../../widgets/owner/owner_promo_card.dart';
+import '../owner/owner_performance_screen.dart';
+import '../owner/owner_payments_screen.dart';
 
 class OwnerDashboard extends StatefulWidget {
   const OwnerDashboard({super.key});
@@ -22,8 +29,7 @@ class OwnerDashboard extends StatefulWidget {
 }
 
 class _OwnerDashboardState extends State<OwnerDashboard> {
-  int _currentIndex = 0;
-
+  int _currentIndex = 0; // Shared index mapped according to desktop/mobile layouts
   final List<String> _mobileTitles = ['Dashboard', 'Bookings', 'Profile'];
 
   @override
@@ -42,7 +48,9 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   .map((p) => p.propertyId)
                   .toList();
               if (propertyIds.isNotEmpty) {
-                context.read<BookingProvider>().loadPendingCount(propertyIds);
+                final bookingProvider = context.read<BookingProvider>();
+                bookingProvider.loadOwnerBookings(propertyIds);
+                bookingProvider.loadPendingCount(propertyIds);
               }
             });
       }
@@ -61,84 +69,102 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth >= 900;
 
-        return Scaffold(
-          extendBody: !isDesktop,
-          backgroundColor: AppColors.background,
-          appBar: isDesktop
-              ? const PreferredSize(
-                  preferredSize: Size.fromHeight(80),
-                  child: OwnerTopNavBar(currentRoute: 'Dashboard'),
-                )
-              : AppBar(
-                  title: Text(_mobileTitles[_currentIndex]),
-                  backgroundColor: Colors.white,
-                  foregroundColor: AppColors.textPrimary,
-                  elevation: 0,
-                  automaticallyImplyLeading: false,
-                  actions: [
-                    NotificationBadge(
-                      child: IconButton(
-                        icon: const Icon(Icons.notifications_none_rounded),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const NotificationsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.logout),
-                      onPressed: () => authProvider.signOut(),
-                    ),
-                  ],
+        if (isDesktop) {
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            body: Row(
+              children: [
+                // Sidebar Navigation
+                OwnerSideNav(
+                  selectedIndex: _currentIndex,
+                  pendingBookingsCount: pendingCount,
+                  onIndexChanged: (index) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  },
+                  onLogout: () => authProvider.signOut(),
                 ),
-          bottomNavigationBar: isDesktop
-              ? null
-              : SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 24,
-                      right: 24,
-                      bottom: 24,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.textPrimary.withValues(alpha: 0.95),
-                        borderRadius: BorderRadius.circular(32),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildNavItem(Icons.dashboard_rounded, 'Home', 0),
-                          _buildNavItem(
-                            Icons.calendar_today_rounded,
-                            'Bookings',
-                            1,
-                          ),
-                          _buildNavItem(Icons.person_rounded, 'Profile', 2),
-                        ],
-                      ),
+
+                // Main Content Screen mapping
+                Expanded(
+                  child: Container(
+                    color: AppColors.background,
+                    child: _buildDesktopScreen(
+                      _currentIndex,
+                      authProvider,
+                      propertyProvider,
+                      bookingProvider,
+                      properties,
+                      pendingCount,
                     ),
                   ),
                 ),
-          body: !isDesktop && _currentIndex == 1
+              ],
+            ),
+          );
+        }
+
+        // Mobile View remains unchanged structure-wise, styled elegantly
+        return Scaffold(
+          extendBody: true,
+          backgroundColor: AppColors.background,
+          appBar: AppBar(
+            title: Text(_mobileTitles[_currentIndex]),
+            backgroundColor: Colors.white,
+            foregroundColor: AppColors.textPrimary,
+            elevation: 0,
+            automaticallyImplyLeading: false,
+            actions: [
+              NotificationBadge(
+                child: IconButton(
+                  icon: const Icon(Icons.notifications_none_rounded),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const NotificationsScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () => authProvider.signOut(),
+              ),
+            ],
+          ),
+          bottomNavigationBar: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.textPrimary.withValues(alpha: 0.95),
+                  borderRadius: BorderRadius.circular(32),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildMobileNavItem(Icons.dashboard_rounded, 'Home', 0),
+                    _buildMobileNavItem(Icons.calendar_today_rounded, 'Bookings', 1),
+                    _buildMobileNavItem(Icons.person_rounded, 'Profile', 2),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          body: _currentIndex == 1
               ? const OwnerBookingsScreen(showAppBar: false)
-              : !isDesktop && _currentIndex == 2
+              : _currentIndex == 2
               ? const OwnerProfileScreen(showAppBar: false)
               : propertyProvider.isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -148,312 +174,68 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   child: Center(
                     child: Container(
                       constraints: const BoxConstraints(maxWidth: 1200),
-                      padding: EdgeInsets.only(
-                        left: isDesktop ? 40 : 20,
-                        right: isDesktop ? 40 : 20,
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 20,
                         top: 32,
-                        bottom: isDesktop ? 32 : 140,
+                        bottom: 140,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Header Section
-                          if (isDesktop) ...[
-                            const Text(
-                              'Owner Dashboard',
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                                letterSpacing: -0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Manage your boarding house listings and room vacancies',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-                          ],
-                          // Owner Verification Alert Banner
-                          if (!(authProvider.user?.isVerified ?? false))
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: Colors.orange[50],
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.orange[200]!),
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Icon(
-                                    Icons.pending_actions_rounded,
-                                    color: Colors.orange[700],
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Account Verification Pending',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.orange[800],
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'An admin will review your account shortly. You can browse the dashboard, but publishing listings is locked until verified.',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.orange[700],
-                                            height: 1.4,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
                           // Stats Cards
-                          LayoutBuilder(
-                            builder: (context, constraints) {
-                              final statsCrossAxisCount = isDesktop ? 4 : 2;
-                              return GridView.count(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                crossAxisCount: statsCrossAxisCount,
-                                crossAxisSpacing: 16,
-                                mainAxisSpacing: 16,
-                                childAspectRatio: isDesktop ? 1.3 : 1.1,
-                                children: [
-                                  _buildStatCard(
-                                    Icons.home_rounded,
-                                    properties
-                                        .where(
-                                          (p) =>
-                                              p.status !=
-                                              PropertyStatus.deleted,
-                                        )
-                                        .length
-                                        .toString(),
-                                    'Total Listings',
-                                    const Color(0xFF3B82F6),
-                                    isDesktop,
-                                  ),
-                                  _buildStatCard(
-                                    Icons.check_circle_rounded,
-                                    propertyProvider.totalOccupiedRooms
-                                        .toString(),
-                                    'Occupied Rooms',
-                                    const Color(0xFF10B981),
-                                    isDesktop,
-                                  ),
-                                  _buildStatCard(
-                                    Icons.home_outlined,
-                                    propertyProvider.totalAvailableRooms
-                                        .toString(),
-                                    'Available Rooms',
-                                    const Color(0xFF8B5CF6),
-                                    isDesktop,
-                                  ),
-                                  _buildStatCard(
-                                    Icons.calendar_today_rounded,
-                                    pendingCount.toString(),
-                                    'Pending Requests',
-                                    const Color(0xFFF59E0B),
-                                    isDesktop,
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
+                          _buildMobileStatsGrid(propertyProvider, pendingCount, properties),
                           const SizedBox(height: 32),
                           // Pending Requests Banner
                           if (pendingCount > 0)
-                            Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFFBEB),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: const Color(0xFFFEF3C7),
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'You have $pendingCount pending booking request${pendingCount > 1 ? 's' : ''}',
-                                          style: TextStyle(
-                                            fontSize: isDesktop ? 18 : 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: const Color(0xFF92400E),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Review and respond to booking requests to keep your tenants updated',
-                                          style: TextStyle(
-                                            fontSize: isDesktop ? 14 : 12,
-                                            color: const Color(0xFFB45309),
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      if (isDesktop) {
-                                        Navigator.push(
-                                          context,
-                                          FadePageRoute(
-                                            child: const OwnerBookingsScreen(),
-                                          ),
-                                        );
-                                      } else {
-                                        setState(() => _currentIndex = 1);
-                                      }
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFFD97706),
-                                      foregroundColor: Colors.white,
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: isDesktop ? 24 : 16,
-                                        vertical: isDesktop ? 18 : 12,
-                                      ),
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Review Now',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: isDesktop ? 15 : 13,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                            _buildMobilePendingBanner(pendingCount),
                           const SizedBox(height: 40),
-                          // My Boarding Houses Header
+                          // Header for boarding houses
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              if (isDesktop) ...[
-                                const Text(
-                                  'My Boarding Houses',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1D1B16),
-                                  ),
-                                ),
-                                ElevatedButton.icon(
-                                  onPressed:
-                                      (authProvider.user?.isVerified ?? false)
-                                      ? () {
-                                          Navigator.push(
-                                            context,
-                                            FadePageRoute(
-                                              child:
-                                                  const CreatePropertyScreen(),
-                                            ),
-                                          );
-                                        }
-                                      : null,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 16,
-                                    ),
-                                    disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  icon: const Icon(Icons.add, size: 20),
-                                  label: Text(
-                                    (authProvider.user?.isVerified ?? false)
-                                        ? 'Add New Listing'
-                                        : 'Verification Required',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ),
-                              ] else ...[
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'My Boarding Houses',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF1D1B16),
-                                        ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'My Boarding Houses',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF1D1B16),
                                       ),
-                                      Text(
-                                        '${properties.length} Active Listings',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.grey[500],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton.filled(
-                                  onPressed:
-                                      (authProvider.user?.isVerified ?? false)
-                                      ? () {
-                                          Navigator.push(
-                                            context,
-                                            FadePageRoute(
-                                              child:
-                                                  const CreatePropertyScreen(),
-                                            ),
-                                          );
-                                        }
-                                      : null,
-                                  icon: const Icon(Icons.add),
-                                  style: IconButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
                                     ),
+                                    Text(
+                                      '${properties.length} Active Listings',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[500],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton.filled(
+                                onPressed: (authProvider.user?.isVerified ?? false)
+                                    ? () {
+                                        Navigator.push(
+                                          context,
+                                          FadePageRoute(
+                                            child: const CreatePropertyScreen(),
+                                          ),
+                                        );
+                                      }
+                                    : null,
+                                icon: const Icon(Icons.add),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                              ],
+                              ),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -461,13 +243,12 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                           GridView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: isDesktop ? 3 : 2,
-                                  crossAxisSpacing: 24,
-                                  mainAxisSpacing: 24,
-                                  childAspectRatio: isDesktop ? 0.9 : 0.75,
-                                ),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: 0.75,
+                            ),
                             itemCount: properties.length,
                             itemBuilder: (context, index) {
                               final property = properties[index];
@@ -484,6 +265,503 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     );
   }
 
+  // Desktop Screen Selector
+  Widget _buildDesktopScreen(
+    int index,
+    AuthProvider authProvider,
+    PropertyProvider propertyProvider,
+    BookingProvider bookingProvider,
+    List<PropertyModel> properties,
+    int pendingCount,
+  ) {
+    switch (index) {
+      case 0:
+        return _buildDesktopDashboardHome(
+          authProvider,
+          propertyProvider,
+          bookingProvider,
+          properties,
+          pendingCount,
+        );
+      case 1:
+        return _buildDesktopPropertiesGrid(authProvider, propertyProvider, properties);
+      case 2:
+        return const OwnerBookingsScreen(showAppBar: false);
+      case 3:
+        return _buildComingSoonScreen('Direct Messages');
+      case 4:
+        return const OwnerPerformanceScreen();
+      case 5:
+        return const OwnerPaymentsScreen();
+      case 6:
+        return const OwnerProfileScreen(showAppBar: false);
+      default:
+        return _buildComingSoonScreen('Screen');
+    }
+  }
+
+  // RentEasy inspired Desktop Dashboard Home
+  Widget _buildDesktopDashboardHome(
+    AuthProvider authProvider,
+    PropertyProvider propertyProvider,
+    BookingProvider bookingProvider,
+    List<PropertyModel> properties,
+    int pendingCount,
+  ) {
+    final displayName = authProvider.user?.displayName ?? 'Owner';
+    final firstName = displayName.split(' ').first;
+
+    // Greeting Message based on time of day
+    final hour = DateTime.now().hour;
+    String greeting = 'Welcome back';
+    if (hour < 12) {
+      greeting = 'Good Morning';
+    } else if (hour < 17) {
+      greeting = 'Good Afternoon';
+    } else {
+      greeting = 'Good Evening';
+    }
+
+    // Top Performing Properties calculation
+    final sortedProperties = List<PropertyModel>.from(properties)
+      ..sort((a, b) {
+        final aOccupied = a.totalRooms - a.availableRooms;
+        final bOccupied = b.totalRooms - b.availableRooms;
+        return bOccupied.compareTo(aOccupied);
+      });
+    final topProperties = sortedProperties.take(3).toList();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(40.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Row for Greetings and Action
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$greeting, $firstName! 👋',
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Here is your boarding house activity overview for today.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+              ElevatedButton.icon(
+                onPressed: (authProvider.user?.isVerified ?? false)
+                    ? () {
+                        Navigator.push(
+                          context,
+                          FadePageRoute(
+                            child: const CreatePropertyScreen(),
+                          ),
+                        );
+                      }
+                    : null,
+                icon: const Icon(Icons.add, size: 20),
+                label: const Text('Add Listing'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF5287B2),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+
+          // 4 KPI Cards Grid
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 4,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 20,
+            childAspectRatio: 1.6,
+            children: [
+              _buildStatCard(
+                Icons.home_work_rounded,
+                properties.length.toString(),
+                'Active Listings',
+                const Color(0xFF5287B2),
+                true,
+              ),
+              _buildStatCard(
+                Icons.pending_actions_rounded,
+                pendingCount.toString(),
+                'Pending Requests',
+                Colors.orangeAccent,
+                true,
+              ),
+              _buildStatCard(
+                Icons.check_circle_rounded,
+                propertyProvider.totalOccupiedRooms.toString(),
+                'Occupied Rooms',
+                const Color(0xFF10B981),
+                true,
+              ),
+              _buildStatCard(
+                Icons.home_outlined,
+                propertyProvider.totalAvailableRooms.toString(),
+                'Available Rooms',
+                Colors.indigo,
+                true,
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+
+          // Row for Revenue Chart and Recent Booking Requests
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Revenue Bar Chart
+              Expanded(
+                flex: 3,
+                child: SizedBox(
+                  height: 380,
+                  child: OwnerRevenueChart(bookings: bookingProvider.bookings),
+                ),
+              ),
+              const SizedBox(width: 24),
+              // Recent Booking Requests
+              Expanded(
+                flex: 2,
+                child: SizedBox(
+                  height: 380,
+                  child: OwnerRecentBookingRequests(
+                    bookings: bookingProvider.bookings,
+                    onViewAll: () {
+                      setState(() {
+                        _currentIndex = 2; // Switch to Booking Requests tab
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+
+          // Top Performing Properties & Promo card Grid
+          const Text(
+            'Top Performing Properties',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0F172A),
+            ),
+          ),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 4,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20,
+                childAspectRatio: 0.9,
+                children: [
+                  ...topProperties.map((p) => _buildPropertyCard(p)),
+                  // Fallback empty slots if there are fewer than 3 properties
+                  if (topProperties.length < 3)
+                    ...List.generate(
+                      3 - topProperties.length,
+                      (index) => _buildEmptyPropertySlot(),
+                    ),
+                  // 4th cell is always the promo card
+                  const OwnerPromoCard(),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Original Listings view, but tailored for Desktop main body
+  Widget _buildDesktopPropertiesGrid(
+    AuthProvider authProvider,
+    PropertyProvider propertyProvider,
+    List<PropertyModel> properties,
+  ) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(40.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'My Boarding Houses',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'You have ${properties.length} active listings listed on VacanSee.',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+              ElevatedButton.icon(
+                onPressed: (authProvider.user?.isVerified ?? false)
+                    ? () {
+                        Navigator.push(
+                          context,
+                          FadePageRoute(
+                            child: const CreatePropertyScreen(),
+                          ),
+                        );
+                      }
+                    : null,
+                icon: const Icon(Icons.add, size: 20),
+                label: const Text('Add Boarding House'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF5287B2),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+          if (properties.isEmpty)
+            _buildEmptyState(context)
+          else
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 24,
+                mainAxisSpacing: 24,
+                childAspectRatio: 0.95,
+              ),
+              itemCount: properties.length,
+              itemBuilder: (context, index) {
+                return _buildPropertyCard(properties[index]);
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  // Placeholder Screen
+  Widget _buildComingSoonScreen(String screenName) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.construction_rounded,
+            size: 64,
+            color: const Color(0xFF5287B2).withValues(alpha: 0.3),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '$screenName Coming Soon',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0F172A),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'We are currently building this screen for you.',
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xFF64748B),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyPropertySlot() {
+    return Card(
+      elevation: 0,
+      color: const Color(0xFFF8FAFC),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Color(0xFFE2E8F0)),
+        ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.home_work_rounded,
+              color: const Color(0xFF5287B2).withValues(alpha: 0.2),
+              size: 40,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'No Listing Available',
+              style: TextStyle(
+                fontSize: 12,
+                color: Color(0xFF64748B),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // UI Utilities for Mobile View
+  Widget _buildMobileNavItem(IconData icon, String label, int index) {
+    final isSelected = _currentIndex == index;
+    return _AnimatedNavItem(
+      icon: icon,
+      label: label,
+      isSelected: isSelected,
+      onTap: () => setState(() => _currentIndex = index),
+    );
+  }
+
+  Widget _buildMobileStatsGrid(
+    PropertyProvider propertyProvider,
+    int pendingCount,
+    List<PropertyModel> properties,
+  ) {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      crossAxisSpacing: 16,
+      mainAxisSpacing: 16,
+      childAspectRatio: 1.1,
+      children: [
+        _buildStatCard(
+          Icons.home_rounded,
+          properties.length.toString(),
+          'Total Listings',
+          const Color(0xFF3B82F6),
+          false,
+        ),
+        _buildStatCard(
+          Icons.check_circle_rounded,
+          propertyProvider.totalOccupiedRooms.toString(),
+          'Occupied Rooms',
+          const Color(0xFF10B981),
+          false,
+        ),
+        _buildStatCard(
+          Icons.home_outlined,
+          propertyProvider.totalAvailableRooms.toString(),
+          'Available Rooms',
+          const Color(0xFF8B5CF6),
+          false,
+        ),
+        _buildStatCard(
+          Icons.calendar_today_rounded,
+          pendingCount.toString(),
+          'Pending Requests',
+          const Color(0xFFF59E0B),
+          false,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobilePendingBanner(int pendingCount) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFBEB),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFFEF3C7),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'You have $pendingCount pending request${pendingCount > 1 ? 's' : ''}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF92400E),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Review and respond to booking requests',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFFB45309),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          ElevatedButton(
+            onPressed: () {
+              setState(() => _currentIndex = 1); // switch to bookings tab on mobile
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFD97706),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Review',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Reusable Widgets
   Widget _buildStatCard(
     IconData icon,
     String value,
@@ -496,47 +774,42 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
       padding: EdgeInsets.all(isDesktop ? 24 : 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            padding: EdgeInsets.all(isDesktop ? 12 : 8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: isDesktop ? 24 : 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: isDesktop ? 12 : 11,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF64748B),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: color, size: 18),
+              ),
+            ],
           ),
-          SizedBox(height: isDesktop ? 20 : 12),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 32,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-              letterSpacing: -1,
+              color: Color(0xFF0F172A),
+              letterSpacing: -0.5,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: isDesktop ? 14 : 12,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -544,17 +817,14 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
   }
 
   Widget _buildPropertyCard(PropertyModel property) {
+    final isDesktop = MediaQuery.of(context).size.width >= 900;
+    final occupiedRooms = property.totalRooms - property.availableRooms;
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -564,9 +834,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
             child: Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(20),
-                  ),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   child: property.coverImageUrl != null
                       ? Image.network(
                           property.coverImageUrl!,
@@ -575,12 +843,12 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                           height: double.infinity,
                         )
                       : Container(
-                          color: Colors.grey[100],
+                          color: const Color(0xFFF8FAFC),
                           child: Center(
                             child: Icon(
                               Icons.home_work_rounded,
-                              size: 48,
-                              color: Colors.grey[300],
+                              size: 40,
+                              color: const Color(0xFF5287B2).withValues(alpha: 0.3),
                             ),
                           ),
                         ),
@@ -599,28 +867,32 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                       );
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
                         ],
                       ),
-                      child: const Text(
-                        'Edit',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.edit_rounded, size: 12, color: Color(0xFF0F172A)),
+                          SizedBox(width: 4),
+                          Text(
+                            'Edit',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -630,20 +902,15 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   top: 12,
                   right: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: property.hasVacancy
-                           ? AppColors.success
-                           : AppColors.error,
-                      borderRadius: BorderRadius.circular(12),
+                      color: property.hasVacancy ? const Color(0xFF10B981) : Colors.redAccent,
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       property.hasVacancy ? 'Available' : 'Full',
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -655,26 +922,26 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
           ),
           // Info Section
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   property.name,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: Color(0xFF0F172A),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Row(
                   children: [
                     Icon(
                       Icons.location_on_rounded,
-                      size: 16,
+                      size: 14,
                       color: Colors.grey[400],
                     ),
                     const SizedBox(width: 4),
@@ -682,7 +949,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                       child: Text(
                         property.address,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 12,
                           color: Colors.grey[600],
                           fontWeight: FontWeight.w400,
                         ),
@@ -692,6 +959,32 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     ),
                   ],
                 ),
+                if (isDesktop) ...[
+                  const SizedBox(height: 12),
+                  const Divider(color: Color(0xFFF1F5F9), height: 1),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Occupancy: $occupiedRooms/${property.totalRooms} Rooms',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF64748B),
+                        ),
+                      ),
+                      Text(
+                        '₱${property.monthlyPrice}/mo',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF5287B2),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -706,29 +999,28 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 140,
-            height: 140,
+            width: 120,
+            height: 120,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.08),
+              color: const Color(0xFF5287B2).withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.home_work_outlined,
-              size: 80,
-              color: AppColors.primary.withValues(alpha: 0.4),
+              size: 64,
+              color: Color(0xFF5287B2),
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
           const Text(
             'No Properties Yet',
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-              letterSpacing: -0.5,
+              color: Color(0xFF0F172A),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
@@ -737,13 +1029,13 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   : 'Your account is pending verification. Once approved, you can add listings.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 color: Colors.grey[600],
                 height: 1.5,
               ),
             ),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: (context.read<AuthProvider>().user?.isVerified ?? false)
                 ? () {
@@ -756,35 +1048,22 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   }
                 : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: const Color(0xFF5287B2),
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-              disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
             icon: const Icon(Icons.add_rounded),
-            label: Text(
-              (context.read<AuthProvider>().user?.isVerified ?? false)
-                  ? 'Add Your First Property'
-                  : 'Verification Required',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            label: const Text(
+              'Add Your First Property',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    final isSelected = _currentIndex == index;
-    return _AnimatedNavItem(
-      icon: icon,
-      label: label,
-      isSelected: isSelected,
-      onTap: () => setState(() => _currentIndex = index),
     );
   }
 }
@@ -810,14 +1089,14 @@ class _AnimatedNavItemState extends State<_AnimatedNavItem> {
   bool isHovered = false;
 
   Color get backgroundColor {
-    if (widget.isSelected) return AppColors.primary;
-    if (isHovered) return AppColors.primary.withValues(alpha: 0.15);
+    if (widget.isSelected) return const Color(0xFF5287B2);
+    if (isHovered) return const Color(0xFF5287B2).withValues(alpha: 0.15);
     return Colors.transparent;
   }
 
   Color get iconColor {
     if (widget.isSelected) return Colors.white;
-    if (isHovered) return AppColors.primary;
+    if (isHovered) return const Color(0xFF5287B2);
     return Colors.white.withValues(alpha: 0.65);
   }
 
@@ -843,13 +1122,13 @@ class _AnimatedNavItemState extends State<_AnimatedNavItem> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(widget.icon, color: iconColor, size: 24),
+              Icon(widget.icon, color: iconColor, size: 22),
               if (widget.isSelected) ...[
                 const SizedBox(width: 8),
                 Text(
                   widget.label,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),

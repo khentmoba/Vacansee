@@ -70,6 +70,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final authProvider = context.watch<AuthProvider>();
     final user = authProvider.user;
     final isDesktop = MediaQuery.of(context).size.width >= 800;
+    final initials = user != null
+        ? '${(user.firstName ?? '').isNotEmpty ? user.firstName![0] : ''}${(user.lastName ?? '').isNotEmpty ? user.lastName![0] : ''}'.toUpperCase()
+        : 'U';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FBFD),
@@ -79,10 +82,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         centerTitle: false,
         title: const Text(
-          'Edit Profile',
+          'Profile settings',
           style: TextStyle(
             color: Color(0xFF1D1B16),
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w800,
             fontSize: 20,
           ),
         ),
@@ -96,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18),
                     SizedBox(width: 8),
                     Text(
-                      'Changes Saved',
+                      'Saved',
                       style: TextStyle(
                         color: Color(0xFF10B981),
                         fontWeight: FontWeight.w600,
@@ -118,7 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
                     : const Icon(Icons.save_rounded, size: 18),
-                label: const Text('Save Changes'),
+                label: const Text('Save'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF5287B2),
                   foregroundColor: Colors.white,
@@ -132,9 +135,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(
-          horizontal: isDesktop ? 40 : 20,
-          vertical: 32,
+        padding: EdgeInsets.only(
+          left: isDesktop ? 40 : 16,
+          right: isDesktop ? 40 : 16,
+          top: 24,
+          bottom: 140, // clear bottom floating bar
         ),
         child: Center(
           child: ConstrainedBox(
@@ -145,65 +150,152 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 if (authProvider.errorMessage != null)
                   _buildErrorBanner(authProvider.errorMessage!),
 
-                _buildSectionHeader('Personal Information'),
-                const SizedBox(height: 24),
-                
-                if (isDesktop) ...[
-                  Row(
+                // Profile Hero / Avatar Section
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  margin: const EdgeInsets.only(bottom: 24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.02),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    border: Border.all(color: const Color(0xFFF3F4F6)),
+                  ),
+                  child: Column(
                     children: [
-                      Expanded(child: _buildTextField('First Name', _firstNameController, Icons.person_outline)),
-                      const SizedBox(width: 20),
-                      Expanded(child: _buildTextField('Last Name', _lastNameController, Icons.person_outline)),
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF5287B2), Color(0xFF3B82F6)],
+                          ),
+                        ),
+                        child: CircleAvatar(
+                          radius: 40,
+                          backgroundColor: Colors.white,
+                          child: Text(
+                            initials,
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF5287B2),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        user?.displayName ?? 'Valued Tenant',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1F2937),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        user?.email ?? 'tenant@vacansee.com',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  Row(
+                ),
+
+                // Personal Info Card
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: _buildGenderDropdown()),
-                      const SizedBox(width: 20),
-                      Expanded(child: _buildTextField('Phone Number', _phoneController, Icons.phone_outlined, keyboardType: TextInputType.phone)),
+                      _buildSectionHeader('Personal Information'),
+                      const SizedBox(height: 20),
+                      if (isDesktop) ...[
+                        Row(
+                          children: [
+                            Expanded(child: _buildTextField('First Name', _firstNameController, Icons.person_outline)),
+                            const SizedBox(width: 16),
+                            Expanded(child: _buildTextField('Last Name', _lastNameController, Icons.person_outline)),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(child: _buildGenderDropdown()),
+                            const SizedBox(width: 16),
+                            Expanded(child: _buildTextField('Phone Number', _phoneController, Icons.phone_outlined, keyboardType: TextInputType.phone)),
+                          ],
+                        ),
+                      ] else ...[
+                        _buildTextField('First Name', _firstNameController, Icons.person_outline),
+                        const SizedBox(height: 16),
+                        _buildTextField('Last Name', _lastNameController, Icons.person_outline),
+                        const SizedBox(height: 16),
+                        _buildGenderDropdown(),
+                        const SizedBox(height: 16),
+                        _buildTextField('Phone Number', _phoneController, Icons.phone_outlined, keyboardType: TextInputType.phone),
+                      ],
+                      const SizedBox(height: 16),
+                      _buildTextField('Home Address', _addressController, Icons.location_on_outlined),
                     ],
                   ),
-                ] else ...[
-                  _buildTextField('First Name', _firstNameController, Icons.person_outline),
-                  const SizedBox(height: 20),
-                  _buildTextField('Last Name', _lastNameController, Icons.person_outline),
-                  const SizedBox(height: 20),
-                  _buildGenderDropdown(),
-                  const SizedBox(height: 20),
-                  _buildTextField('Phone Number', _phoneController, Icons.phone_outlined, keyboardType: TextInputType.phone),
-                ],
-                const SizedBox(height: 20),
-                _buildTextField('Email Address', TextEditingController(text: user?.email), Icons.email_outlined, enabled: false),
-                const SizedBox(height: 20),
-                _buildTextField('Home Address', _addressController, Icons.location_on_outlined),
+                ),
                 
-                const SizedBox(height: 48),
-                _buildSectionHeader('Emergency Contact'),
                 const SizedBox(height: 24),
 
-                if (isDesktop) ...[
-                  Row(
+                // Emergency Contact Card
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: _buildTextField('Contact Name', _emergencyNameController, Icons.contact_page_outlined)),
-                      const SizedBox(width: 20),
-                      Expanded(child: _buildTextField('Contact Number', _emergencyPhoneController, Icons.phone_callback_outlined, keyboardType: TextInputType.phone)),
+                      _buildSectionHeader('Emergency Contact'),
+                      const SizedBox(height: 20),
+                      if (isDesktop) ...[
+                        Row(
+                          children: [
+                            Expanded(child: _buildTextField('Contact Name', _emergencyNameController, Icons.contact_page_outlined)),
+                            const SizedBox(width: 16),
+                            Expanded(child: _buildTextField('Contact Number', _emergencyPhoneController, Icons.phone_callback_outlined, keyboardType: TextInputType.phone)),
+                          ],
+                        ),
+                      ] else ...[
+                        _buildTextField('Contact Name', _emergencyNameController, Icons.contact_page_outlined),
+                        const SizedBox(height: 16),
+                        _buildTextField('Contact Number', _emergencyPhoneController, Icons.phone_callback_outlined, keyboardType: TextInputType.phone),
+                      ],
                     ],
                   ),
-                ] else ...[
-                  _buildTextField('Contact Name', _emergencyNameController, Icons.contact_page_outlined),
-                  const SizedBox(height: 20),
-                  _buildTextField('Contact Number', _emergencyPhoneController, Icons.phone_callback_outlined, keyboardType: TextInputType.phone),
-                ],
+                ),
                 
-                const SizedBox(height: 60),
+                const SizedBox(height: 32),
+                
                 // Danger Zone / Sign Out
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.02),
+                    color: Colors.red.withValues(alpha: 0.01),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.red.withValues(alpha: 0.1)),
+                    border: Border.all(color: Colors.red.withValues(alpha: 0.15)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: Colors.red,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
                         child: OutlinedButton.icon(
@@ -232,9 +324,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.red,
                             side: const BorderSide(color: Colors.red),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                         ),
@@ -242,7 +334,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 40),
               ],
             ),
           ),
@@ -252,13 +343,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildSectionHeader(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Color(0xFF1D1B16),
-      ),
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 16,
+          decoration: BoxDecoration(
+            color: const Color(0xFF5287B2),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1F2937),
+          ),
+        ),
+      ],
     );
   }
 
@@ -275,36 +379,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Text(
           label,
           style: const TextStyle(
-            fontSize: 13,
+            fontSize: 12.5,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1D1B16),
+            color: Color(0xFF4B5563),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 6),
         TextField(
           controller: controller,
           enabled: enabled,
           keyboardType: keyboardType,
-          style: const TextStyle(fontSize: 15),
+          style: const TextStyle(fontSize: 14.5),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, size: 18, color: const Color(0xFF5287B2)),
             filled: true,
-            fillColor: enabled ? const Color(0xFFFBFBFB) : Colors.grey[50],
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            fillColor: enabled ? const Color(0xFFF9FAFB) : Colors.grey[50],
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
             ),
             disabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[100]!, width: 1),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFF3F4F6), width: 1),
             ),
             hintText: 'Enter $label',
-            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13.5),
           ),
         ),
       ],
@@ -318,31 +422,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const Text(
           'Gender',
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 12.5,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1D1B16),
+            color: Color(0xFF4B5563),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 6),
         DropdownButtonFormField<String>(
-          initialValue: _gender,
+          value: _gender,
           items: const [
             DropdownMenuItem(value: 'male', child: Text('Male')),
             DropdownMenuItem(value: 'female', child: Text('Female')),
             DropdownMenuItem(value: 'other', child: Text('Other')),
           ],
           onChanged: (val) => setState(() => _gender = val),
+          style: const TextStyle(fontSize: 14.5, color: Colors.black),
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.people_outline, size: 18, color: Color(0xFF5287B2)),
             filled: true,
-            fillColor: const Color(0xFFFBFBFB),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            fillColor: const Color(0xFFF9FAFB),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
             ),
           ),

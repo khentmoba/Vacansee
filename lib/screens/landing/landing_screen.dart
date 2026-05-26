@@ -23,7 +23,9 @@ class LandingScreen extends StatelessWidget {
                 _buildNavbar(context, isMobile, padding),
                 _buildHero(context, isMobile, padding),
                 _buildFeatures(context, isMobile, padding),
+                _buildFeaturedGrid(context, isMobile, padding),
                 _buildRoles(context, isMobile, padding),
+                _buildFAQSection(context, isMobile, padding),
                 _buildCTA(context, isMobile, padding),
                 _buildFooter(context, isMobile, padding),
               ],
@@ -149,156 +151,354 @@ class LandingScreen extends StatelessWidget {
   Widget _buildHero(BuildContext context, bool isMobile, double padding) {
     return Container(
       width: double.infinity,
-      color: Colors.white,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF0F172A), // Deep Slate
+            Color(0xFF1E3A8A), // Indigo Navy
+          ],
+        ),
+      ),
       child: Stack(
         children: [
-          // Decorative polygon top right
-          if (!isMobile)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: CustomPaint(
-                size: const Size(400, 400),
-                painter: _HeroPolygonPainter(),
+          // Decorative glowing blurred circles in the background
+          Positioned(
+            top: -100,
+            right: -50,
+            child: Container(
+              key: const ValueKey('glow_circle_1'),
+              width: 350,
+              height: 350,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.secondary.withValues(alpha: 0.15),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+                child: const SizedBox.shrink(),
               ),
             ),
-          // Decorative circle bottom left
-          if (!isMobile)
-            Positioned(
-              bottom: -100,
-              left: -100,
-              child: Container(
-                width: 350,
-                height: 350,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primary.withValues(alpha: 0.15),
-                      AppColors.primary.withValues(alpha: 0.05),
-                    ],
-                  ),
-                  shape: BoxShape.circle,
-                ),
+          ),
+          Positioned(
+            bottom: -50,
+            left: -100,
+            child: Container(
+              key: const ValueKey('glow_circle_2'),
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primary.withValues(alpha: 0.15),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
+                child: const SizedBox.shrink(),
               ),
             ),
+          ),
           // Content
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: padding,
-              vertical: isMobile ? 40 : 60,
+              vertical: isMobile ? 50 : 90,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Title
-                RichText(
-                  textAlign: TextAlign.center,
-                  text: const TextSpan(
-                    style: TextStyle(
-                      fontSize: 40, // Let size adjust cleanly or clamp
-                      fontWeight: FontWeight.bold,
-                      height: 1.1,
-                      fontFamily: 'sans-serif', // cleaner fallback
-                    ),
+            child: isMobile
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      TextSpan(
-                        text: 'Find Your Perfect\n',
-                        style: TextStyle(color: AppColors.textPrimary),
+                      _buildHeroText(context, isMobile),
+                      const SizedBox(height: 48),
+                      _buildHeroMockupCard(context, true),
+                    ],
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildHeroText(context, isMobile),
+                          ],
+                        ),
                       ),
-                      TextSpan(
-                        text: 'Boarding House',
-                        style: TextStyle(color: AppColors.primary),
+                      const SizedBox(width: 48),
+                      Expanded(
+                        flex: 4,
+                        child: _buildHeroMockupCard(context, false),
+                      ),
+                    ],
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeroText(BuildContext context, bool isMobile) {
+    return Column(
+      crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.stars_rounded, color: AppColors.secondary, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'AY 2025-2026 Housing Companion',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        RichText(
+          textAlign: isMobile ? TextAlign.center : TextAlign.start,
+          text: const TextSpan(
+            style: TextStyle(
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+              height: 1.15,
+              fontFamily: 'sans-serif',
+            ),
+            children: [
+              TextSpan(
+                text: 'Find Your Perfect\n',
+                style: TextStyle(color: Colors.white),
+              ),
+              TextSpan(
+                text: 'Boarding House',
+                style: TextStyle(
+                  color: AppColors.secondary,
+                  shadows: [
+                    Shadow(
+                      color: AppColors.secondary,
+                      blurRadius: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          "Discover, reserve, and manage boarding houses in Cagayan de Oro City in real-time. Filter by budget, location, and gender preference seamlessly.",
+          textAlign: isMobile ? TextAlign.center : TextAlign.start,
+          style: TextStyle(
+            fontSize: 17,
+            color: Colors.white.withValues(alpha: 0.8),
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 36),
+        Row(
+          mainAxisAlignment: isMobile ? MainAxisAlignment.center : MainAxisAlignment.start,
+          children: [
+            InteractiveHover(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const RegisterScreen()),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppColors.primary, AppColors.secondary],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.35),
+                      blurRadius: 15,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: const Text(
+                  'Get Started',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            InteractiveHover(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.4),
+                    width: 1.5,
+                  ),
+                ),
+                child: const Text(
+                  'Sign In',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeroMockupCard(BuildContext context, bool isMobile) {
+    return Container(
+      width: isMobile ? double.infinity : 400,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Stack(
+            children: [
+              Image.asset(
+                'assets/images/room_ocean_view.png',
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: 200,
+                  color: Colors.grey[800],
+                  child: const Icon(Icons.home_work, color: Colors.white70, size: 40),
+                ),
+              ),
+              Positioned(
+                top: 16,
+                right: 16,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.success,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.circle, color: Colors.white, size: 8),
+                      SizedBox(width: 6),
+                      Text(
+                        'AVAILABLE NOW',
+                        style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
-                // Subtitle
-                Text(
-                  "Discover, book, and manage boarding houses in real-time. Whether you're searching for a place to stay or managing properties, VacanSee makes it seamless.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: isMobile ? 16 : 18,
-                    color: AppColors.textSecondary,
-                    height: 1.6,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                // Buttons
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    InteractiveHover(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const RegisterScreen(),
-                        ),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.transparent,
-                            width: 1.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.25),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: const Text(
-                          'Get Started',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+                    const Expanded(
+                      child: Text(
+                        'Ocean View Dorms',
+                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    InteractiveHover(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const LoginScreen(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.primary,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: const Text(
-                          'Sign In',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
-                          ),
-                        ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6),
                       ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.star, color: Colors.amber, size: 14),
+                          SizedBox(width: 4),
+                          Text('4.8', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined, color: Colors.white70, size: 14),
+                    const SizedBox(width: 4),
+                    Text('Lapasan, CDO (150m from USTP)', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                const Divider(color: Colors.white24, height: 1),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('STARTING FROM', style: TextStyle(color: Colors.white38, fontSize: 10, letterSpacing: 0.5)),
+                          SizedBox(height: 2),
+                          Text('₱4,200/mo', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.secondary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Book Now'),
                     ),
                   ],
                 ),
@@ -315,9 +515,9 @@ class LandingScreen extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(
         horizontal: padding,
-        vertical: isMobile ? 40 : 80,
+        vertical: isMobile ? 50 : 90,
       ),
-      color: AppColors.background,
+      color: Colors.white,
       child: Column(
         children: [
           const Text(
@@ -327,84 +527,50 @@ class LandingScreen extends StatelessWidget {
               fontSize: 36,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
+              letterSpacing: -0.5,
             ),
           ),
           const SizedBox(height: 12),
           const Text(
-            'Everything you need to find or manage boarding houses in one place',
+            'The absolute smoothest way to find or host student boarding houses',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
               color: AppColors.textSecondary,
             ),
           ),
-          SizedBox(height: isMobile ? 32 : 48),
-          if (isMobile)
-            Column(
-              children: [
-                InteractiveHover(
-                  child: _buildFeatureCard(
-                    Icons.search,
-                    'Easy Search',
-                    'Find the perfect boarding house with powerful filters. Search by location, price, amenities, and availability in seconds.',
-                    isMobile,
-                  ),
+          SizedBox(height: isMobile ? 32 : 54),
+          Wrap(
+            spacing: 24,
+            runSpacing: 24,
+            alignment: WrapAlignment.center,
+            children: [
+              InteractiveHover(
+                child: _buildFeatureCard(
+                  Icons.search_rounded,
+                  'Smart Searching',
+                  'Find listings near USTP, Xavier, or Liceo. Filter instantly by price range, amenities, and co-ed preferences.',
+                  isMobile,
                 ),
-                const SizedBox(height: 24),
-                InteractiveHover(
-                  child: _buildFeatureCard(
-                    Icons.check_circle_outline,
-                    'Quick Booking',
-                    'Book your ideal room with just a few clicks. Track your bookings, communicate with owners, and manage everything in one place.',
-                    isMobile,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                InteractiveHover(
-                  child: _buildFeatureCard(
-                    Icons.star_border,
-                    'Verified Reviews',
-                    'Read honest reviews from real tenants. Make informed decisions based on ratings, photos, and detailed feedback.',
-                    isMobile,
-                  ),
-                ),
-              ],
-            )
-          else
-            IntrinsicHeight(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  InteractiveHover(
-                    child: _buildFeatureCard(
-                      Icons.search,
-                      'Easy Search',
-                      'Find the perfect boarding house with powerful filters. Search by location, price, amenities, and availability in seconds.',
-                      isMobile,
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  InteractiveHover(
-                    child: _buildFeatureCard(
-                      Icons.check_circle_outline,
-                      'Quick Booking',
-                      'Book your ideal room with just a few clicks. Track your bookings, communicate with owners, and manage everything in one place.',
-                      isMobile,
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  InteractiveHover(
-                    child: _buildFeatureCard(
-                      Icons.star_border,
-                      'Verified Reviews',
-                      'Read honest reviews from real tenants. Make informed decisions based on ratings, photos, and detailed feedback.',
-                      isMobile,
-                    ),
-                  ),
-                ],
               ),
-            ),
+              InteractiveHover(
+                child: _buildFeatureCard(
+                  Icons.bolt_rounded,
+                  'Real-Time Status',
+                  'Never waste walks under the hot sun. See live vacancy updates direct from the property owners.',
+                  isMobile,
+                ),
+              ),
+              InteractiveHover(
+                child: _buildFeatureCard(
+                  Icons.verified_user_rounded,
+                  'Trusted Landlords',
+                  'We verify owner identities and property listings to protect you from housing scams and fake bookings.',
+                  isMobile,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -417,17 +583,17 @@ class LandingScreen extends StatelessWidget {
     bool isMobile,
   ) {
     return Container(
-      width: isMobile ? double.infinity : 340,
-      padding: const EdgeInsets.all(36),
+      width: isMobile ? double.infinity : 350,
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border, width: 0.8),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -435,10 +601,9 @@ class LandingScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 60,
-            height: 60,
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.08),
+              color: AppColors.primaryContainer,
               shape: BoxShape.circle,
             ),
             child: Icon(icon, size: 28, color: AppColors.primary),
@@ -447,10 +612,9 @@ class LandingScreen extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
-              letterSpacing: -0.3,
             ),
           ),
           const SizedBox(height: 12),
@@ -459,7 +623,253 @@ class LandingScreen extends StatelessWidget {
             style: const TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
-              height: 1.6,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Curated property listings grid/carousel
+  Widget _buildFeaturedGrid(BuildContext context, bool isMobile, double padding) {
+    return Container(
+      width: double.infinity,
+      color: AppColors.background,
+      padding: EdgeInsets.symmetric(
+        horizontal: padding,
+        vertical: isMobile ? 50 : 90,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text(
+            'Discover Your Ideal Space',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Explore high-fidelity verified boarding spaces around major CDO campuses',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 32),
+          // Filter Chips mock
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildMockFilterChip('All', true),
+                _buildMockFilterChip('Near USTP', false),
+                _buildMockFilterChip('Near Xavier', false),
+                _buildMockFilterChip('Female Only', false),
+                _buildMockFilterChip('Male Only', false),
+              ],
+            ),
+          ),
+          const SizedBox(height: 48),
+          // Room grid list
+          Wrap(
+            spacing: 24,
+            runSpacing: 24,
+            alignment: WrapAlignment.center,
+            children: [
+              _buildRoomCard(
+                context,
+                'Vista Grand Suites',
+                'assets/images/room_vista_grand.png',
+                '₱3,500/mo',
+                'Carmen, Cagayan de Oro',
+                4.9,
+                'Co-Ed',
+                isMobile,
+              ),
+              _buildRoomCard(
+                context,
+                'Ocean View Dorms',
+                'assets/images/room_ocean_view.png',
+                '₱4,200/mo',
+                'Lapasan, Cagayan de Oro',
+                4.8,
+                'Female Only',
+                isMobile,
+              ),
+              _buildRoomCard(
+                context,
+                'Pine Hill Boarding House',
+                'assets/images/room_pine_hill.png',
+                '₱2,800/mo',
+                'Nazareth, Cagayan de Oro',
+                4.7,
+                'Male Only',
+                isMobile,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMockFilterChip(String label, bool isSelected) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Chip(
+        label: Text(label),
+        backgroundColor: isSelected ? AppColors.primary : Colors.white,
+        labelStyle: TextStyle(
+          color: isSelected ? Colors.white : AppColors.textPrimary,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+        side: BorderSide(
+          color: isSelected ? AppColors.primary : AppColors.border,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRoomCard(
+    BuildContext context,
+    String title,
+    String imagePath,
+    String price,
+    String location,
+    double rating,
+    String gender,
+    bool isMobile,
+  ) {
+    return Container(
+      width: isMobile ? double.infinity : 350,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              Image.asset(
+                imagePath,
+                height: 180,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: 180,
+                  color: Colors.grey[200],
+                  child: const Icon(Icons.home_work, color: Colors.grey, size: 36),
+                ),
+              ),
+              Positioned(
+                top: 12,
+                left: 12,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    gender,
+                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        const Icon(Icons.star, color: Colors.amber, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          rating.toString(),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined, color: AppColors.textSecondary, size: 14),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        location,
+                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        price,
+                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppColors.primary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('View Space'),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -472,47 +882,71 @@ class LandingScreen extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(
         horizontal: padding,
-        vertical: isMobile ? 40 : 80,
+        vertical: isMobile ? 50 : 90,
       ),
       color: Colors.white,
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        spacing: 32,
-        runSpacing: 32,
+      child: Column(
         children: [
-          // Tenant Card
-          InteractiveHover(
-            child: _buildRoleCard(
-              context,
-              isTenant: true,
-              icon: Icons.people_outline_rounded,
-              title: 'For Tenants',
-              features: [
-                'Browse hundreds of verified boarding houses',
-                'Filter by price, location, and amenities',
-                'Book rooms instantly with owner approval',
-                'Leave reviews and ratings to help others',
-              ],
-              buttonText: 'Sign Up as Tenant',
-              isMobile: isMobile,
+          const Text(
+            'Two Simple Pathways',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+              letterSpacing: -0.5,
             ),
           ),
-          // Owner Card
-          InteractiveHover(
-            child: _buildRoleCard(
-              context,
-              isTenant: false,
-              icon: Icons.business_rounded,
-              title: 'For Owners',
-              features: [
-                'List your boarding house for free',
-                'Manage all your units in one dashboard',
-                'Review and approve booking requests',
-                'Track occupancy and income analytics',
-              ],
-              buttonText: 'Sign Up as Owner',
-              isMobile: isMobile,
+          const SizedBox(height: 12),
+          const Text(
+            'Whether you need a place to stay or own a property, we have you covered',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: AppColors.textSecondary,
             ),
+          ),
+          const SizedBox(height: 48),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 32,
+            runSpacing: 32,
+            children: [
+              // Tenant Card
+              InteractiveHover(
+                child: _buildRoleCard(
+                  context,
+                  isTenant: true,
+                  icon: Icons.people_outline_rounded,
+                  title: 'For Tenants',
+                  features: [
+                    'Browse hundreds of verified boarding houses',
+                    'Filter by price, location, and amenities',
+                    'Book rooms instantly with owner approval',
+                    'Leave reviews and ratings to help others',
+                  ],
+                  buttonText: 'Sign Up as Tenant',
+                  isMobile: isMobile,
+                ),
+              ),
+              // Owner Card
+              InteractiveHover(
+                child: _buildRoleCard(
+                  context,
+                  isTenant: false,
+                  icon: Icons.business_rounded,
+                  title: 'For Owners',
+                  features: [
+                    'List your boarding house for free',
+                    'Manage all your units in one dashboard',
+                    'Review and approve booking requests',
+                    'Track occupancy and income analytics',
+                  ],
+                  buttonText: 'Sign Up as Owner',
+                  isMobile: isMobile,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -627,6 +1061,100 @@ class LandingScreen extends StatelessWidget {
     );
   }
 
+  // Interactive Accordion FAQ Section
+  Widget _buildFAQSection(BuildContext context, bool isMobile, double padding) {
+    return Container(
+      width: double.infinity,
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(
+        horizontal: padding,
+        vertical: isMobile ? 50 : 90,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                'Got Questions?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Everything you need to know about the VacanSee community tracker',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 48),
+              _buildFAQTile(
+                'How do I search for a boarding house?',
+                'Once registered, you can use our advanced filtering system to search by rent cost, location proximity to major universities in CDO, and preferred room gender orientation.',
+              ),
+              _buildFAQTile(
+                'Is VacanSee completely free?',
+                'Yes, VacanSee is 100% free. There are no registration fees, platform listing fees, or tenant search subscription costs. It is built strictly for the student community.',
+              ),
+              _buildFAQTile(
+                'How does the real-time vacancy status update?',
+                'Verified property owners have direct access to a simplified vacancy toggle switch in their dashboard. When they click to update room vacancy, the listing updates instantly for all searching tenants.',
+              ),
+              _buildFAQTile(
+                'What verification is needed for owners?',
+                'To secure the community from fraudulent listings, we verify property owner accounts using valid government IDs and property proof documents before allowing any listings to go live.',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFAQTile(String question, String answer) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Theme(
+        data: ThemeData(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          title: Text(
+            question,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+              fontSize: 15,
+            ),
+          ),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          expandedAlignment: Alignment.topLeft,
+          children: [
+            Text(
+              answer,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildCTA(BuildContext context, bool isMobile, double padding) {
     return Container(
       width: double.infinity,
@@ -643,29 +1171,20 @@ class LandingScreen extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Decorative shapes
-          if (!isMobile) ...[
-            Positioned(
-              top: -50,
-              left: 100,
-              child: CustomPaint(
-                size: const Size(300, 300),
-                painter: _CTAPolygonPainter(),
+          // Watermarked Brand Title behind
+          Positioned(
+            bottom: -30,
+            right: -20,
+            child: Text(
+              'VACANSEE',
+              style: TextStyle(
+                fontSize: isMobile ? 80 : 120,
+                fontWeight: FontWeight.w900,
+                color: Colors.white.withValues(alpha: 0.05),
+                letterSpacing: 2,
               ),
             ),
-            Positioned(
-              bottom: -100,
-              right: 50,
-              child: Container(
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-          ],
+          ),
           // Content
           Column(
             children: [
@@ -1409,50 +1928,4 @@ class LandingScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class _HeroPolygonPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          AppColors.primary.withValues(alpha: 0.2),
-          AppColors.primary.withValues(alpha: 0.05),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-
-    final path = Path()
-      ..moveTo(size.width, 0)
-      ..lineTo(size.width, size.height * 0.8)
-      ..lineTo(size.width * 0.3, size.height)
-      ..lineTo(size.width * 0.5, size.height * 0.3)
-      ..close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _CTAPolygonPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withValues(alpha: 0.08);
-
-    final path = Path()
-      ..moveTo(0, size.height * 0.3)
-      ..lineTo(size.width * 0.7, 0)
-      ..lineTo(size.width, size.height * 0.6)
-      ..lineTo(size.width * 0.3, size.height)
-      ..close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
