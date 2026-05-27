@@ -625,22 +625,27 @@ class PropertyProvider extends ChangeNotifier {
   /// Load rooms for a property
   Future<void> loadRooms(String propertyId) async {
     _propertyRoomsSubscription?.cancel();
-    final completer = Completer<void>();
 
+    // One-time query for immediate data
+    try {
+      final rooms = await _propertyService.getRoomsOnce(propertyId);
+      _rooms = rooms;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('One-time room fetch failed: $e');
+    }
+
+    // Then start real-time stream for live updates
     _propertyRoomsSubscription = _propertyService.getRooms(propertyId).listen(
       (rooms) {
         _rooms = rooms;
         notifyListeners();
-        if (!completer.isCompleted) completer.complete();
       },
       onError: (error) {
         _errorMessage = 'Failed to load rooms: $error';
         notifyListeners();
-        if (!completer.isCompleted) completer.complete();
       },
     );
-
-    await completer.future.timeout(const Duration(seconds: 10));
   }
 
   /// Add a room to a property

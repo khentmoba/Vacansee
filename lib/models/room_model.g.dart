@@ -43,4 +43,5 @@ Map<String, dynamic> _$$RoomModelImplToJson(_$RoomModelImpl instance) =>
 const _$RoomStatusEnumMap = {
   RoomStatus.vacant: 'vacant',
   RoomStatus.occupied: 'occupied',
+  RoomStatus.maintenance: 'maintenance',
 };

@@ -1188,12 +1188,6 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             child: ElevatedButton(
               onPressed: isVacant
                   ? () {
-                      if (rooms.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Loading room details, please try again in a moment')),
-                        );
-                        return;
-                      }
                       final firstVacantRoom = rooms.cast<RoomModel?>().firstWhere(
                         (r) => r!.status == RoomStatus.vacant,
                         orElse: () => null,
@@ -1696,12 +1690,6 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
               child: ElevatedButton(
                 onPressed: isVacant
                     ? () {
-                        if (rooms.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Loading room details, please try again in a moment')),
-                          );
-                          return;
-                        }
                         final firstVacantRoom = rooms.cast<RoomModel?>().firstWhere(
                           (r) => r!.status == RoomStatus.vacant,
                           orElse: () => null,

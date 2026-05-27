@@ -10,6 +10,8 @@ enum RoomStatus {
   vacant,
   @JsonValue('occupied')
   occupied,
+  @JsonValue('maintenance')
+  maintenance,
 }
 
 /// Room model representing individual rooms within a property

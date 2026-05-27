@@ -348,6 +348,16 @@ class PropertyService {
         .map((data) => data.map((json) => RoomModel.fromJson(json)).toList());
   }
 
+  /// One-time fetch of rooms for a property (bypasses realtime stream)
+  Future<List<RoomModel>> getRoomsOnce(String propertyId) async {
+    final data = await _supabase
+        .from('rooms')
+        .select()
+        .eq('property_id', propertyId)
+        .order('last_updated');
+    return (data as List).map((json) => RoomModel.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
   /// Get all rooms across all properties (for real-time vacancy tracking)
   Stream<List<RoomModel>> getAllRooms() {
     return _supabase
