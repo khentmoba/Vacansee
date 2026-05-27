@@ -1084,11 +1084,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   }
 
   Widget _buildSidebarCard(int vacantRooms, int totalRooms, List<RoomModel> rooms) {
-    final firstVacantRoom = rooms.cast<RoomModel?>().firstWhere(
-      (r) => r!.status == RoomStatus.vacant,
-      orElse: () => null,
-    );
-    final isVacant = firstVacantRoom != null;
+    final isVacant = vacantRooms > 0;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -1192,6 +1188,22 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             child: ElevatedButton(
               onPressed: isVacant
                   ? () {
+                      if (rooms.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Loading room details, please try again in a moment')),
+                        );
+                        return;
+                      }
+                      final firstVacantRoom = rooms.cast<RoomModel?>().firstWhere(
+                        (r) => r!.status == RoomStatus.vacant,
+                        orElse: () => null,
+                      );
+                      if (firstVacantRoom == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('No vacant rooms available')),
+                        );
+                        return;
+                      }
                       final authProvider = context.read<AuthProvider>();
                       if (authProvider.user == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -1627,11 +1639,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   }
 
   Widget _buildMobileStickyBottomBar(int vacantRooms, int totalRooms, List<RoomModel> rooms) {
-    final firstVacantRoom = rooms.cast<RoomModel?>().firstWhere(
-      (r) => r!.status == RoomStatus.vacant,
-      orElse: () => null,
-    );
-    final isVacant = firstVacantRoom != null;
+    final isVacant = vacantRooms > 0;
 
     return Positioned(
       bottom: 0,
@@ -1688,6 +1696,22 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
               child: ElevatedButton(
                 onPressed: isVacant
                     ? () {
+                        if (rooms.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Loading room details, please try again in a moment')),
+                          );
+                          return;
+                        }
+                        final firstVacantRoom = rooms.cast<RoomModel?>().firstWhere(
+                          (r) => r!.status == RoomStatus.vacant,
+                          orElse: () => null,
+                        );
+                        if (firstVacantRoom == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('No vacant rooms available')),
+                          );
+                          return;
+                        }
                         final authProvider = context.read<AuthProvider>();
                         if (authProvider.user == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
