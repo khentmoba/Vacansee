@@ -286,35 +286,21 @@ class PropertyProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    _propertiesSubscription?.cancel();
-    final stream = _propertyService.getProperties(
-      searchQuery: _searchQuery,
-      genderOrientation: _genderFilter,
-      minPrice: _minPrice,
-      maxPrice: _maxPrice,
-      amenities: _selectedAmenities.isEmpty ? null : _selectedAmenities,
-    );
-    
-    _propertiesSubscription = stream.listen(
-      (properties) {
-        _properties = properties;
-        _isLoading = false;
-        notifyListeners();
-      },
-      onError: (error) {
-        _errorMessage = 'Failed to load properties: $error';
-        _isLoading = false;
-        notifyListeners();
-      },
-    );
-
     try {
-      final initialProperties = await stream.first;
-      _properties = initialProperties;
+      final properties = await _propertyService.getProperties(
+        searchQuery: _searchQuery,
+        genderOrientation: _genderFilter,
+        minPrice: _minPrice,
+        maxPrice: _maxPrice,
+        amenities: _selectedAmenities.isEmpty ? null : _selectedAmenities,
+      );
+      _properties = properties;
       _isLoading = false;
       notifyListeners();
     } catch (e) {
-      debugPrint('Error loading initial properties: $e');
+      _errorMessage = 'Failed to load properties: $e';
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -324,35 +310,20 @@ class PropertyProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    _propertiesSubscription?.cancel();
-    final stream = _propertyService.getOwnerProperties(ownerId);
-    
-    _propertiesSubscription = stream.listen(
-      (properties) {
-        _properties = properties;
-        _isLoading = false;
-        notifyListeners();
-      },
-      onError: (error) {
-        _errorMessage = 'Failed to load properties: $error';
-        _isLoading = false;
-        notifyListeners();
-      },
-    );
-
-    // Wait for initial data to ensure subsequent calls (like pending count) have property IDs
     try {
-      final initialProperties = await stream.first;
-      _properties = initialProperties;
+      final properties = await _propertyService.getOwnerProperties(ownerId);
+      _properties = properties;
       _isLoading = false;
       notifyListeners();
 
       // Load rooms for all properties to calculate occupancy stats
-      for (final property in initialProperties) {
+      for (final property in properties) {
         _loadPropertyRoomsQuietly(property.propertyId);
       }
     } catch (e) {
-      debugPrint('Error loading initial properties: $e');
+      _errorMessage = 'Failed to load properties: $e';
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

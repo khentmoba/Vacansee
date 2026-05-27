@@ -23,6 +23,20 @@ class PropertyService {
     : _supabase = supabase ?? Supabase.instance.client,
       _storage = storage ?? StorageService(supabase: supabase);
 
+  /// Helper to sanitize property JSON data before DB queries
+  Map<String, dynamic> _sanitizeForDb(Map<String, dynamic> json) {
+    final sanitized = Map<String, dynamic>.from(json);
+    sanitized.remove('id');
+    sanitized.remove('owner_name');
+    sanitized.remove('has_vacancy');
+    sanitized.remove('average_rating');
+    sanitized.remove('reviews_count');
+    sanitized.remove('total_rooms');
+    sanitized.remove('available_rooms');
+    sanitized.remove('monthly_price');
+    return sanitized;
+  }
+
   /// Create a new property
   Future<PropertyModel> createProperty({
     required String ownerId,
@@ -53,12 +67,7 @@ class PropertyService {
         images: images ?? [],
       );
 
-      final json = property.toJson();
-      json.remove('id'); // Explicitly remove for insert
-      json.remove('has_vacancy'); // UI-only field not in DB schema
-      json.remove('average_rating');
-      json.remove('reviews_count');
-      json.remove('owner_name');
+      final json = _sanitizeForDb(property.toJson());
 
       final response = await _supabase
           .from('properties')
@@ -126,29 +135,29 @@ class PropertyService {
   }
 
   /// Get all properties with optional filters
-  Stream<List<PropertyModel>> getProperties({
+  Future<List<PropertyModel>> getProperties({
     String? ownerId,
     GenderOrientation? genderOrientation,
     int? minPrice,
     int? maxPrice,
     List<String>? amenities,
     String? searchQuery,
-  }) {
-    return _supabase.from('properties').stream(primaryKey: ['id']).map((
-      snapshot,
-    ) {
-      var properties = snapshot
+  }) async {
+    try {
+      var query = _supabase.from('properties').select().neq('status', 'deleted');
+
+      if (ownerId != null) {
+        query = query.eq('owner_id', ownerId);
+      }
+      if (genderOrientation != null) {
+        query = query.eq('gender_orientation', genderOrientation.name);
+      }
+
+      final data = await query.order('last_updated', ascending: false);
+      var properties = (data as List)
           .map((doc) => PropertyModel.fromJson(doc))
           .toList();
 
-      if (ownerId != null) {
-        properties = properties.where((p) => p.ownerId == ownerId).toList();
-      }
-      if (genderOrientation != null) {
-        properties = properties
-            .where((p) => p.genderOrientation == genderOrientation)
-            .toList();
-      }
       if (minPrice != null) {
         properties = properties
             .where((p) => p.priceRange.min >= minPrice)
@@ -173,7 +182,9 @@ class PropertyService {
       }
 
       return properties;
-    });
+    } catch (e) {
+      throw PropertyException('Failed to fetch properties: $e');
+    }
   }
 
   /// Update a property
@@ -205,11 +216,7 @@ class PropertyService {
         lastUpdated: DateTime.now(),
       );
 
-      final json = updated.toJson();
-      json.remove('has_vacancy'); // UI-only field not in DB schema
-      json.remove('average_rating');
-      json.remove('reviews_count');
-      json.remove('owner_name');
+      final json = _sanitizeForDb(updated.toJson());
 
       await _supabase
           .from('properties')
@@ -362,13 +369,17 @@ class PropertyService {
   }
 
   /// Get properties by owner
-  Stream<List<PropertyModel>> getOwnerProperties(String ownerId) {
-    return _supabase
-        .from('properties')
-        .stream(primaryKey: ['id'])
-        .eq('owner_id', ownerId)
-        .order('last_updated', ascending: false)
-        .map((data) => data.map((doc) => PropertyModel.fromJson(doc)).toList());
+  Future<List<PropertyModel>> getOwnerProperties(String ownerId) async {
+    try {
+      final data = await _supabase
+          .from('properties')
+          .select()
+          .eq('owner_id', ownerId)
+          .order('last_updated', ascending: false);
+      return (data as List).map((doc) => PropertyModel.fromJson(doc)).toList();
+    } catch (e) {
+      throw PropertyException('Failed to fetch owner properties: $e');
+    }
   }
 
   /// Submit a rating for a property
