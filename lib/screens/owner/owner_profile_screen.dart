@@ -109,10 +109,6 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (widget.showAppBar || isDesktop) ...[
-                    _buildBreadcrumb(),
-                    const SizedBox(height: 24),
-                  ],
                   _buildProfileHeader(user),
                   const SizedBox(height: 32),
                   Form(
@@ -152,27 +148,6 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
           body: content,
         );
       },
-    );
-  }
-
-  Widget _buildBreadcrumb() {
-    return InkWell(
-      onTap: () => Navigator.pop(context),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.arrow_back, size: 18, color: Color(0xFF475569)),
-          const SizedBox(width: 8),
-          Text(
-            'Back to Dashboard',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
