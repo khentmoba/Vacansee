@@ -138,121 +138,112 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
     final initials = user.displayName.isNotEmpty
         ? user.displayName.trim().split(' ').map((l) => l.isNotEmpty ? l[0] : '').take(2).join().toUpperCase()
         : 'U';
-    final isMobile = MediaQuery.of(context).size.width < 800;
     final dateFormat = DateFormat('MMM d, yyyy');
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(_isEditing ? 'Edit User' : 'User Details',
-            style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-        actions: [
-          if (_isEditing)
-            TextButton(
-              onPressed: _isSaving ? null : _save,
-              child: _isSaving
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text('Save', style: TextStyle(fontWeight: FontWeight.bold)),
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.edit_outlined, color: AppColors.textPrimary),
-              onPressed: () => setState(() => _isEditing = true),
-              tooltip: 'Edit',
-            ),
-        ],
-      ),
-      body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 40, vertical: 24),
-        children: [
-          _buildProfileHeader(initials, user),
-          const SizedBox(height: 32),
-          _buildSection('Personal Information', [
-            _buildField('Display Name', _displayNameController, enabled: _isEditing),
-            _buildField('Email', _emailController, enabled: _isEditing),
-            _buildField('Phone Number', _phoneController, enabled: _isEditing, optional: true),
-            if (!isMobile) ...[
-              _buildField('First Name', _firstNameController, enabled: _isEditing, optional: true),
-              _buildField('Last Name', _lastNameController, enabled: _isEditing, optional: true),
-            ],
-            if (isMobile) ...[
-              _buildField('First Name', _firstNameController, enabled: _isEditing, optional: true),
-              _buildField('Last Name', _lastNameController, enabled: _isEditing, optional: true),
-            ],
-            _buildField('Address', _addressController, enabled: _isEditing, optional: true, maxLines: 2),
-          ]),
-          const SizedBox(height: 24),
-          _buildSection('Account', [
-            _buildRoleSelector(),
-            _buildInfoRow('Created', dateFormat.format(user.createdAt)),
-            if (user.lastLoginAt != null) _buildInfoRow('Last Login', dateFormat.format(user.lastLoginAt!)),
-            _buildVerificationToggle(),
-          ]),
-          const SizedBox(height: 24),
-          _buildSection('Emergency Contact', [
-            _buildField('Contact Name', _emergencyContactNameController, enabled: _isEditing, optional: true),
-            _buildField('Contact Phone', _emergencyContactPhoneController, enabled: _isEditing, optional: true),
-          ]),
-          if (user.role == UserRole.owner) ...[
-            const SizedBox(height: 24),
-            _buildSection('Business Information', [
-              _buildField('Business Name', _businessNameController, enabled: _isEditing, optional: true),
-              _buildField('Business Permit No.', _businessPermitController, enabled: _isEditing, optional: true),
-            ]),
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 40),
+      children: [
+        Center(
+          child: Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(_isEditing ? 'Edit User' : 'User Details',
+                style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+            if (_isEditing)
+              TextButton(
+                onPressed: _isSaving ? null : _save,
+                child: _isSaving
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Text('Save', style: TextStyle(fontWeight: FontWeight.bold)),
+              )
+            else
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, color: AppColors.textPrimary, size: 20),
+                onPressed: () => setState(() => _isEditing = true),
+                tooltip: 'Edit',
+                visualDensity: VisualDensity.compact,
+              ),
           ],
-          const SizedBox(height: 32),
-          if (!_isEditing)
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _deleteUser,
-                icon: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-                label: Text('Delete User', style: GoogleFonts.outfit(color: Colors.red, fontWeight: FontWeight.w600)),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.red),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
+        ),
+        const SizedBox(height: 24),
+        _buildProfileHeader(initials, user),
+        const SizedBox(height: 24),
+        _buildSection('Personal Information', [
+          _buildField('Display Name', _displayNameController, enabled: _isEditing),
+          _buildField('Email', _emailController, enabled: _isEditing),
+          _buildField('Phone Number', _phoneController, enabled: _isEditing, optional: true),
+          _buildField('First Name', _firstNameController, enabled: _isEditing, optional: true),
+          _buildField('Last Name', _lastNameController, enabled: _isEditing, optional: true),
+          _buildField('Address', _addressController, enabled: _isEditing, optional: true, maxLines: 2),
+        ]),
+        const SizedBox(height: 16),
+        _buildSection('Account', [
+          _buildRoleSelector(),
+          _buildInfoRow('Created', dateFormat.format(user.createdAt)),
+          if (user.lastLoginAt != null) _buildInfoRow('Last Login', dateFormat.format(user.lastLoginAt!)),
+        ]),
+        const SizedBox(height: 16),
+        _buildSection('Emergency Contact', [
+          _buildField('Contact Name', _emergencyContactNameController, enabled: _isEditing, optional: true),
+          _buildField('Contact Phone', _emergencyContactPhoneController, enabled: _isEditing, optional: true),
+        ]),
+        if (user.role == UserRole.owner) ...[
+          const SizedBox(height: 16),
+          _buildSection('Business Information', [
+            _buildField('Business Name', _businessNameController, enabled: _isEditing, optional: true),
+            _buildField('Business Permit No.', _businessPermitController, enabled: _isEditing, optional: true),
+          ]),
+        ],
+        const SizedBox(height: 24),
+        if (!_isEditing)
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _deleteUser,
+              icon: const Icon(Icons.delete_outline_rounded, color: Colors.red, size: 18),
+              label: Text('Delete User', style: GoogleFonts.outfit(color: Colors.red, fontWeight: FontWeight.w600, fontSize: 13)),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.red),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
-          const SizedBox(height: 40),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
   Widget _buildProfileHeader(String initials, UserModel user) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.border),
         boxShadow: [AppShadows.md],
       ),
       child: Row(
         children: [
           CircleAvatar(
-            radius: 36,
+            radius: 28,
             backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-            child: Text(initials, style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.primary)),
+            child: Text(initials, style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primary)),
           ),
-          const SizedBox(width: 20),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(user.displayName, style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    _buildMiniBadge(user.role),
-                    const SizedBox(width: 8),
-                    _buildVerificationBadge(user.isVerified),
-                  ],
-                ),
+                Text(user.displayName, style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                const SizedBox(height: 4),
+                _buildMiniBadge(user.role),
               ],
             ),
           ),
@@ -275,40 +266,21 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
         color = AppColors.textMuted; label = 'Unknown';
     }
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(100), border: Border.all(color: color.withValues(alpha: 0.2))),
-      child: Text(label, style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.w800, color: color)),
-    );
-  }
-
-  Widget _buildVerificationBadge(bool isVerified) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: isVerified ? AppColors.success.withValues(alpha: 0.1) : AppColors.warning.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: isVerified ? AppColors.success.withValues(alpha: 0.2) : AppColors.warning.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(isVerified ? Icons.verified_rounded : Icons.pending_outlined, size: 12, color: isVerified ? AppColors.success : AppColors.warning),
-          const SizedBox(width: 4),
-          Text(isVerified ? 'Verified' : 'Unverified', style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.w800, color: isVerified ? AppColors.success : AppColors.warning)),
-        ],
-      ),
+      child: Text(label, style: GoogleFonts.outfit(fontSize: 11, fontWeight: FontWeight.w800, color: color)),
     );
   }
 
   Widget _buildSection(String title, List<Widget> children) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.border), boxShadow: [AppShadows.md]),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border), boxShadow: [AppShadows.md]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-          const Divider(height: 24),
+          Text(title, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+          const Divider(height: 20),
           ...children,
         ],
       ),
@@ -317,33 +289,33 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
 
   Widget _buildField(String label, TextEditingController controller, {bool enabled = false, bool optional = false, int maxLines = 1}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text(label, style: GoogleFonts.workSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-              if (optional) Text(' (optional)', style: GoogleFonts.workSans(fontSize: 11, color: AppColors.textMuted.withValues(alpha: 0.6))),
+              Text(label, style: GoogleFonts.workSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+              if (optional) Text(' (optional)', style: GoogleFonts.workSans(fontSize: 10, color: AppColors.textMuted.withValues(alpha: 0.6))),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           enabled
               ? TextFormField(
                   controller: controller,
                   maxLines: maxLines,
-                  style: GoogleFonts.workSans(fontSize: 14, color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+                  style: GoogleFonts.workSans(fontSize: 13, color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AppColors.border)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.border)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     isDense: true,
                   ),
                 )
               : Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(10), border: Border.all(color: AppColors.border)),
-                  child: Text(controller.text.isEmpty ? '—' : controller.text, style: GoogleFonts.workSans(fontSize: 14, color: AppColors.textPrimary, fontWeight: FontWeight.w500)),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.border)),
+                  child: Text(controller.text.isEmpty ? '—' : controller.text, style: GoogleFonts.workSans(fontSize: 13, color: AppColors.textPrimary, fontWeight: FontWeight.w500)),
                 ),
         ],
       ),
@@ -352,12 +324,12 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: GoogleFonts.workSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-          Text(value, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+          Text(label, style: GoogleFonts.workSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+          Text(value, style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
         ],
       ),
     );
@@ -366,23 +338,23 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
   Widget _buildRoleSelector() {
     if (!_isEditing) {
       return Padding(
-        padding: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.only(bottom: 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Role', style: GoogleFonts.workSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-            Text(_selectedRole.name.toUpperCase(), style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+            Text('Role', style: GoogleFonts.workSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+            Text(_selectedRole.name.toUpperCase(), style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
           ],
         ),
       );
     }
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Role', style: GoogleFonts.workSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-          const SizedBox(height: 8),
+          Text('Role', style: GoogleFonts.workSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+          const SizedBox(height: 6),
           DropdownButtonFormField<UserRole>(
             initialValue: _selectedRole,
             items: UserRole.values.map((r) => DropdownMenuItem(value: r, child: Text(r.name.toUpperCase()))).toList(),
@@ -390,36 +362,11 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
               if (v != null) setState(() => _selectedRole = v);
             },
             decoration: InputDecoration(
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AppColors.border)),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.border)),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               isDense: true,
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVerificationToggle() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('Verification Status', style: GoogleFonts.workSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-          _isEditing
-              ? TextButton(
-                  onPressed: () async {
-                    try {
-                      await context.read<AdminProvider>().toggleVerification(widget.user.uid);
-                      if (mounted) setState(() {});
-                    } catch (e) {
-                      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red));
-                    }
-                  },
-                  child: Text(widget.user.isVerified ? 'Revoke' : 'Verify', style: TextStyle(fontWeight: FontWeight.bold, color: widget.user.isVerified ? Colors.red : AppColors.primary)),
-                )
-              : _buildVerificationBadge(widget.user.isVerified),
         ],
       ),
     );

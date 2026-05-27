@@ -186,8 +186,6 @@ class AuthService {
   }
 
   /// Update user profile in Supabase.
-  /// When role is set to [UserRole.owner], [is_verified] is set to false.
-  /// When role is [UserRole.student] or [UserRole.admin], [is_verified] is set to true.
   Future<void> updateProfile({
     required String uid,
     String? displayName,
@@ -217,8 +215,6 @@ class AuthService {
       
       if (role != null) {
         updates['role'] = role.name;
-        // Owners require admin verification; students and admins are auto-verified.
-        updates['is_verified'] = role != UserRole.owner;
       }
 
       if (updates.isNotEmpty) {
@@ -230,45 +226,6 @@ class AuthService {
       }
     } catch (e) {
       throw AppAuthException('Failed to update profile: ${e.toString()}');
-    }
-  }
-
-  /// Update user verification status (Admin only)
-  Future<void> updateUserVerification({
-    required String uid,
-    required bool isVerified,
-    UserRole? role,
-  }) async {
-    try {
-      final updates = <String, dynamic>{
-        'is_verified': isVerified,
-      };
-      if (role != null) updates['role'] = role.name;
-
-      await _supabase
-          .from('users')
-          .update(updates)
-          .eq('id', uid)
-          .select()
-          .single();
-    } catch (e) {
-      throw AppAuthException('Failed to verify user: ${e.toString()}');
-    }
-  }
-
-  /// Get pending owners for verification (Admin only)
-  Future<List<UserModel>> getPendingOwners() async {
-    try {
-      final data = await _supabase
-          .from('users')
-          .select()
-          .eq('role', 'owner')
-          .eq('is_verified', false)
-          .order('created_at', ascending: false);
-      
-      return (data as List).map((json) => UserModel.fromJson(json)).toList();
-    } catch (e) {
-      throw AppAuthException('Failed to fetch pending owners: ${e.toString()}');
     }
   }
 

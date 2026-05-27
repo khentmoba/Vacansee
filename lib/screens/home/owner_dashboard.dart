@@ -199,18 +199,15 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                                       _buildSectionHeader(
                                         'My Boarding Houses',
                                         '${properties.length} Active Listings',
-                                        onAdd: (authProvider.user?.isVerified ??
-                                                false)
-                                            ? () {
-                                                Navigator.push(
-                                                  context,
-                                                  FadePageRoute(
-                                                    child:
-                                                        const CreatePropertyScreen(),
-                                                  ),
-                                                );
-                                              }
-                                            : null,
+                                        onAdd: () {
+                                          Navigator.push(
+                                            context,
+                                            FadePageRoute(
+                                              child:
+                                                  const CreatePropertyScreen(),
+                                            ),
+                                          );
+                                        },
                                       ),
                                       const SizedBox(height: 16),
                                       GridView.builder(
@@ -391,16 +388,14 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 ],
               ),
               ElevatedButton.icon(
-                onPressed: (authProvider.user?.isVerified ?? false)
-                    ? () {
-                        Navigator.push(
-                          context,
-                          FadePageRoute(
-                            child: const CreatePropertyScreen(),
-                          ),
-                        );
-                      }
-                    : null,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    FadePageRoute(
+                      child: const CreatePropertyScreen(),
+                    ),
+                  );
+                },
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text('Add Listing'),
                 style: ElevatedButton.styleFrom(
@@ -540,16 +535,14 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
           _buildSectionHeader(
             'My Boarding Houses',
             'You have ${properties.length} active listings listed on VacanSee.',
-            onAdd: (authProvider.user?.isVerified ?? false)
-                ? () {
-                    Navigator.push(
-                      context,
-                      FadePageRoute(
-                        child: const CreatePropertyScreen(),
-                      ),
-                    );
-                  }
-                : null,
+            onAdd: () {
+              Navigator.push(
+                context,
+                FadePageRoute(
+                  child: const CreatePropertyScreen(),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 32),
           if (properties.isEmpty)
@@ -1179,9 +1172,6 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    final isVerified =
-        context.read<AuthProvider>().user?.isVerified ?? false;
-
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1219,9 +1209,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
-              isVerified
-                  ? 'Start by adding your first boarding house listing to manage vacancies'
-                  : 'Your account is pending verification. Once approved, you can add listings.',
+              'Start by adding your first boarding house listing to manage vacancies',
               textAlign: TextAlign.center,
               style: GoogleFonts.openSans(
                 fontSize: 14,
@@ -1231,17 +1219,16 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
             ),
           ),
           const SizedBox(height: 24),
-          if (isVerified)
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const CreatePropertyScreen(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const CreatePropertyScreen(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 padding:

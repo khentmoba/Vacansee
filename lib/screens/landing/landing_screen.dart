@@ -2011,7 +2011,7 @@ class _LandingScreenState extends State<LandingScreen>
             _buildModalFeatureItem(
               Icons.support_agent_outlined,
               '24/7 Support',
-              'Get help from our support team to onboard your properties and verify your account.',
+              'Get help from our support team to onboard your properties and manage listings.',
             ),
           ],
         );
@@ -2165,7 +2165,7 @@ class _LandingScreenState extends State<LandingScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'Have questions, feedback, or need help verifying your account? Reach out to us directly:',
+              'Have questions, feedback, or need help? Reach out to us directly:',
               style: TextStyle(
                 fontSize: 15,
                 color: Color(0xFF666666),
@@ -2214,11 +2214,6 @@ class _LandingScreenState extends State<LandingScreen>
               Icons.lock_outline_rounded,
               'Secure Data Encryption',
               'All user credentials and personal details are encrypted and securely stored in Supabase.',
-            ),
-            _buildModalFeatureItem(
-              Icons.supervised_user_circle_outlined,
-              'Verified Profiles Only',
-              'We strictly require phone and role verification to protect the community from fake listings.',
             ),
             _buildModalFeatureItem(
               Icons.visibility_off_outlined,

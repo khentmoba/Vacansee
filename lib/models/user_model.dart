@@ -10,7 +10,6 @@ class UserModel {
   final String? phoneNumber;
   final DateTime createdAt;
   final DateTime? lastLoginAt;
-  final bool isVerified;
   final String? gender;
   final String? firstName;
   final String? lastName;
@@ -28,7 +27,6 @@ class UserModel {
     this.phoneNumber,
     required this.createdAt,
     this.lastLoginAt,
-    this.isVerified = false,
     this.gender,
     this.firstName,
     this.lastName,
@@ -61,7 +59,6 @@ class UserModel {
       lastLoginAt: data['last_login_at'] != null
           ? DateTime.parse(data['last_login_at'] as String)
           : null,
-      isVerified: data['is_verified'] as bool? ?? false,
       gender: data['gender'] as String?,
       firstName: data['first_name'] as String?,
       lastName: data['last_name'] as String?,
@@ -82,7 +79,6 @@ class UserModel {
       'role': role?.name,
       'phone_number': phoneNumber,
       'created_at': createdAt.toIso8601String(),
-      'is_verified': isVerified,
       'gender': gender,
       'first_name': firstName,
       'last_name': lastName,
@@ -105,7 +101,6 @@ class UserModel {
     String? phoneNumber,
     DateTime? createdAt,
     DateTime? lastLoginAt,
-    bool? isVerified,
     String? gender,
     String? firstName,
     String? lastName,
@@ -123,7 +118,6 @@ class UserModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       createdAt: createdAt ?? this.createdAt,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
-      isVerified: isVerified ?? this.isVerified,
       gender: gender ?? this.gender,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,

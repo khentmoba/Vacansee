@@ -21,8 +21,6 @@ enum NotificationType {
   propertyVerified,
   @JsonValue('property_rejected')
   propertyRejected,
-  @JsonValue('owner_verification_request')
-  ownerVerificationRequest,
   @JsonValue('system')
   system,
 }
@@ -61,8 +59,6 @@ class NotificationModel with _$NotificationModel {
         return Icons.verified_rounded;
       case NotificationType.propertyRejected:
         return Icons.do_not_disturb_alt_rounded;
-      case NotificationType.ownerVerificationRequest:
-        return Icons.verified_user_rounded;
       case NotificationType.system:
         return Icons.notifications;
     }
@@ -84,8 +80,6 @@ class NotificationModel with _$NotificationModel {
         return Colors.green;
       case NotificationType.propertyRejected:
         return Colors.red;
-      case NotificationType.ownerVerificationRequest:
-        return Colors.purple;
       case NotificationType.system:
         return Colors.orange;
     }

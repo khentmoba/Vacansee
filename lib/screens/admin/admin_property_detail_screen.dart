@@ -672,7 +672,7 @@ class _AdminPropertyDetailScreenState extends State<AdminPropertyDetailScreen> {
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: MediaQuery.of(context).size.width >= 1000 ? 2 : 1, crossAxisSpacing: 48, mainAxisSpacing: 32, mainAxisExtent: 140),
           itemBuilder: (context, index) {
             final reviewData = reviews[index];
-            final studentName = reviewData['users']?['display_name'] ?? 'Verified Tenant';
+            final studentName = reviewData['users']?['display_name'] ?? 'Tenant';
             final reviewText = reviewData['review'] ?? 'Great place to stay!';
             final ratingVal = reviewData['rating'] as int? ?? 5;
             final createdAtStr = reviewData['created_at'] != null ? DateFormat('MMMM yyyy').format(DateTime.parse(reviewData['created_at'])) : 'May 2026';

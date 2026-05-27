@@ -102,7 +102,6 @@ class AdminProvider extends ChangeNotifier {
           role: fields['role'] != null
               ? UserRole.values.firstWhere((r) => r.name == fields['role'])
               : null,
-          isVerified: fields['is_verified'] as bool? ?? _users[index].isVerified,
           gender: fields['gender'] as String?,
           firstName: fields['first_name'] as String?,
           lastName: fields['last_name'] as String?,
@@ -126,24 +125,6 @@ class AdminProvider extends ChangeNotifier {
     try {
       await _adminService.deleteUser(uid);
       _users.removeWhere((u) => u.uid == uid);
-      notifyListeners();
-    } catch (e) {
-      _errorMessage = e.toString();
-      notifyListeners();
-      rethrow;
-    }
-  }
-
-  /// Toggle verification status
-  Future<void> toggleVerification(String uid) async {
-    final user = _users.firstWhere((u) => u.uid == uid);
-    final newStatus = !user.isVerified;
-    try {
-      await _adminService.toggleUserVerification(uid, newStatus);
-      final index = _users.indexWhere((u) => u.uid == uid);
-      if (index != -1) {
-        _users[index] = _users[index].copyWith(isVerified: newStatus);
-      }
       notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();

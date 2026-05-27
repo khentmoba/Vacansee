@@ -1188,7 +1188,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             ),
             itemBuilder: (context, index) {
               final reviewData = reviews[index];
-              final studentName = reviewData['users']?['display_name'] ?? 'Verified Tenant';
+              final studentName = reviewData['users']?['display_name'] ?? 'Tenant';
               final reviewText = reviewData['review'] ?? 'Great place to stay, highly recommended!';
               final ratingVal = reviewData['rating'] as int? ?? 5;
               final createdAtStr = reviewData['created_at'] != null 

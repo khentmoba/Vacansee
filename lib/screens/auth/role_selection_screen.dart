@@ -138,10 +138,6 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                             _buildHeader(colorScheme),
                             const SizedBox(height: 36),
                             _buildRoleCards(colorScheme),
-                            if (_selectedRole == UserRole.owner) ...[
-                              const SizedBox(height: 12),
-                              _OwnerVerificationNotice(),
-                            ],
                             const SizedBox(height: 32),
                             _buildProfileFields(colorScheme),
                             const SizedBox(height: 32),
@@ -351,42 +347,6 @@ class _Blob extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: opacity),
         shape: BoxShape.circle,
-      ),
-    );
-  }
-}
-
-// ── Owner verification notice ────────────────────────────────────────────────
-
-class _OwnerVerificationNotice extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeOut,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.amber[50],
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.amber[300]!),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.info_outline_rounded, size: 16, color: Colors.amber[800]),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Owners require admin verification before listing properties.',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  color: Colors.amber[900],
-                  height: 1.4,
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

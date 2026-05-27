@@ -50,7 +50,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
     if (!mounted) return;
     final adminProvider = context.read<AdminProvider>();
     final propertyProvider = context.read<PropertyProvider>();
-    final authProvider = context.read<AuthProvider>();
     final bookingProvider = context.read<BookingProvider>();
 
     adminProvider.loadStats();
@@ -67,7 +66,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
     if (_currentView == AdminView.users) {
       adminProvider.loadAllUsers();
     }
-    authProvider.loadPendingOwners();
   }
 
   void _onViewChanged(AdminView view) {
@@ -486,8 +484,32 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   final u = users[index];
                   return AdminUserCard(
                     user: u,
-                    onViewDetails: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AdminUserDetailScreen(user: u))),
-                    onEdit: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AdminUserDetailScreen(user: u, editMode: true))),
+                    onViewDetails: () => showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+                      builder: (_) => DraggableScrollableSheet(
+                        initialChildSize: 0.85,
+                        minChildSize: 0.5,
+                        maxChildSize: 0.95,
+                        expand: false,
+                        builder: (_, scrollController) => AdminUserDetailScreen(user: u),
+                      ),
+                    ),
+                    onEdit: () => showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+                      builder: (_) => DraggableScrollableSheet(
+                        initialChildSize: 0.85,
+                        minChildSize: 0.5,
+                        maxChildSize: 0.95,
+                        expand: false,
+                        builder: (_, scrollController) => AdminUserDetailScreen(user: u, editMode: true),
+                      ),
+                    ),
                   );
                 },
               );
@@ -683,15 +705,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
         else
           LayoutBuilder(
             builder: (context, constraints) {
-              final crossAxisCount = constraints.maxWidth < 600 ? 1 : (constraints.maxWidth < 1200 ? 2 : 3);
+              final crossAxisCount = constraints.maxWidth > 1200 ? 4 : (constraints.maxWidth > 600 ? 2 : 1);
               return GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: isMobile ? 16 : 24,
-                  mainAxisSpacing: isMobile ? 16 : 24,
-                  childAspectRatio: isMobile ? 0.7 : (constraints.maxWidth < 1200 ? 0.8 : 0.85),
+                  crossAxisSpacing: 24,
+                  mainAxisSpacing: 32,
+                  childAspectRatio: 0.76,
                 ),
                 itemCount: properties.length,
                 itemBuilder: (context, index) => AdminPropertyCard(
@@ -798,7 +820,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           children: [
             QuickActionCard(label: 'Manage Listings', subLabel: 'Approve & view listings', icon: Icons.home_work_outlined, accentColor: AppColors.primary, onTap: () => _onViewChanged(AdminView.listings)),
             QuickActionCard(label: 'View Bookings', subLabel: 'Track request stats', icon: Icons.calendar_month_outlined, accentColor: AppColors.warning, onTap: () => _onViewChanged(AdminView.bookings)),
-            QuickActionCard(label: 'User Management', subLabel: 'Review owner verifications', icon: Icons.group_outlined, accentColor: const Color(0xFF8B5CF6), onTap: () => _onViewChanged(AdminView.users)),
+            QuickActionCard(label: 'User Management', subLabel: 'Manage users, roles & accounts', icon: Icons.group_outlined, accentColor: const Color(0xFF8B5CF6), onTap: () => _onViewChanged(AdminView.users)),
             QuickActionCard(label: 'Admin Profile', subLabel: 'System permissions & settings', icon: Icons.person_outline, accentColor: AppColors.secondary, onTap: () => _onViewChanged(AdminView.profile)),
           ],
         ),

@@ -646,25 +646,6 @@ class _ProfileTab extends StatelessWidget {
                                     color: Colors.white,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.verified_user_rounded,
-                                      size: 16,
-                                      color: Colors.white,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      'Verified Tenant',
-                                      style: GoogleFonts.workSans(
-                                        fontSize: 15,
-                                        color: Colors.white.withValues(alpha: 0.9),
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
                               ],
                             ),
                           ),

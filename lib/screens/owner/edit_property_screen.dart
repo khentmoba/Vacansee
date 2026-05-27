@@ -7,6 +7,7 @@ import '../../models/room_model.dart';
 import '../../providers/property_provider.dart';
 import '../../services/listing_service.dart';
 import '../../widgets/property/property_form_components.dart';
+import '../../widgets/common/confirmation_dialog.dart';
 
 class EditPropertyScreen extends StatefulWidget {
   final PropertyModel property;
@@ -168,6 +169,90 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
     }
   }
 
+  Future<void> _handleDelete() async {
+    final navigator = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    setState(() => _isSaving = true);
+    try {
+      final propertyProvider = context.read<PropertyProvider>();
+      final hasBookings = await propertyProvider.hasActiveBookings(widget.property.propertyId);
+      
+      setState(() => _isSaving = false);
+
+      if (hasBookings) {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('Cannot Delete Boarding House'),
+            content: const Text(
+              'This boarding house has active (pending or approved) bookings. '
+              'Please resolve or cancel these bookings before deleting the listing.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (dialogContext) => ConfirmationDialog(
+          title: 'Delete Boarding House',
+          content: 'Are you sure you want to delete "${widget.property.name}"? '
+              'This will remove the listing and set all associated rooms to maintenance.',
+          confirmLabel: 'Delete',
+          confirmColor: AppColors.error,
+          onConfirm: () async {
+            setState(() => _isSaving = true);
+            try {
+              final success = await propertyProvider.deleteProperty(widget.property.propertyId);
+              if (success) {
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Boarding house deleted successfully'),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
+                navigator.pop();
+              } else {
+                scaffoldMessenger.showSnackBar(
+                  SnackBar(
+                    content: Text(propertyProvider.errorMessage ?? 'Failed to delete boarding house'),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              }
+            } catch (e) {
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text('Error deleting property: $e'),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+            } finally {
+              if (mounted) setState(() => _isSaving = false);
+            }
+          },
+        ),
+      );
+    } catch (e) {
+      setState(() => _isSaving = false);
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Error checking bookings: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -852,16 +937,26 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
           if (isDesktop) ...[
             const Spacer(),
             _buildTopTab('Listing Details', isSelected: true),
-            _buildTopTab('Tenant Preferences', isSelected: false),
-            _buildTopTab('Contract & Documents', isSelected: false),
-            _buildTopTab('Viewings', isSelected: false),
-            _buildTopTab('Transactions', isSelected: false),
           ],
 
           const Spacer(),
 
-          // Right Save & Cancel Buttons (Desktop only)
+          // Right Save, Cancel & Delete Buttons (Desktop only)
           if (isDesktop) ...[
+            OutlinedButton.icon(
+              onPressed: _isSaving ? null : _handleDelete,
+              icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 18),
+              label: const Text(
+                'Delete Listing',
+                style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold),
+              ),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                side: const BorderSide(color: AppColors.error),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+            const SizedBox(width: 12),
             OutlinedButton(
               onPressed: () => Navigator.pop(context),
               style: OutlinedButton.styleFrom(
@@ -890,6 +985,15 @@ class _EditPropertyScreenState extends State<EditPropertyScreen> {
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
                   : const Text('Save Changes'),
+            ),
+          ],
+
+          // Right Delete Button (Mobile only)
+          if (!isDesktop) ...[
+            IconButton(
+              icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error),
+              onPressed: _isSaving ? null : _handleDelete,
+              tooltip: 'Delete Listing',
             ),
           ],
         ],

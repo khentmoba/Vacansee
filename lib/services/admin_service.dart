@@ -90,15 +90,5 @@ class AdminService {
     }
   }
 
-  /// Toggle user verification status
-  Future<void> toggleUserVerification(String uid, bool isVerified) async {
-    try {
-      await _supabase
-          .from('users')
-          .update({'is_verified': isVerified})
-          .eq('id', uid);
-    } catch (e) {
-      throw Exception('Failed to toggle verification: $e');
-    }
-  }
+
 }

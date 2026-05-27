@@ -37,5 +37,8 @@ const _$NotificationTypeEnumMap = {
   NotificationType.bookingAccepted: 'booking_accepted',
   NotificationType.bookingDeclined: 'booking_declined',
   NotificationType.bookingExpired: 'booking_expired',
+  NotificationType.propertySubmitted: 'property_submitted',
+  NotificationType.propertyVerified: 'property_verified',
+  NotificationType.propertyRejected: 'property_rejected',
   NotificationType.system: 'system',
 };

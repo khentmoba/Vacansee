@@ -58,6 +58,7 @@ class PropertyService {
       json.remove('has_vacancy'); // UI-only field not in DB schema
       json.remove('average_rating');
       json.remove('reviews_count');
+      json.remove('owner_name');
 
       final response = await _supabase
           .from('properties')
@@ -208,6 +209,7 @@ class PropertyService {
       json.remove('has_vacancy'); // UI-only field not in DB schema
       json.remove('average_rating');
       json.remove('reviews_count');
+      json.remove('owner_name');
 
       await _supabase
           .from('properties')
