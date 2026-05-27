@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd landing && npm install && npm run build && node -e \"const fs=require('fs'),path=require('path'); const src='../build/web'; const dst='dist/app'; if(fs.existsSync(src)){ fs.mkdirSync(dst,{recursive:true}); fs.readdirSync(src).forEach(f=>{ const s=path.join(src,f),d=path.join(dst,f); if(fs.statSync(s).isDirectory()){ fs.mkdirSync(d,{recursive:true}); fs.readdirSync(s).forEach(c=>fs.copyFileSync(path.join(s,c),path.join(d,c))); }else{ fs.copyFileSync(s,d); } }); console.log('Flutter app copied to /app'); }else{ console.log('No Flutter build found at build/web'); } \"",
+  "buildCommand": "node scripts/build-landing.js",
   "outputDirectory": "landing/dist",
   "cleanUrls": true,
   "trailingSlash": false,
