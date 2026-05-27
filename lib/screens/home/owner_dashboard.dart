@@ -46,6 +46,8 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
             .then((_) {
           if (!mounted) return;
           final propertyProvider = context.read<PropertyProvider>();
+          propertyProvider.subscribeToOwnerProperties(authProvider.user!.uid);
+          propertyProvider.subscribeToVacancyUpdates();
           final propertyIds =
               propertyProvider.properties.map((p) => p.propertyId).toList();
           if (propertyIds.isNotEmpty) {
@@ -223,8 +225,13 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                                         ),
                                         itemCount: properties.length,
                                         itemBuilder: (context, index) {
+                                          final p = properties[index];
                                           return _buildPropertyCard(
-                                              properties[index]);
+                                            p,
+                                            totalRooms: propertyProvider.getTotalRoomsForProperty(p.propertyId),
+                                            occupiedRooms: propertyProvider.getOccupiedRoomsForProperty(p.propertyId),
+                                            liveVacancy: propertyProvider.hasLiveVacancy(p.propertyId),
+                                          );
                                         },
                                       ),
                                     ],
@@ -344,8 +351,8 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
 
     final sortedProperties = List<PropertyModel>.from(properties)
       ..sort((a, b) {
-        final aOccupied = a.totalRooms - a.availableRooms;
-        final bOccupied = b.totalRooms - b.availableRooms;
+        final aOccupied = propertyProvider.getOccupiedRoomsForProperty(a.propertyId);
+        final bOccupied = propertyProvider.getOccupiedRoomsForProperty(b.propertyId);
         return bOccupied.compareTo(aOccupied);
       });
     final topProperties = sortedProperties.take(3).toList();
@@ -506,7 +513,12 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 mainAxisSpacing: 20,
                 childAspectRatio: 0.9,
                 children: [
-                  ...topProperties.map((p) => _buildPropertyCard(p)),
+                  ...topProperties.map((p) => _buildPropertyCard(
+                    p,
+                    totalRooms: propertyProvider.getTotalRoomsForProperty(p.propertyId),
+                    occupiedRooms: propertyProvider.getOccupiedRoomsForProperty(p.propertyId),
+                    liveVacancy: propertyProvider.hasLiveVacancy(p.propertyId),
+                  )),
                   if (topProperties.length < 3)
                     ...List.generate(
                       3 - topProperties.length,
@@ -559,7 +571,13 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
               ),
               itemCount: properties.length,
               itemBuilder: (context, index) {
-                return _buildPropertyCard(properties[index]);
+                final p = properties[index];
+                return _buildPropertyCard(
+                  p,
+                  totalRooms: propertyProvider.getTotalRoomsForProperty(p.propertyId),
+                  occupiedRooms: propertyProvider.getOccupiedRoomsForProperty(p.propertyId),
+                  liveVacancy: propertyProvider.hasLiveVacancy(p.propertyId),
+                );
               },
             ),
         ],
@@ -901,11 +919,15 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     );
   }
 
-  Widget _buildPropertyCard(PropertyModel property) {
+  Widget _buildPropertyCard(
+    PropertyModel property, {
+    int totalRooms = 0,
+    int occupiedRooms = 0,
+    bool liveVacancy = false,
+  }) {
     final isDesktop = MediaQuery.of(context).size.width >= 900;
-    final occupiedRooms = property.totalRooms - property.availableRooms;
-    final occupancyPercent = property.totalRooms > 0
-        ? (occupiedRooms / property.totalRooms)
+    final occupancyPercent = totalRooms > 0
+        ? (occupiedRooms / totalRooms)
         : 0.0;
     bool isHovered = false;
 
@@ -1039,13 +1061,13 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: property.hasVacancy
+                                color: liveVacancy
                                     ? AppColors.success
                                     : AppColors.error,
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                property.hasVacancy ? 'VACANT' : 'FULL',
+                                liveVacancy ? 'VACANT' : 'FULL',
                                 style: GoogleFonts.poppins(
                                   fontSize: 9,
                                   fontWeight: FontWeight.bold,
@@ -1134,7 +1156,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                       ),
                       if (isDesktop)
                         Text(
-                          '$occupiedRooms/${property.totalRooms} rooms',
+                          '$occupiedRooms/$totalRooms rooms',
                           style: GoogleFonts.openSans(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -1143,7 +1165,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                         ),
                     ],
                   ),
-                  if (isDesktop && property.totalRooms > 0) ...[
+                  if (isDesktop && totalRooms > 0) ...[
                     const SizedBox(height: 8),
                     // Occupancy progress bar
                     ClipRRect(

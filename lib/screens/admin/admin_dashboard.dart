@@ -43,7 +43,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _refreshData());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refreshData();
+      _subscribeToRealTime();
+    });
+  }
+
+  void _subscribeToRealTime() {
+    final propertyProvider = context.read<PropertyProvider>();
+    final bookingProvider = context.read<BookingProvider>();
+    final adminProvider = context.read<AdminProvider>();
+    propertyProvider.subscribeToAdminProperties();
+    bookingProvider.subscribeToAdminBookings();
+    adminProvider.subscribeToStats();
+    adminProvider.subscribeToAllUsers();
   }
 
   Future<void> _refreshData() async {

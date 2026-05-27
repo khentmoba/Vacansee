@@ -18,6 +18,7 @@ class BookingProvider extends ChangeNotifier {
   int _pendingCount = 0;
   StreamSubscription<List<BookingModel>>? _bookingsSubscription;
   StreamSubscription<int>? _pendingCountSubscription;
+  StreamSubscription<List<BookingModel>>? _adminBookingsSubscription;
 
   // Search & Filters
   String _searchQuery = '';
@@ -351,10 +352,26 @@ class BookingProvider extends ChangeNotifier {
     }
   }
 
+  /// Subscribe to real-time admin bookings
+  void subscribeToAdminBookings() {
+    _adminBookingsSubscription?.cancel();
+    _adminBookingsSubscription = _bookingService.getAllBookings().listen(
+      (bookings) {
+        _bookings = bookings;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Failed to sync admin bookings: $error';
+        notifyListeners();
+      },
+    );
+  }
+
   @override
   void dispose() {
     _bookingsSubscription?.cancel();
     _pendingCountSubscription?.cancel();
+    _adminBookingsSubscription?.cancel();
     super.dispose();
   }
 }

@@ -32,6 +32,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
       final provider = context.read<PropertyProvider>();
       provider.loadRooms(widget.property.propertyId);
       provider.loadPropertyReviews(widget.property.propertyId);
+      provider.subscribeToPropertyReviews(widget.property.propertyId);
     });
   }
 
@@ -157,7 +158,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _buildHostHeader(),
+                                    _buildHostHeader(vacantRooms, totalRooms),
                                     const Divider(height: 48, thickness: 1, color: AppColors.border),
                                     _buildKeyHighlights(propertyProvider),
                                     const Divider(height: 48, thickness: 1, color: AppColors.border),
@@ -181,7 +182,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildHostHeader(),
+                              _buildHostHeader(vacantRooms, totalRooms),
                               const Divider(height: 36, thickness: 1, color: AppColors.border),
                               _buildKeyHighlights(propertyProvider),
                               const Divider(height: 36, thickness: 1, color: AppColors.border),
@@ -620,7 +621,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
     );
   }
 
-  Widget _buildHostHeader() {
+  Widget _buildHostHeader(int vacantRooms, int totalRooms) {
     final String ownerInit = widget.property.ownerName?.isNotEmpty == true 
         ? widget.property.ownerName![0].toUpperCase() 
         : 'O';
@@ -643,7 +644,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                '${widget.property.availableRooms} vacant rooms · ${widget.property.totalRooms} total rooms · Gender: ${widget.property.genderOrientation.name.toUpperCase()}',
+                '$vacantRooms vacant rooms · $totalRooms total rooms · Gender: ${widget.property.genderOrientation.name.toUpperCase()}',
                 style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
               ),
             ],

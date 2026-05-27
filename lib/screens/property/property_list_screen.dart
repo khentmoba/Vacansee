@@ -315,13 +315,18 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-              letterSpacing: -0.5,
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+                letterSpacing: -0.5,
+              ),
+              softWrap: true,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           const Row(

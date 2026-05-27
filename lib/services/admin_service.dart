@@ -72,6 +72,39 @@ class AdminService {
     }
   }
 
+  /// Stream admin statistics (real-time from admin_stats view)
+  Stream<AdminStatsModel> getEcosystemStatsStream() {
+    return _supabase
+        .from('admin_stats')
+        .stream(primaryKey: ['last_updated'])
+        .map((data) {
+      if (data.isEmpty) {
+        return AdminStatsModel(
+          totalProperties: 0,
+          verifiedProperties: 0,
+          totalOwners: 0,
+          totalStudents: 0,
+          totalUsers: 0,
+          totalBookings: 0,
+          pendingBookings: 0,
+          activeTenants: 0,
+          occupancyRate: 0.0,
+          lastUpdated: DateTime.now(),
+        );
+      }
+      return AdminStatsModel.fromJson(data.first);
+    });
+  }
+
+  /// Stream all users (real-time)
+  Stream<List<UserModel>> getAllUsersStream() {
+    return _supabase
+        .from('users')
+        .stream(primaryKey: ['id'])
+        .order('display_name', ascending: true)
+        .map((data) => data.map((json) => UserModel.fromJson(json)).toList());
+  }
+
   /// Update a user's fields
   Future<void> updateUser(String uid, Map<String, dynamic> fields) async {
     try {

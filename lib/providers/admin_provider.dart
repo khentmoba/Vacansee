@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/admin_stats_model.dart';
 import '../services/admin_service.dart';
@@ -14,6 +15,8 @@ class AdminProvider extends ChangeNotifier {
   List<UserModel> _users = [];
   bool _isLoading = false;
   String? _errorMessage;
+  StreamSubscription<AdminStatsModel>? _statsSubscription;
+  StreamSubscription<List<UserModel>>? _usersSubscription;
 
   // Search & Filters
   String _searchQuery = '';
@@ -78,6 +81,43 @@ class AdminProvider extends ChangeNotifier {
     }
   }
 
+  /// Subscribe to real-time admin statistics
+  void subscribeToStats() {
+    _statsSubscription?.cancel();
+    _statsSubscription = _adminService.getEcosystemStatsStream().listen(
+      (stats) {
+        _stats = stats;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Failed to sync stats: $error';
+        notifyListeners();
+      },
+    );
+  }
+
+  /// Subscribe to real-time user list
+  void subscribeToAllUsers() {
+    _usersSubscription?.cancel();
+    _usersSubscription = _adminService.getAllUsersStream().listen(
+      (users) {
+        _users = users;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Failed to sync users: $error';
+        notifyListeners();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _statsSubscription?.cancel();
+    _usersSubscription?.cancel();
+    super.dispose();
+  }
+
   /// Update filters
   void setSearchQuery(String query) {
     _searchQuery = query;
@@ -93,25 +133,7 @@ class AdminProvider extends ChangeNotifier {
   Future<void> updateUser(String uid, Map<String, dynamic> fields) async {
     try {
       await _adminService.updateUser(uid, fields);
-      final index = _users.indexWhere((u) => u.uid == uid);
-      if (index != -1) {
-        _users[index] = _users[index].copyWith(
-          displayName: fields['display_name'] as String?,
-          email: fields['email'] as String?,
-          phoneNumber: fields['phone_number'] as String?,
-          role: fields['role'] != null
-              ? UserRole.values.firstWhere((r) => r.name == fields['role'])
-              : null,
-          gender: fields['gender'] as String?,
-          firstName: fields['first_name'] as String?,
-          lastName: fields['last_name'] as String?,
-          address: fields['address'] as String?,
-          businessName: fields['business_name'] as String?,
-          businessPermitNo: fields['business_permit_no'] as String?,
-          emergencyContactName: fields['emergency_contact_name'] as String?,
-          emergencyContactPhone: fields['emergency_contact_phone'] as String?,
-        );
-      }
+      // Stream will handle the update automatically
       notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();
@@ -124,7 +146,7 @@ class AdminProvider extends ChangeNotifier {
   Future<void> deleteUser(String uid) async {
     try {
       await _adminService.deleteUser(uid);
-      _users.removeWhere((u) => u.uid == uid);
+      // Stream will handle the update automatically
       notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();

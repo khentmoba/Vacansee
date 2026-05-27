@@ -33,9 +33,13 @@ class PropertyProvider extends ChangeNotifier {
   Map<String, bool> _propertyVacancyMap = {};
   final Map<String, DateTime> _lastVacancyUpdate = {};
   StreamSubscription<List<RoomModel>>? _allRoomsSubscription;
+  final Map<String, StreamSubscription<List<RoomModel>>> _propertyRoomStreams = {};
   StreamSubscription<List<PropertyModel>>? _propertiesSubscription;
+  StreamSubscription<List<PropertyModel>>? _ownerPropertiesSubscription;
+  StreamSubscription<List<PropertyModel>>? _adminPropertiesSubscription;
   StreamSubscription<List<RoomModel>>? _propertyRoomsSubscription;
   StreamSubscription<List<RatingModel>>? _studentRatingsSubscription;
+  StreamSubscription<List<Map<String, dynamic>>>? _propertyReviewsSubscription;
 
   // Filters
   String? _searchQuery;
@@ -115,6 +119,22 @@ class PropertyProvider extends ChangeNotifier {
       count += rooms.where((r) => r.hasVacancy).length;
     }
     return count;
+  }
+
+  int getTotalRoomsForProperty(String propertyId) {
+    return _propertyRoomsMap[propertyId]?.length ?? 0;
+  }
+
+  int getVacantRoomsForProperty(String propertyId) {
+    final rooms = _propertyRoomsMap[propertyId];
+    if (rooms == null) return 0;
+    return rooms.where((r) => r.status == RoomStatus.vacant).length;
+  }
+
+  int getOccupiedRoomsForProperty(String propertyId) {
+    final rooms = _propertyRoomsMap[propertyId];
+    if (rooms == null) return 0;
+    return rooms.where((r) => r.status == RoomStatus.occupied).length;
   }
 
   /// Clear error message
@@ -201,6 +221,57 @@ class PropertyProvider extends ChangeNotifier {
     _allRoomsSubscription = null;
   }
 
+  /// Subscribe to real-time property updates (for students browsing)
+  void subscribeToProperties() {
+    _propertiesSubscription?.cancel();
+    _propertiesSubscription = _propertyService.getPropertiesStream().listen(
+      (properties) {
+        _properties = properties;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Failed to sync properties: $error';
+        notifyListeners();
+      },
+    );
+  }
+
+  /// Subscribe to real-time property updates for an owner's own properties
+  void subscribeToOwnerProperties(String ownerId) {
+    _ownerPropertiesSubscription?.cancel();
+    _ownerPropertiesSubscription = _propertyService
+        .getPropertiesStream()
+        .map((properties) => properties.where((p) => p.ownerId == ownerId).toList())
+        .listen(
+      (properties) {
+        _properties = properties;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Failed to sync owner properties: $error';
+        notifyListeners();
+      },
+    );
+  }
+
+  /// Subscribe to real-time property updates for admin (with owner names)
+  void subscribeToAdminProperties() {
+    _adminPropertiesSubscription?.cancel();
+    _adminPropertiesSubscription = _propertyService
+        .getPropertiesWithOwnersStream()
+        .listen(
+      (properties) {
+        _allAdminProperties = properties;
+        _properties = properties;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Failed to sync admin properties: $error';
+        notifyListeners();
+      },
+    );
+  }
+
   /// Update vacancy map from room data
   void _updateVacancyMap(List<RoomModel> allRooms) {
     final newVacancyMap = <String, bool>{};
@@ -232,7 +303,8 @@ class PropertyProvider extends ChangeNotifier {
 
   /// Check if a property has vacancy (real-time)
   bool hasLiveVacancy(String propertyId) {
-    return _propertyVacancyMap[propertyId] ?? false;
+    return _propertyVacancyMap[propertyId] ??
+        (_propertyRoomsMap[propertyId]?.any((r) => r.status == RoomStatus.vacant) ?? false);
   }
 
   /// Get time since last vacancy update
@@ -251,8 +323,15 @@ class PropertyProvider extends ChangeNotifier {
   void dispose() {
     _allRoomsSubscription?.cancel();
     _propertiesSubscription?.cancel();
+    _ownerPropertiesSubscription?.cancel();
+    _adminPropertiesSubscription?.cancel();
     _propertyRoomsSubscription?.cancel();
     _studentRatingsSubscription?.cancel();
+    _propertyReviewsSubscription?.cancel();
+    for (final sub in _propertyRoomStreams.values) {
+      sub.cancel();
+    }
+    _propertyRoomStreams.clear();
     super.dispose();
   }
 
@@ -330,8 +409,17 @@ class PropertyProvider extends ChangeNotifier {
   /// Load rooms for a property without showing full loading state
   Future<void> _loadPropertyRoomsQuietly(String propertyId) async {
     try {
-      // Use getRooms but we only need one snapshot for stats
+      _propertyRoomStreams[propertyId]?.cancel();
       final stream = _propertyService.getRooms(propertyId);
+      _propertyRoomStreams[propertyId] = stream.listen(
+        (rooms) {
+          _propertyRoomsMap[propertyId] = rooms;
+          notifyListeners();
+        },
+        onError: (error) {
+          debugPrint('Error streaming rooms for property $propertyId: $error');
+        },
+      );
       final rooms = await stream.first;
       _propertyRoomsMap[propertyId] = rooms;
       notifyListeners();
@@ -449,15 +537,7 @@ class PropertyProvider extends ChangeNotifier {
 
     try {
       await _propertyService.updateProperty(property);
-      final index = _properties.indexWhere(
-        (p) => p.propertyId == property.propertyId,
-      );
-      if (index != -1) {
-        _properties[index] = property;
-      }
-      if (_selectedProperty?.propertyId == property.propertyId) {
-        _selectedProperty = property;
-      }
+      // Stream will handle the update automatically
       _isLoading = false;
       notifyListeners();
       return true;
@@ -477,16 +557,7 @@ class PropertyProvider extends ChangeNotifier {
 
     try {
       await _listingService.deletePropertyListing(propertyId);
-      final index = _properties.indexWhere((p) => p.propertyId == propertyId);
-      if (index != -1) {
-        // Update local state to 'deleted' status
-        _properties[index] = _properties[index].copyWith(
-          status: PropertyStatus.deleted,
-        );
-      }
-      if (_selectedProperty?.propertyId == propertyId) {
-        _selectedProperty = null;
-      }
+      // Stream will handle the update automatically
       _isLoading = false;
       notifyListeners();
       return true;
@@ -506,14 +577,7 @@ class PropertyProvider extends ChangeNotifier {
 
     try {
       await _listingService.restorePropertyListing(propertyId);
-      final index = _properties.indexWhere((p) => p.propertyId == propertyId);
-      if (index != -1) {
-        // Revert status to verified
-        // Note: In a production app, we'd fetch the latest state from DB
-        _properties[index] = _properties[index].copyWith(
-          status: PropertyStatus.verified,
-        );
-      }
+      // Stream will handle the update automatically
       _isLoading = false;
       notifyListeners();
       return true;
@@ -541,32 +605,7 @@ class PropertyProvider extends ChangeNotifier {
         status: status,
         reason: reason,
       );
-
-    // Update local state if present
-    final index = _properties.indexWhere((p) => p.propertyId == propertyId);
-    if (index != -1) {
-      _properties[index] = _properties[index].copyWith(
-        status: status,
-        rejectionReason: reason,
-      );
-    }
-
-    // Also update _allAdminProperties for admin dashboard consistency
-    final adminIndex = _allAdminProperties.indexWhere((p) => p.propertyId == propertyId);
-    if (adminIndex != -1) {
-      _allAdminProperties[adminIndex] = _allAdminProperties[adminIndex].copyWith(
-        status: status,
-        rejectionReason: reason,
-      );
-    }
-
-    if (_selectedProperty?.propertyId == propertyId) {
-      _selectedProperty = _selectedProperty?.copyWith(
-        status: status,
-        rejectionReason: reason,
-      );
-    }
-
+      // Stream will handle the update automatically
       _isLoading = false;
       notifyListeners();
       return true;
@@ -637,6 +676,7 @@ class PropertyProvider extends ChangeNotifier {
       if (cachedRooms != null) {
         cachedRooms.add(room);
       }
+      _propertyService.syncPropertyRoomCounts(propertyId);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -667,6 +707,7 @@ class PropertyProvider extends ChangeNotifier {
           cachedRooms[cachedIndex] = cachedRooms[cachedIndex].copyWith(status: status);
         }
       }
+      _propertyService.syncPropertyRoomCounts(propertyId);
       notifyListeners();
       return true;
     } catch (e) {
@@ -686,6 +727,7 @@ class PropertyProvider extends ChangeNotifier {
       if (cachedRooms != null) {
         cachedRooms.removeWhere((r) => r.roomId == roomId);
       }
+      _propertyService.syncPropertyRoomCounts(propertyId);
       notifyListeners();
       return true;
     } catch (e) {
@@ -768,6 +810,23 @@ class PropertyProvider extends ChangeNotifier {
       _isLoadingReviews = false;
       notifyListeners();
     }
+  }
+
+  /// Subscribe to real-time property reviews
+  void subscribeToPropertyReviews(String propertyId) {
+    _propertyReviewsSubscription?.cancel();
+    _propertyReviewsSubscription = _propertyService
+        .getPropertyReviewsStream(propertyId)
+        .listen(
+      (reviews) {
+        _propertyReviews = reviews;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Failed to sync property reviews: $error';
+        notifyListeners();
+      },
+    );
   }
 }
 

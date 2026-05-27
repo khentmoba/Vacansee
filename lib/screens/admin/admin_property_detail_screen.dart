@@ -32,6 +32,7 @@ class _AdminPropertyDetailScreenState extends State<AdminPropertyDetailScreen> {
       final provider = context.read<PropertyProvider>();
       provider.loadRooms(widget.property.propertyId);
       provider.loadPropertyReviews(widget.property.propertyId);
+      provider.subscribeToPropertyReviews(widget.property.propertyId);
     });
   }
 

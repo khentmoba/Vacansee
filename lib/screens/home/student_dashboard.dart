@@ -476,9 +476,9 @@ class _AnimatedNavItemState extends State<_AnimatedNavItem>
           child: AnimatedContainer(
             duration: AppDurations.fast,
             curve: Curves.easeOutCubic,
-            padding: EdgeInsets.symmetric(
-              horizontal: widget.isSelected ? 20 : 16,
-              vertical: 10,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
             ),
             decoration: BoxDecoration(
               color: backgroundColor,
@@ -488,42 +488,22 @@ class _AnimatedNavItemState extends State<_AnimatedNavItem>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: widget.isSelected
-                      ? const EdgeInsets.symmetric(horizontal: 12, vertical: 6)
-                      : const EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     gradient: widget.isSelected ? AppGradients.primaryGradient : null,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(widget.icon, color: widget.isSelected ? Colors.white : iconColor, size: 22),
-                      if (widget.isSelected) ...[
-                        const SizedBox(width: 6),
-                        Text(
-                          widget.label,
-                          style: GoogleFonts.workSans(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ],
+                  child: Icon(widget.icon, color: widget.isSelected ? Colors.white : iconColor, size: 22),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  widget.label,
+                  style: GoogleFonts.workSans(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: labelColor,
                   ),
                 ),
-                if (!widget.isSelected) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    widget.label,
-                    style: GoogleFonts.workSans(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: labelColor,
-                    ),
-                  ),
-                ],
               ],
             ),
           ),

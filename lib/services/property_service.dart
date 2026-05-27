@@ -185,6 +185,25 @@ class PropertyService {
     }
   }
 
+  /// Stream all properties (real-time)
+  Stream<List<PropertyModel>> getPropertiesStream() {
+    return _supabase
+        .from('properties')
+        .stream(primaryKey: ['id'])
+        .neq('status', 'deleted')
+        .order('last_updated', ascending: false)
+        .map((data) => data.map((json) => PropertyModel.fromJson(json)).toList());
+  }
+
+  /// Stream all properties with owner names using the properties_with_owners view (real-time)
+  Stream<List<PropertyModel>> getPropertiesWithOwnersStream() {
+    return _supabase
+        .from('properties_with_owners')
+        .stream(primaryKey: ['id'])
+        .order('last_updated', ascending: false)
+        .map((data) => data.map((json) => PropertyModel.fromJson(json)).toList());
+  }
+
   /// Update a property
   Future<void> updateProperty(PropertyModel property) async {
     try {
@@ -366,6 +385,31 @@ class PropertyService {
     }
   }
 
+  /// Sync property-level room counters from the actual rooms table
+  Future<void> syncPropertyRoomCounts(String propertyId) async {
+    try {
+      final rooms = await _supabase
+          .from('rooms')
+          .select('status')
+          .eq('property_id', propertyId);
+      final totalRooms = (rooms as List).length;
+      final availableRooms = (rooms as List)
+          .where((r) => r['status'] == 'vacant')
+          .length;
+      final hasVacancy = availableRooms > 0;
+      await _supabase
+          .from('properties')
+          .update({
+            'total_rooms': totalRooms,
+            'available_rooms': availableRooms,
+            'has_vacancy': hasVacancy,
+          })
+          .eq('id', propertyId);
+    } catch (e) {
+      debugPrint('Error syncing property room counts: $e');
+    }
+  }
+
   /// Get properties by owner
   Future<List<PropertyModel>> getOwnerProperties(String ownerId) async {
     try {
@@ -423,5 +467,15 @@ class PropertyService {
     } catch (e) {
       throw PropertyException('Failed to fetch property reviews: $e');
     }
+  }
+
+  /// Stream property reviews with student details (real-time)
+  Stream<List<Map<String, dynamic>>> getPropertyReviewsStream(String propertyId) {
+    return _supabase
+        .from('property_reviews')
+        .stream(primaryKey: ['id'])
+        .eq('property_id', propertyId)
+        .order('created_at', ascending: false)
+        .map((data) => data.cast<Map<String, dynamic>>());
   }
 }
