@@ -1,3 +1,4 @@
+// ignore_for_file: use_null_aware_elements
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/booking_model.dart';
 
