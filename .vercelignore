@@ -1,0 +1,35 @@
+# Flutter
+.dart_tool/
+.flutter-plugins*
+build/
+android/
+ios/
+linux/
+macos/
+windows/
+web/.dart_tool/
+
+# Node
+landing/node_modules/
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+.metadata
+
+# Misc
+*.iml
+*.log
+*.lock
+specs/
+functions/
+supabase/
+test/
+.agent/
+OpenCode Desktop Installer.exe
+VacanSee_SDE.docx
+
+# Git
+.git/
+.github/
