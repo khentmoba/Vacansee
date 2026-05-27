@@ -7,8 +7,8 @@
 ---
 
 **Project:** VacanSee
-**Generated:** 2026-05-27 02:16:30
-**Category:** SaaS (General)
+**Generated:** 2026-05-27 13:49:45
+**Category:** Service Landing Page
 
 ---
 
@@ -18,13 +18,13 @@
 
 | Role | Hex | CSS Variable |
 |------|-----|--------------|
-| Primary | `#18181B` | `--color-primary` |
-| Secondary | `#3F3F46` | `--color-secondary` |
-| CTA/Accent | `#2563EB` | `--color-cta` |
-| Background | `#FAFAFA` | `--color-background` |
-| Text | `#09090B` | `--color-text` |
+| Primary | `#0EA5E9` | `--color-primary` |
+| Secondary | `#38BDF8` | `--color-secondary` |
+| CTA/Accent | `#F97316` | `--color-cta` |
+| Background | `#F0F9FF` | `--color-background` |
+| Text | `#0C4A6E` | `--color-text` |
 
-**Color Notes:** Monochrome + blue accent
+**Color Notes:** Sky blue trust + warm CTA
 
 ### Typography
 
@@ -68,7 +68,7 @@
 ```css
 /* Primary Button */
 .btn-primary {
-  background: #2563EB;
+  background: #F97316;
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
@@ -85,8 +85,8 @@
 /* Secondary Button */
 .btn-secondary {
   background: transparent;
-  color: #18181B;
-  border: 2px solid #18181B;
+  color: #0EA5E9;
+  border: 2px solid #0EA5E9;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -99,7 +99,7 @@
 
 ```css
 .card {
-  background: #FAFAFA;
+  background: #F0F9FF;
   border-radius: 12px;
   padding: 24px;
   box-shadow: var(--shadow-md);
@@ -125,9 +125,9 @@
 }
 
 .input:focus {
-  border-color: #18181B;
+  border-color: #0EA5E9;
   outline: none;
-  box-shadow: 0 0 0 3px #18181B20;
+  box-shadow: 0 0 0 3px #0EA5E920;
 }
 ```
 
@@ -153,27 +153,28 @@
 
 ## Style Guidelines
 
-**Style:** Glassmorphism
+**Style:** Social Proof-Focused
 
-**Keywords:** Frosted glass, transparent, blurred background, layered, vibrant background, light source, depth, multi-layer
+**Keywords:** Testimonials prominent, client logos displayed, case studies sections, reviews/ratings, user avatars, success metrics, credibility markers
 
-**Best For:** Modern SaaS, financial dashboards, high-end corporate, lifestyle apps, modal overlays, navigation
+**Best For:** B2B SaaS, professional services, premium products, e-commerce conversion pages, established brands
 
-**Key Effects:** Backdrop blur (10-20px), subtle border (1px solid rgba white 0.2), light reflection, Z-depth
+**Key Effects:** Testimonial carousel animations, logo grid fade-in, stat counter animations (number count-up), review star ratings
 
 ### Page Pattern
 
-**Pattern Name:** Hero + Features + CTA
+**Pattern Name:** Scroll-Triggered Storytelling
 
-- **CTA Placement:** Above fold
-- **Section Order:** Hero > Features > CTA
+- **Conversion Strategy:** Narrative increases time-on-page 3x. Use progress indicator. Mobile: simplify animations.
+- **CTA Placement:** End of each chapter (mini) + Final climax CTA
+- **Section Order:** 1. Intro hook, 2. Chapter 1 (problem), 3. Chapter 2 (journey), 4. Chapter 3 (solution), 5. Climax CTA
 
 ---
 
 ## Anti-Patterns (Do NOT Use)
 
-- ❌ Excessive animation
-- ❌ Dark mode by default
+- ❌ Complex navigation
+- ❌ Hidden contact info
 
 ### Additional Forbidden Patterns
 
