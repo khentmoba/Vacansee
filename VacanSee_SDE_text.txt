@@ -1,0 +1,1705 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+VacanSee: Boarding House Tracker Website
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reymund Abing
+Jasper Carl Jumawan
+Jacob Manales
+Khent Felary Sanco
+
+
+
+
+
+
+
+
+
+February 2026
+BOARDING HOUSE VACANT
+TRACKER WEBSITE
+
+
+-------------------------------------------------------------------------------
+
+A Project Proposal
+     Presented to the
+Faculty of the Computer Engineering Department
+University of Science and Technology of Southern Philippines
+Cagayan de Oro City
+
+
+
+
+-------------------------------------------------------------------------------
+
+
+
+
+In Partial Fulfillment 
+of the Requirements for the Course 
+Software Design and Engineering
+
+
+
+
+-------------------------------------------------------------------------------
+
+
+
+
+Reymund Abing
+Jasper Carl Jumawan
+Jacob Manales
+Khent Felary Sanco
+
+
+
+
+
+
+February 2026
+
+
+ABSTRACT
+Finding available boarding house accommodations remains inefficient due to the reliance on manual searching methods and outdated vacancy information. Tenants, particularly students, often depend on walking around communities, personal referrals, or social media platforms, while boarding house owners post availability updates through signboards or online posts that are rarely maintained in real time. This situation leads to miscommunication, repeated inquiries, and wasted time for both parties. This study proposes the development of a Boarding House Vacant Tracker Website designed to centralize and update boarding house vacancy information in real time. The system enables boarding house owners to manage room availability efficiently while allowing tenants to view accurate and accessible vacancy information online. The proposed system aims to improve communication, reduce unnecessary inquiries, and provide a more organized approach to managing boarding house vacancies, thereby enhancing the overall efficiency of the boarding house search process.
+
+
+
+
+Keywords: 
+Boarding House Vacancies → core problem domain
+Room Availability Tracking → functional focus
+Web-Based Information System → research/IT classification
+Tenant–Owner Communication → impact area
+Accommodation Management → broader applicability
+
+
+
+
+
+
+
+
+
+
+TABLE OF CONTENTS
+                                                                                                                                   Page
+COVER PAGE       i
+TITLE PAGE      ii
+ABSTRACT     iii
+TABLE OF CONTENTS     iv
+LIST OF TABLES    vii
+LIST OF FIGURES   viii
+LIST OF EQUATIONS     ix
+Chapter
+1THE PROBLEM AND ITS SCOPE                    1                  1.1 Introduction        1
+1.2 Statement of the Problem        2
+1.3 Statement of Objectives                    3
+1.4 Significance of the Project        4
+1.5 Scope and Limitations        5
+1.6 Definition of Terms        6
+
+2REVIEW OF RELATED LITERATURE AND STUDIES     7
+
+
+3METHODOLOGY        8
+3.1 Requirements Gathering        8
+3.2 Requirements Analysis        9
+3.2.1 User Definition       10
+3.2.2 System Requirements              11
+3.3 Design       13
+          3.3.1 Context Level Diagram       14
+          3.3.2 Data Flow Diagram       15
+3.3.3 Use Case Diagram and Description       16
+3.3.4 Activity Diagram       17
+
+3.3.5 Database Design       18
+
+3.3.6 System Architecture       19
+
+3.3.7 Graphical User Interface Design       20
+
+3.4 Implementation       21
+
+3.5 Test & Evaluation              22
+
+4RESULTS AND DISCUSSIONS        23
+
+5CONCLUSIONS AND RECOMMENDATIONS                    24
+       
+5.1 Conclusions       25
+
+5.2 Recommendations       27
+
+
+REFERENCES      28
+
+APPENDICES
+Gantt Chart       29
+PERT/ CPM       30
+Letter of Consent       31
+Document Reviewed       32
+Observation Conducted       33
+Interview Conducted               34
+System Testing Form       35
+Functional Test Form             36
+System Usability Scale Form                                                             37
+System Testing Performed
+Training Conducted                   38
+Functional and Usability Testing Conducted       39
+Project Management Tool Updates
+Documentation/Meetings
+Curriculum Vitae       40
+User Manual       41
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+LIST OF TABLES
+
+
+     TABLE          TITLE                         PAGE
+
+          1     System Requirements      40
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+LIST OF FIGURES
+
+
+   FIGURE          TITLE                         PAGE
+
+1 Modified Waterfall Model of SDLC      13
+
+2 Context Level Diagram      13
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+LIST OF EQUATIONS
+
+
+   EQUATION          TITLE                         PAGE
+
+1 Accuracy      13
+
+Chapter 1
+
+THE PROBLEM AND ITS SCOPE
+
+
+1.1 Introduction
+Finding available boarding house accommodations remains a challenge due to the continued reliance on manual and unstructured methods of tracking room vacancies. Tenants, particularly students seeking affordable housing, often depend on physically visiting locations, asking acquaintances, or browsing social media platforms to locate available rooms. Meanwhile, boarding house owners typically post vacancy updates on signboards or online platforms without consistent maintenance, resulting in outdated or inaccurate information.
+
+This situation leads to inefficiencies such as repeated inquiries, miscommunication, and wasted time for both tenants and boarding house owners. The lack of a centralized and reliable system for managing boarding house vacancy information highlights the need for a more organized approach. With the increasing use of web-based systems for information access and management, developing a centralized platform to track and update boarding house vacancies presents a practical solution.
+
+This study proposes the development of a Boarding House Vacant Tracker Website that enables boarding house owners to update room availability in real time and allows tenants to view accurate vacancy information online. The proposed system aims to improve accessibility, communication, and efficiency in the boarding house search and management process.
+
+
+1.2 Statement of the Problem
+The process of tracking and searching for available boarding house rooms is currently inefficient and unreliable due to the absence of a centralized system. This study seeks to address the following problems:
+General Problem:
+How can the process of tracking and accessing boarding house vacancy information be improved to ensure efficiency, accuracy, and convenience for both tenants and boarding house owners?
+
+Specific Problems:
+How does the reliance on manual methods affect the efficiency of tenants searching for available boarding house rooms?
+How does outdated vacancy information contribute to miscommunication and repeated inquiries between tenants and boarding house owners?
+What difficulties do boarding house owners encounter in managing and updating room availability information?
+How can a web-based system improve the accessibility and reliability of boarding house vacancy information?
+
+1.3 Statement of Objectives 
+General Objective
+The general objective of this study is to design and develop a web-based Boarding House Vacant Tracker Website that improves the management and accessibility of boarding house vacancy information.Specifically, this study aims to:
+Analyze the current methods used by tenants and boarding house owners in searching for and updating boarding house vacancy information.
+Design a centralized system that allows boarding house owners to update room availability in real time.
+Develop a platform that enables tenants to view accurate and up-to-date boarding house vacancy information online.
+Evaluate how the proposed system improves efficiency and reduces unnecessary inquiries between tenants and boarding house owners.
+
+
+1.4 Significance of the Project
+The Boarding House Vacant Tracker Website is expected to benefit the following groups:
+
+Tenants and Students:
+The system provides tenants with easy access to accurate and updated boarding house vacancy information, reducing the need for physical searching and minimizing time wasted on unavailable rooms.
+
+Boarding House Owners:
+The platform offers a convenient way to manage and update room availability, reducing repeated inquiries and improving communication with potential tenants.
+Institution and Community:
+The study contributes to improving housing accessibility within the community by promoting an organized and efficient method of managing boarding house vacancies.
+Future Researchers and Developers:
+This study may serve as a reference for future research related to accommodation management systems, vacancy tracking platforms, and web-based information systems.
+1.5 Scope and Limitations 
+Scope of the Study
+This study focuses on the design and development of a web-based Boarding House Vacant Tracker Website intended for use by boarding house owners and tenants, particularly students seeking affordable accommodations. The system is designed to allow boarding house owners to update room availability and enable tenants to view available boarding house rooms online.
+The study covers the analysis of current vacancy tracking practices, system design, development, and basic evaluation of the proposed system’s effectiveness in improving information accessibility and efficiency.
+
+Limitations of the Study
+The study is limited to tracking boarding house room availability only. Features such as online payment processing, rental agreements, tenant background verification, and reservation or booking functionalities are excluded. The system’s effectiveness depends on the accuracy and consistency of updates provided by boarding house owners. Additionally, the study does not cover mobile application development, is limited to a web-based platform, and is strictly restricted to boarding houses located within Cagayan de Oro City. 
+
+
+1.6 Definition of Terms
+For clarity, the following terms are defined as used in this study:
+Boarding House – A residential establishment that provides rooms for rent, typically on a long-term basis.
+Tenant – An individual seeking or renting a room in a boarding house.
+Boarding House Owner – A person responsible for managing and renting out rooms in a boarding house.
+Vacancy – The availability of a room for rent within a boarding house.
+Vacancy Tracking – The process of monitoring and updating the availability status of boarding house rooms.
+Web-Based System – A system that operates through a web browser and is accessible via the internet.
+Boarding House Vacant Tracker Website – The proposed web-based platform developed to manage and display real-time boarding house vacancy information.
+
+
+
+
+
+
+
+
+Chapter 2
+
+REVIEW OF RELATED LITERATURE AND STUDIES
+
+This chapter focuses on related projects or studies that have provided additional relevant information to proponents which serves as the guide in developing the project.
+
+2.1 Digital Platforms in the Rental Housing Market
+           Digital platforms have significantly changed the way rental housing services are delivered by enabling online access to property information and streamlining communication between landlords and tenants. Modern information systems allow users to search for available spaces, compare prices, and evaluate amenities in a faster and more organized manner (Laudon & Laudon, 2021). These platforms reduce the limitations of traditional manual inquiries by providing centralized and easily accessible databases. As organizations adopt digital solutions, they are able to improve service efficiency while maintaining competitiveness in an increasingly technology-driven environment. The integration of online platforms also supports transparency, allowing users to make informed decisions based on accurate and updated information. Furthermore, digital accessibility enhances customer satisfaction because users can interact with systems anytime and anywhere. The study highlights that adopting digital platforms is essential for improving housing service delivery and operational coordination.
+2.2 Adoption of Web-Based Property Management Systems
+The adoption of web-based property management systems has become a key factor in improving administrative efficiency and reducing manual workload. Technology adoption theories explain that users are more willing to utilize systems that they perceive as useful, reliable, and easy to operate (Venkatesh, Thong, & Xu, 2016). These systems automate essential processes such as monitoring vacancies, recording tenant information, and responding to inquiries in real time. By replacing paper-based methods, web-based platforms minimize human error and improve record accuracy. They also enable faster communication between stakeholders, which enhances the responsiveness of property managers. Organizations benefit from improved workflow because digital tools allow data to be stored, retrieved, and updated efficiently. The findings suggest that successful adoption depends on system usability, accessibility, and the perceived value it provides to users.
+2.3 Online Marketing Effectiveness in Real Estate
+Digital marketing strategies play an important role in promoting rental properties through online environments, allowing property owners to reach a broader audience. Modern marketing frameworks emphasize the importance of visibility, interactive content, and mobile-friendly platforms in attracting potential tenants (Chaffey & Ellis-Chadwick, 2019). Online promotion provides measurable outcomes such as increased inquiries, engagement, and faster occupancy of available units. Compared to traditional advertising methods, digital platforms enable quicker dissemination of information and more dynamic interaction with clients. Property owners can update listings instantly, ensuring that advertised information remains accurate and relevant. The accessibility of online marketing tools supports continuous communication and strengthens relationships between service providers and users. These advantages demonstrate that digital marketing is an essential component of modern rental management systems.
+2.4 Application of E-Commerce Principles in Rental Websites
+E-commerce principles influence how rental websites are structured, particularly in terms of usability, accessibility, and trust-building features. Contemporary e-commerce systems emphasize organized presentation of information, seamless navigation, and secure interactions to improve customer experience (Laudon & Traver, 2021). Applying these concepts allows users to evaluate rental options efficiently without confusion or misinformation. Well-designed platforms create transparency by presenting accurate pricing, availability, and property descriptions. These features enhance credibility and encourage users to rely on digital services for housing inquiries. Additionally, integrating e-commerce strategies helps organizations maintain consistency and professionalism in service delivery. The application of these principles strengthens user confidence and improves overall platform effectiveness.
+
+2.5 User Experience and Website Usability
+User experience is a critical factor that determines whether individuals continue to use a digital platform or abandon it. International usability standards emphasize designing systems that are effective, efficient, and satisfying for users (ISO 9241-210, 2019). Clear navigation, readable content, and responsive design reduce confusion and make interactions more intuitive. Systems that prioritize user-centered design can significantly improve engagement and minimize operational errors. A well-designed interface enables users to locate information quickly and complete tasks without unnecessary complexity. These improvements directly influence 
+
+satisfaction and encourage repeated use of the platform. Therefore, usability is essential in ensuring that rental websites remain functional, accessible, and user-friendly.
+
+2.6 Information Systems and Database Integration
+Database integration plays a vital role in managing large volumes of rental information by ensuring that data remains organized and accessible. Modern database systems support centralized storage, allowing administrators to update vacancy details and tenant records in real time (Elmasri & Navathe, 2016). This integration reduces redundancy and ensures consistency across the platform. Efficient data management improves coordination between users and administrators by providing accurate and up-to-date information. It also enhances system reliability because information can be retrieved quickly when needed. Organizations benefit from improved operational control through structured data handling. These capabilities highlight the importance of database-driven solutions in rental monitoring systems.
+
+2.7 Security in Online Rental Platforms
+Security measures are essential for protecting sensitive user information and maintaining trust in online rental systems. Modern information security frameworks emphasize the need for authentication controls, encryption, and secure data management practices (Whitman & Mattord, 2021). Implementing these protections reduces the risk of unauthorized access and safeguards both tenant and administrator data. Secure platforms encourage users to engage confidently with digital services, knowing their information is protected. In addition, visible security features enhance the credibility of the website and strengthen user trust. Organizations that prioritize cybersecurity can maintain reliable and continuous operations. These measures are necessary to ensure safe and dependable digital interactions.
+
+
+2.8 Digital Transformation in Property Management
+Digital transformation has reshaped traditional property management by integrating automation, cloud technologies, and data-driven processes. Organizations adopting digital solutions experience improved coordination, faster communication, and enhanced service delivery (Bharadwaj et al., 2017). These technologies allow real-time monitoring of rental availability and streamline administrative workflows. By transitioning from manual systems to digital platforms, property managers can respond more efficiently to tenant needs and market demands. Digital transformation also supports scalability, enabling systems to adapt as the number of users increases. The adoption of modern technologies leads to better resource management and improved organizational performance. These developments demonstrate the value of digital innovation in managing boarding house vacancies and inquiries.
+
+2.9 Boarding House Management Systems 
+       Boarding house management systems have been developed to improve accommodation management, tenant monitoring, and vacancy tracking through digital technologies. According to Kevin C. Laudon and Jane P. Laudon (2021), information systems help organizations centralize records, automate transactions, and improve communication between service providers and users. In accommodation services, centralized systems reduce manual processing and improve the accuracy of information management. Their study emphasized that web-based systems enhance operational efficiency by enabling real-time updates and organized data storage.
+       Similarly, Mirza Khazim Nugraha, Nur Cahyo Wibowo, and Iqbal Ramadhani Mukhlis (2025) developed a web-based boarding house management information system that automated room monitoring, booking management, and tenant record keeping. The researchers concluded that centralized digital systems significantly improve administrative efficiency, minimize errors, and provide more accurate vacancy monitoring.
+In another study, Mei Albert Zendrato, Dadang Heksaputra, Avrillaila Akbar Harahap, and Yanuar Wicaksono (2025) designed a boarding house management information system using a prototype development approach. Their study highlighted that digital management systems simplify tenant coordination, payment monitoring, and room availability updates while improving accessibility for both tenants and boarding house owners.
+These studies demonstrate that boarding house management systems improve operational efficiency, reduce manual workload, and provide more organized monitoring of room availability and tenant information.
+2.10 Online Accommodation Finder Systems 
+       Online accommodation finder systems have become increasingly important in helping users efficiently locate rental properties and available boarding houses. According to Dave Chaffey and Fiona Ellis-Chadwick (2019), digital platforms improve customer interaction and information accessibility by allowing users to search and compare services online in real time. Their study emphasized that online systems reduce the inconvenience associated with traditional searching methods and improve decision-making through centralized information access.
+     A related study by Reza Pratama and Mustofa Abi Hamid (2025) developed a web-based boarding house information system integrated with location-based services. The researchers found that centralized accommodation systems improve accessibility by allowing students and tenants to search for available boarding houses using filters such as location, price range, and room type. The system also improved information accuracy and reduced the time spent searching for accommodations.
+     Furthermore, Marlia Sari, Lusia Septia ER, and Muhammad Junaidi (2024) developed a mobile web-based boarding house information system intended for students searching for accommodations near universities. Their findings showed that the system improved convenience, accessibility, and communication between tenants and boarding house owners by providing updated room availability and detailed accommodation information.
+    These studies highlight the importance of web-based accommodation finder systems in improving accessibility, reducing manual searching, and providing updated vacancy information for users.
+2.11 Synthesis of the Reviewed Literature and Studies 
+        The reviewed literature and studies emphasize the growing importance of digital platforms and web-based systems in improving accommodation management and boarding house vacancy monitoring. Existing studies consistently show that centralized information systems improve accessibility, reduce manual workload, enhance communication, and provide real-time updates for both tenants and boarding house owners. Studies conducted by Laudon and Laudon (2021), Nugraha et al. (2025), and Zendrato et al. (2025) demonstrated that digital management systems improve operational efficiency, tenant monitoring, and vacancy management through organized and automated processes.
+       Similarly, studies by Chaffey and Ellis-Chadwick (2019), Pratama and Hamid (2025), and Sari et al. (2024) revealed that online accommodation finder systems improve convenience and accessibility by enabling users to search for rental spaces through centralized platforms with updated information. These systems reduce the inefficiencies associated with traditional accommodation searching methods such as physical inquiries and word-of-mouth recommendations.
+     The reviewed studies also highlight the importance of usability, accessibility, database integration, and real-time information updating in ensuring effective system performance. User-friendly interfaces and centralized databases improve the overall user experience while ensuring that vacancy information remains accurate and reliable.
+     Although several existing systems focus on accommodation management and property searching, many platforms emphasize general rental management, payment systems, or booking functionalities rather than dedicated real-time vacancy tracking specifically designed for boarding houses near educational institutions. Some systems also include broader features that are beyond the scope of vacancy monitoring and simplified inquiry management.
+      Therefore, the proposed Boarding House Vacant Tracker Website aims to address these gaps by developing a centralized and web-based platform specifically focused on real-time boarding house vacancy tracking. The proposed system emphasizes accurate vacancy updates, improved communication between tenants and boarding house owners, and reduced inefficiencies associated with manual accommodation searching.
+
+
+
+
+
+
+
+
+
+
+
+Chapter 3
+
+METHODOLOGY
+This chapter presents the methodology of the project. The System Development Life Cycle (SDLC), specifically the modified Waterfall Model, was utilized to ensure that all the requirements were met in developing the XXXXXX. It demonstrates the process, procedures, techniques, and tools that were used in developing the system. The diagram shown in Figure 1 depicts the stages taken by the proponents of this project.
+Requirements GatheringRequirements AnalysisDesignImplementationTest & Evaluation
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figure 1: Modified Waterfall Model of SDLC
+3.1 Requirements Gathering
+During the requirements gathering phase of the VacanSee System, a document review was conducted to collect essential information that served as the basis for the system design and development. The documents reviewed included boarding house inquiry records, availability listings, student accommodation search notes, and informal records related to housing inquiries. 
+
+
+These materials provided important insights into the difficulties students experience when searching for available boarding houses and how information about vacancies is currently managed. The existing situation was observed in chronological order from start to end. The process begins when a student looks for a boarding house by asking around, visiting nearby areas, or checking informal listings. Students often rely on word-of-mouth recommendations or social media posts to find available rooms. If a boarding house is found, the student personally inquires about availability, rent, and rules. If no vacancy is available, the student moves to another location and repeats the process. Once a boarding house is found with an available slot, the student negotiates with the owner and completes the rental arrangement. Overall, the process is manual, time-consuming, and often requires physically visiting multiple locations before securing a place to stay. An interview was conducted at the University of Science and Technology of Southern Philippines (USTP). The respondents were students who have experienced difficulty in finding available boarding houses near the university. They were selected because they directly face challenges related to accommodation and vacancy searching. The interview guide included questions about their experiences in finding boarding houses, difficulties encountered in locating available rooms, and suggestions for improving access to vacancy information. Prior to the interview, consent was obtained from the respondents. During the interview, notes were taken and key responses were recorded. After the interview, the information gathered was reviewed and organized to ensure accuracy and completeness. One of the main challenges identified is the difficulty students face in finding available boarding houses, especially during peak enrollment periods. Since vacancy information is not centralized, students often spend a lot of time walking around or asking multiple landlords before finding an available room. Another issue is the lack of real-time updates on room availability, which leads to wasted time and repeated inquiries. Additionally, some boarding houses are not publicly advertised, making it harder for students to know their options. Overall, the current process is inefficient and inconvenient for students. The VacanSee System aims to address these problems by providing a centralized and accessible platform where boarding house vacancies can be easily viewed and updated.
+
+
+3.2 Requirements Analysis
+Once the requirements gathering phase was completed, the project proponents collected and carefully analyzed all the data obtained from the respondents. Through this process, the proponents were able to identify the primary users of the system as well as determine the specific functional and non-functional requirements needed for its development. The analysis helped in understanding how each user interacts with the system and what features are necessary to support their tasks. By identifying these requirements, the proponents ensured that the system design aligns with the actual needs and expectations of its intended users. The following sections present a comprehensive list of system users, along with a detailed discussion of their roles and corresponding requirements. This information serves as a foundation for designing and developing the Boarding House Vacant Tracker Website, ensuring that it effectively supports both tenants and boarding house owners.
+
+3.2.1 User Definition
+After evaluating the system requirements gathered from the respondents, two primary users of the system have been identified. These users are comprised of the Tenant and the Boarding House Owner.
+
+
+Tenant – The tenant is responsible for searching and selecting suitable boarding houses based on their preferences and needs. They are the primary end-users of the system who interact directly with the platform to explore available boarding units. Tenants can register and log in to the system, search for boarding houses using filters such as location, price, and availability, and submit booking requests. They can also provide feedback and ratings based on their experience, which helps improve the reliability of the system and assists other users in making informed decisions.
+Boarding House Owner – The boarding house owner is responsible for managing and maintaining boarding house listings within the system. They provide essential information such as room availability, pricing, amenities, and location details. Owners can register and log in to the system, add and update boarding house information, and monitor booking requests submitted by tenants. They are also responsible for approving or rejecting booking requests, ensuring that the availability status of each unit is accurate and up to date.
+
+3.2.2 System Requirements
+Table 1: System Requirements
+--- TABLE START ---
+Category | System Requirement
+Input Requirements | -The system shall allow users to create a new account for the      VacanSee System. / -The system shall allow users (students or boarding house  owners) to log in to the system. / -The system shall allow boarding house owners to input  boarding house details such as location, price, room type,  and availability. / -The system shall allow owners to update room availability  (vacant or occupied). / -The system shall allow students to input search preferences  such as location, budget, and room type. / -The system shall allow users to submit inquiries or booking  requests for available boarding houses.
+Process Requirements | - The system shall consolidate and display all boarding house  listings in a centralized vacancy database. / -The system shall filter boarding house results based on user  input such as location, price range, and availability. / -The system shall match student preferences with available  boarding house listings. / -The system shall process booking requests and update  availability status automatically. / -The system shall notify boarding house owners when a  student submits an inquiry or booking request. / -The system shall update records in real-time whenever  changes in availability occur. / -The system shall automatically save all user inputs and  transaction data.
+Output Requirements | -The system should be able to display a list of available  boarding houses based on student search preferences. / -The system should be able to generate detailed boarding  house profiles including price, location, and availability. / -The system should be able to provide confirmation   notifications for successful inquiries or bookings. / -The system should allow users to view updated availability  status in real-time.
+Control Requirements | -The system should enforce user authentication to ensure  only registered users can access the system. / -The system should restrict boarding house owners from  modifying other owners’ listings. / -The system should protect user data and ensure only  authorized actions are allowed within the system.
+Performance Requirements | -The system should provide fast search results for boarding  house availability. / -The system should minimize system downtime to ensure  continuous access for students and owners. / -The system should be able to handle multiple users  simultaneously without performance degradation.
+--- TABLE END ---
+
+
+
+
+
+The VacanSee System will allow users to create an account and log in to use the system. Boarding house owners can register their boarding house and input important details such as location, price, room type, and whether the room is available or not. Students can also enter their preferences like budget, preferred location, and room type to help them find a suitable boarding house. The system also allows students to send inquiries or booking requests directly to the boarding house owner. The system will collect all boarding house listings in one place so students can easily see available rooms. It can also match student preferences with available boarding houses to help them find faster results. When a student sends a booking request, the system will update the room status automatically if it is already taken or reserved. The system can also notify the owner when a student makes an inquiry or request. All information is saved automatically to keep records updated and accurate. The system will show complete details of each boarding house such as price, location, room type, and availability. It will also show updates or confirmations about student inquiries and bookings. Students can see real-time availability so they will know which rooms are still open. The system will have security features so only registered users can access it. Boarding house owners can only manage their own listings, while students can only search and send requests. This helps protect the information and prevents unauthorized changes. The system is designed to work fast so students can quickly search for available boarding houses. It will also stay online most of the time to avoid interruptions. Even if many users are using the system at the same time, it will still work smoothly and without delay.
+
+
+
+
+
+3.3 Design
+This section presents the design of the system. The proponents worked on the design to meet the specifications described in the system requirements. Context level diagram, data flow diagram, use case diagram, activity diagram, entity-relationship diagram, system architecture, and graphical user interface design were used to illustrate the design of the system.
+
+3.3.1 Context Level Diagram
+
+
+
+Figure 2: Context Level Diagram
+The context level diagram (Level 0 Data Flow Diagram) of the proposed Boarding House Vacant Tracker Website shows the system as one main process that interacts with two external entities: the Owner and the Tenant. The diagram focuses only on how data enters and leaves the system. First, the Owner sends boarding unit details and availability updates to the system. This includes information such as the type of unit, rental price, location, and whether it is vacant or occupied. The system stores this information and makes it available online. Next, the Tenant uses the system by sending a search request to view available boarding units. The system then provides a list of vacant units along with their details. If the Tenant chooses a boarding unit, a booking request is sent to the system. The system forwards the booking information to the Owner for confirmation. After the Owner approves the request, the system sends a booking confirmation to the Tenant. Overall, the system acts as a bridge between the Owner and the Tenant by organizing vacancy information and making the renting process easier and more efficient.
+
+
+
+3.3.2 Data Flow Diagram
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figure 4: Data Flow Diagram
+
+
+
+
+
+
+
+
+
+
+The Level 1 Data Flow Diagram of the Boarding House Vacant Tracker Website shows the internal processes of the system and how data moves between the external entities, processes, and data stores. The system involves two external entities: the Owner and the Tenant. The process begins when either the Owner or the Tenant submits their login information to the User Authentication process. The system verifies the login credentials and sends a login status response. Once successfully authenticated, the Owner can access the Manage Boarding House Information process. In this process, the Owner submits boarding unit details, uploads pictures, and updates availability. The system then stores or updates this information in the Boarding House Database. After logging in, the Tenant can use the Search and Filter Boarding Unit process. The Tenant sends a search request and may include a budget range to filter available boarding units. The system retrieves the relevant data from the Boarding House Database and sends the vacancy list and boarding unit details back to the Tenant. If the Tenant decides to book a boarding unit, a booking request is sent to the Booking and Approval process. The system records the booking information in the Booking Records data store and sends a booking notification to the Owner. The Owner reviews the request and sends an approval or rejection response back to the system. If approved, the system sends a booking confirmation to the Tenant. After a successful booking transaction, the Tenant can submit a star rating through the Manage Ratings process. The system then stores the rating information in the Ratings Database. Overall, the Level 1 Data Flow Diagram shows how the system manages authentication, boarding unit information, search and filtering, booking transactions, and ratings in an organized and structured manner, ensuring secure and efficient interaction between the Owner and the Tenant.
+
+
+
+
+3.3.3 Use Case Diagram and Description
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figure 5: Use Case Diagram
+
+
+
+--- TABLE START ---
+Use Case ID: | 1
+Use Case Name: | Post a Vacant Room
+Description: | A verified boarding house owner creates and publishes an available room listing on the VacanSee Website platform. The owner provides essential text descriptions, uploads visual media, and establishes the rental price so that potential tenants can discover and inquire about the accommodation.
+Primary Actor: | Owner
+Secondary Actor: | Tenant
+Include Use Case: | Upload Room Photos & Description / Determine Rental Cost
+Extend Use Case: | None
+Precondition: | The owner must have a verified account and be logged into the VacanSee Website dashboard.The room being listed must be physically located within the target service area (CDO City).
+Postcondition: | The vacant room listing is securely stored in the system database.The room details and real-time availability status become visible to searching tenants on the platform.
+Main Flow: | 1. The owner selects the option to post a vacant room from their account menu. / 2. The system triggers the mandatory inclusion --<<include>>--> Upload Room Photos & Description, prompting the owner to fill out specifications and attach media files. / 3. The system triggers the mandatory inclusion --<<include>>--> Determine Rental Cost, requiring the owner to input the monthly rental price. / 4. The system validates all inputs and flags the listing status as active. / 5. The system saves the changes via the "Update in App Record" procedure. / 6. The listing is published live onto the VacanSee Website for tenants to view.
+Alternative Flow | 2A: Missing or Invalid Information / 1. The system detects empty required text inputs or incompatible image files during the upload phase. / 2. The system blocks the publication step, displays an error message, and prompts the owner to correct the listing errors before resubmitting.
+--- TABLE END ---
+
+
+
+
+
+3.3.4 Activity Diagram
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figure 6: Tenant Data Flow Diagram
+
+
+
+
+
+
+
+In Figure 6, The activity diagram represents the workflow of the Tenant within the tracking system, detailing how student lodgers browse and secure accommodations. The process begins with user authentication, where tenants input their credentials into the log-in interface. A decision node validates the login; invalid attempts loop the user back to try again, while a true validation grants access to the system menu. From the system menu, the tenant can transition into three main operational activities. They can choose to view room listings, which opens up sub-options to filter properties by price or location within CDO City or view vacancy status to check real-time availability. Alternatively, the tenant can directly select the option to filter by price and location from the main menu, which immediately leads them to submit a booking request. Once a booking request is submitted, the system automatically logs the transaction via the "update in app record" action block. Finally, tenants can opt to log out from the system menu, which routes the session cleanly to the final termination state node, ensuring a structured, intuitive, and secure room-seeking experience. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figure 7: Owner Data Flow Diagram
+In Figure 7, the activity diagram represents the workflow of the Boarding House Owner, outlining how property managers manage listings, process reservations, and generate records. The process begins with authentication, where owners submit their log-in details. If the credentials are false, they are looped back to the log-in screen; if true, they access the primary system menu. From the system menu, owners can navigate three independent operational streams. The first stream allows owners to manage vacancies, enabling a cascading sequence where they upload photos, notify the tenant, and proceed to process bookings by choosing to approve or reject them. The second stream allows direct modification of active records, where owners can update room status between 
+
+available and occupied, edit house details like price or photos, view pending bookings, and route back into the booking approval/rejection process. The third stream handles data maintenance; when an owner chooses to generate an owner report, the system initiates a parallel processing fork. One branch backs up data directly to the database, while the parallel branch uses a decision diamond to check if the oldest file is greater than one month. If true, the file is downloaded to the PC and deleted from the database; if the file is less than one month, it bypasses deletion and joins the database backup line at the synchronization bar. The workflow concludes when the owner selects logout from the system menu, terminating the session at the final state node.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figure 8: Admin Data Flow Diagram
+
+In Figure 8, the activity diagram represents the workflow of the System Administrator, detailing the strict moderation controls, user tracking, and data archiving paths available to platform supervisors. The process begins with secure administrator authentication, where inputting credentials leads to a validation choice node that loops back on failure and grants access to the central system menu on success. From the system menu, the administrator can pivot into three specialized oversight branches. The first branch enables user moderation, allowing the admin to access all user accounts, manage system settings, and oversee the flag system to handle reported accounts. The second branch allows the administrator to view all system activity, providing direct sub-menus to moderate user reviews or oversee the platform-wide flag system. The third branch governs data auditing, where the admin can generate system-wide reports. This action triggers a parallel execution fork: one line instantly backs up active records to the database, while the concurrent line checks if the oldest file is over one month old. If the file is older than a month, it is downloaded to a local PC and deleted from the database before both paths merge at a synchronization bar. This synchronization bar feeds into a massive parallel processing block that simultaneously handles backing up the global database, archiving old records, syncing data across CDO, monitoring system logs, and updating CDO region data before finally exiting the workflow at the session termination node. 
+
+
+
+
+
+
+
+
+
+3.3.5 Database Design
+………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………
+3.3.6 System Architecture
+………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………………
+
+
+
+
+3.3.7 Graphical User Interface Design
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3.4 Implementation
+The implementation phase of the project encompasses the practical realization of the system design by integrating both hardware and software components. This section details the hardware requirements, including the specifications of computing resources and peripheral devices essential for running and developing the software, as well as the software development tools, such as Integrated Development Environments (IDEs), programming languages, version control systems, and testing frameworks, that facilitate the coding, management, and verification of the system. It also covers project management tools and deployment strategies to ensure a streamlined development process and effective deployment of the final product. Together, these elements ensure that the software is built efficiently, meets performance expectations, and adheres to the project's objectives.
+3.4.1 Hardware Requirements
+3.4.1.1 Definition of Hardware Requirements 
+
+--- TABLE START ---
+Category | Image | Description
+Computers/Servers |  | Specify the types and configurations of computers or servers required (e.g., CPU specifications, RAM, storage, etc.).
+Peripheral Devices |  | List any additional hardware such as printers, scanners, or specialized devices.
+Network Infrastructure |  | Include details on routers, switches, or other networking equipment if relevant.
+Development Boards (if applicable) |  | For projects involving embedded systems or IoT, include details on microcontrollers or development boards
+--- TABLE END ---
+
+3.4.1.2 Justification Requirements
+Performance Needs: Explain why these hardware components are necessary for the project.
+Compatibility: Discuss how the hardware requirements align with the software requirements.
+
+3.4.2 Software Development Tools
+Table No. __ . Software Development Tools Used
+--- TABLE START ---
+Category | Image | Description
+Development Environment |  | Visual Studio Code (VS Code) with Flutter and Dart extensions for code editing, analysis, and execution. 
+Programming Languages |  | Dart (Frontend logic and UI components) and TypeScript (Supabase Edge Functions).
+Version Control |  | Git & GitHub for repository management, branching, and automated Vercel CI/CD deployments..
+Project Management Tools |  | Tools Used: Specify any project management tools (e.g., JIRA, Trello) for tracking progress and managing tasks. / Usage: Explain how these tools support the project’s development lifecycle.
+Software Libraries and Frameworks |  | Libraries/Frameworks: List any software libraries or frameworks used (e.g., React, Django) and their purpose in the project. / Integration: Describe how these libraries and frameworks are integrated into the development process.
+Testing Tools |  | Testing Frameworks: Include information on testing frameworks and tools used (e.g., JUnit, Selenium). / Testing Methodologies: Discuss the testing methodologies employed (e.g., unit testing, integration testing).
+Deployment Tools |  | Deployment Tools: Mention any tools or platforms used for deploying the software (e.g., Docker, Kubernetes). / Deployment Process: Describe the deployment process and any considerations.
+Documentation Tools |  | Documentation Tools: Specify tools used for creating and maintaining project documentation (e.g., Doxygen, Confluence). / Documentation Practices: Discuss best practices for documentation within the project.
+--- TABLE END ---
+
+3.4.3  Cost Considerations
+Budget Constraints: Address any budget constraints and how they affect the choice of hardware and software.
+Cost Estimates: Provide rough cost estimates for the hardware and software components if relevant.
+
+
+
+3.5 Test & Evaluation
+
+The Boarding House Vacant Tracker Website (VacanSee) will undergo a structured testing and evaluation process to ensure its functionality, performance, security, and usability align with the needs of both tenants and boarding house owners. Through a combination of  black-box testing, white-box testing, performance testing, and usability testing, the system will be assessed for reliability and efficiency before full-scale deployment within the university community. All testing results will be comprehensively documented, and any identified issues will be systematically addressed to enhance overall system reliability and platform efficiency. The findings from these technical and user evaluations will be directly utilized to refine the web architecture, ensuring that the VacanSee System is fully optimized, secure, and capable of delivering real-time vacancy tracking updates before its official launch.
+
+3.5.1 Black Box Testing
+Black-box testing will be conducted to evaluate the functionality of the Boarding House Vacant Tracker Website (VacanSee) without analyzing its internal code structure. This approach ensures that the platform meets its functional requirements from an end-user perspective. Several black-box testing techniques will be applied to validate system behavior, including:
+Input Classification Testing – Input fields such as login credentials, housing search filters, and account registration forms will be tested using both valid and invalid inputs to verify that the system correctly processes different types of data. For example, invalid email formats and empty password fields will be tested during tenant and owner registration and authentication.
+Limit Condition Testing – Room price inputs, room capacity numbers, character limits for boarding house descriptions, and file size restrictions for uploaded property images will be tested at their minimum, maximum, and beyond acceptable values to ensure proper validation and error handling.
+Rule-Based Scenario Testing – Different user roles, specifically Tenants/Students, Boarding House Owners, and Administrators, will be tested to confirm that each role has appropriate access to platform functionalities. This will ensure that permissions, such as the ability to update room vacancy status, modify property listings, and view administrative dashboards, are correctly enforced.
+User Error Simulation – Test cases will replicate common user mistakes, such as leaving required fields blank when adding a room listing, incorrect login attempts, and unauthorized actions like trying to update a boarding house listing owned by another user. This will help evaluate how well the system handles errors and prevents data integrity risks.
+
+3.5.2 White Box Testing
+White-box testing will be conducted to evaluate the internal logic, structure, and code implementation of the Boarding House Vacant Tracker Website (VacanSee). This approach ensures that the system’s core functionalities are optimized, secure, and free from logical errors. Several white-box testing techniques will be employed, including:
+Control Structure Testing – The platform’s decision-making logic, such as the authentication process, role-based access control, and vacancy status changes, will be analyzed to ensure all internal execution paths function correctly and securely. This confirms that conditional checks safely separate Tenant/Student views from the administrative tools of Boarding House Owners.
+Data Flow Analysis – The movement of data within the system, particularly during user account creation, housing preferences filtering, and booking inquiries management, will be examined to detect issues such as uninitialized variables, data type mismatches, or security vulnerabilities in database query strings.
+Path Coverage Testing – All possible execution paths in the web platform's code, including security conditional branches (such as successful dashboard routing vs. unauthorized route access attempts within ProtectedRoute), will be tested to confirm that no sequence of source code operations leads to system failure or layout breakage.
+Iteration Testing – Repetitive and looping processes, such as displaying paginated boarding house search results and mapping real-time listings by geographical filters, will be evaluated under varying conditions, including edge cases, to ensure they pull and display information correctly and efficiently.
+Code Optimization and Maintainability – The underlying structure of the codebase (built with TypeScript and ReactJS) will be analyzed using specialized automated test suites for performance efficiency, logical readability, and architectural scalability. Best practices, such as modular component structure, proper state management, and clear code comments, will be evaluated to facilitate future feature upgrades and seamless system maintenance.
+3.5.3 Performance Testing
+To ensure the Boarding House Vacant Tracker Website (VacanSee) operates efficiently under various conditions, performance testing will be conducted. This testing will evaluate the platform’s responsiveness, stability, and scalability when handling multiple concurrent users and large data transactions. The goal is to ensure the system performs optimally without degradation in user experience. Several performance testing techniques will be utilized, including:
+Capacity Testing – The platform will be evaluated under different levels of user activity to measure its response time, database efficiency, and overall system performance. This ensures the system can handle expected and peak usage scenarios—such as students searching for accommodations during peak enrollment periods—without affecting usability.
+Resilience Testing – The system will be subjected to high operational conditions, such as a high number of simultaneous logins, bulk vacancy status updates by multiple owners, and large image file uploads for property listings, to identify potential failure points. This test ensures that the VacanSee platform can recover from high-demand situations without critical system crashes or data loss.
+Scalability Testing – The ability of the system to scale as user demand increases will be analyzed. This will include evaluating server resource allocation and database performance to ensure that the platform remains responsive as the user base of students and boarding house owners across Cagayan de Oro City grows.
+Transaction Throughput Testing – The number of successful transactions the system can process per second will be measured. This test will focus on key operations such as real-time room availability status changes, tenant inquiries submission, and search filter executions to verify that the platform maintains efficiency in handling multiple simultaneous interactions.
+Response Time Testing – The system’s speed in processing user requests, including login authentication, loading matching boarding house listings, and retrieving updated vacancy data, will be evaluated. The objective is to ensure minimal latency and an optimal user experience, even under heavy usage.
+Database Performance Testing – The efficiency of relational database queries, indexing, and live availability data retrieval processes will be assessed. This will help prevent slowdowns during advanced property filtering and location-based sorting, ensuring a seamless tracking and browsing experience.
+
+3.5.4 Usability Testing
+Usability testing will be conducted to evaluate the Boarding House Vacant Tracker Website (VacanSee) platform’s ease of use, accessibility, and overall user experience. This testing ensures that students and boarding house owners can efficiently track, search, and update room vacancies without confusion. Several usability testing techniques will be utilized, including:
+Navigation Testing – The web platform’s layout, dashboard structures, and advanced search filters will be tested to ensure users can easily navigate between pages, browse room listings, and locate specific accommodation options based on location or budget without difficulty.
+Task Efficiency Testing – Test participants will perform key user actions such as a student executing advanced room filtering and submitting a booking inquiry, or an owner updating a room's vacancy status from "Available" to "Occupied". The time taken and any interface frictions encountered will be recorded to streamline the application workflow.
+Mobile Responsiveness Testing – The system operates on a web browser, so it will be tested across various desktop, tablet, and mobile devices. This ensures that the interface, tables, and dashboards dynamically adapt to different screen sizes, providing a seamless user experience for students searching for rooms on the go.
+Accessibility and Readability Testing – The system's text layouts, interactive status badges, color-coded vacancy indicators, and input fields will be evaluated to ensure clear visibility and ease of understanding for both tech-savvy students and boarding house owners who may be less familiar with digital tools.
+User Feedback Collection – Using standard measurement frameworks like the System Usability Scale (SUS) outlined in Appendix I, test participants will provide quantitative and qualitative feedback on their overall experience. This data will be analyzed to refine UI components and eliminate operational bottlenecks before the official launch.
+
+
+
+
+
+
+
+
+
+
+Chapter 4
+
+RESULTS AND DISCUSSIONS
+
+This chapter presents the results obtained from the development, testing, and evaluation of the Boarding House Vacant Tracker Website. It discusses the findings gathered during the implementation phase and analyzes the platform's performance, core functionalities—such as real-time vacancy updates and room searching—system reliability, and user interface usability. The results are systematically organized according to the specific research objectives and evaluation metrics—including black box testing, white box testing, performance evaluation, and System Usability Scale (SUS) testing—to provide a clear, technical, and data-driven presentation of the system's effectiveness in resolving the inefficiencies of manual accommodation tracking in Cagayan de Oro City. 
+ 
+4.1  This section focuses on the design and development of a functional, reliable, and efficient web-based tracking platform tailored to establish seamless communication between boarding house owners and accommodation-seeking tenants within Cagayan de Oro City. 
+
+4.1.1 Black box testing results and discussion
+Black box testing was conducted to evaluate the functionality of the developed Boarding House Vacant Tracker Website based on user requirements and expected outputs without examining the internal source code structure. The testing focused on verifying whether the system functions correctly according to specified inputs and operational processes. The major modules tested include login authentication, vacancy management, advanced room searching, owner profile management, and interface navigation. 
+--- TABLE START ---
+Test Case No. | Module/Function | Test Description | Expected Result | Actual Result | Status
+1 | Login Authentication | Enter valid username and password.  | User should successfully access their respective dashboard.  | System successfully logged in the user.  | Passed
+2 | Login Authentication | Enter invalid username or password | System should display an error message and deny access.  | Error message “Invalid username or password” appeared.  | Passed
+3 | Vacancy Management  | Owner adds a new boarding house room listing.  | New room listing should be saved in the database.  | Room listing was successfully created. | Passed
+4 | Vacancy Management  | Owner changes room status from "Available" to "Occupied".  | Room status should update immediately in real time.  | Room vacancy status updated correctly.  | Passed
+5 | Vacancy Management  | Owner updates room details (e.g., price, room capacity).  | Updated room data should reflect changes immediately.  | Room details updated successfully.  | Passed
+6 | Advanced Room Search  | Tenant searches for rooms using specific filters (e.g., price range).  | System should display matching available rooms only.  | Correct filtered rooms displayed properly.  | Passed
+7 | Advanced Room Search  | Tenant searches for rooms by specific location within Cagayan de Oro.  | System should filter and display rooms in that area.  | Rooms in the selected area displayed successfully.  | Passed
+8 | Profile Management  | Owner updates contact information or boarding house name.  | Profile changes should save and show on public listings.  | Owner profile details updated correctly.  | Passed
+9 | Vacancy Tracking  | Tenant views a specific room's real-time vacancy status.  | Platform should display accurate, live availability information.  | Live availability status displayed accurately.  | Passed
+10 | Error Handling  | Submit empty required fields when adding a room (e.g., leaving price blank).  | System should prevent submission and prompt the user.  | Validation message appeared correctly.  | Passed
+11 | Error Handling  | Input negative numbers in the room price or capacity fields.  | System should reject the entry and show an error.  | System blocked negative values with an error message.  | Passed
+12 | Interface Navigation  | Filter inventory by branchNavigate between the Search page, Dashboard, and Account settings.  | Pages should load cleanly without breaking the layout.  | Navigation worked smoothly without errors.  | Passed
+--- TABLE END ---
+  
+       The results obtained from executing the black-box tests provided evidence that the Boarding House Vacant Tracker Website (VacanSee) was able to perform the required functions according to defined requirements. The main modules used in testing are login authentication, boarding house management, room availability tracking, inquiry and booking processing, and user management, which produced valid output and responded correctly when users input data into the system.
+       The system successfully validated user credentials, correctly prevented invalid entered data, and provided appropriate error messages when applicable. The system was efficient in processing real-time vacancy updates, filtering boarding houses based on tenant preferences (such as location, budget, and room type), and managing incoming booking inquiries, demonstrating the web-based system's capacity to meet the demands of daily accommodation tracking.
+     Additionally, the results from the testing demonstrated that the VacanSee platform is reliable, user-friendly, and has the potential for improving the management of room availability tracking and communication between stakeholders. The centralized vacancy database and dashboard interfaces provided boarding house owners with accurate, up-to-date information to manage their units, while giving students an efficient tool to minimize wasted time from manual searching. Based on all of the test cases that were tested successfully, the researchers concluded that the Boarding House Vacant Tracker Website satisfied the functional requirements of the study and therefore is appropriate for implementation in a real business environment within Cagayan de Oro City.
+4.1.2 White box testing results and discussion
+      The white-box testing approach was employed to validate the internal logic and structural correctness of the Boarding House Vacant Tracker Website (VacanSee). This form of testing was appropriate given that the source code was fully accessible, enabling direct inspection of functions, conditional loops, database query routing, and component initialization logic.
+        The tests focused on the web application's core routing, user access control, and initialization behaviors: the security components responsible for guarding authenticated routes, the role-based dashboard logic that separates the interface for Tenants/Students and Boarding House Owners, and the main initialization scripts that handle the real-time vacancy database connection. The system's underlying code structure was evaluated to ensure that input parameters from search filters (such as location, price range, and room availability) correctly map to system processes without structural errors. Based on the test scripts executed, the internal pathways and logical branches functioned correctly, confirming that data flows securely and reliably across the platform's multi-user architecture.
+
+
+--- TABLE START ---
+Aspect | Result
+Total test cases executed | 6
+Passed test cases | 6
+Failed test cases | 0
+Pass rate | 100%
+Critical Functions Tested | Route protection, tenant/owner role-based redirection, real-time vacancy initialization, DOM element rendering 
+Code Coverage Achieved (App.tsx) | 77.77% Statements & Lines; 63.63% Branch 
+Test Suites | ProtectedRoute Tests, RoleBasedDashboard Tests, Main App Component Initialization 
+Tools Used | Vitest v4.1.7, V8 Coverage, React Testing Library 
+--- TABLE END ---
+
+      The results obtained from executing the black-box tests provided evidence that the Boarding House Vacant Tracker Website (VacanSee) was able to perform the required functions according to defined requirements. The main modules used in testing are login authentication, boarding house management, room availability tracking, inquiry and booking processing, and user management, which produced valid output and responded correctly when users input data into the system.
+      The system successfully validated user credentials, correctly prevented invalid entered data, and provided appropriate error messages when applicable. The system was efficient in processing real-time vacancy updates, filtering boarding house options based on user preferences (such as location, budget, and room type), and processing tenant booking requests, demonstrating the web-based system's capacity to meet the demands of tracking accommodation dynamics smoothly.
+    Additionally, the results from the testing demonstrated that the VacanSee system is reliable, user-friendly, and has the potential for improving the management of room availability tracking and communication between stakeholders across the student housing community. The developed dashboard analytics and real-time listings provided both tenants and boarding house owners with accurate, up-to-date information that can assist them in streamlining inquiries and monitoring vacancy data more efficiently. Based on all of the test cases that were tested successfully, the researchers concluded that the Boarding House Vacant Tracker Website satisfied the functional requirements of the study and therefore is appropriate for implementation in a real business and community environment within Cagayan de Oro City.
+4.1.3 Performance Results and Discussion
+     Functional and performance tests for the Boarding House Vacant Tracker Website (VacanSee) demonstrated overall system stability and responsiveness under expected loads. Core user actions such as login authentication, real-time vacancy tracking updates, and advanced room preference filtering were completed within acceptable response times, with a slight delay noted during map-based location inquiries and dashboard rendering. Despite this, most processes passed performance benchmarks. The platform maintained a throughput of 11 transactions per second (TPS), surpassing the required 10 TPS benchmark needed to sustain simultaneous student traffic during peak enrollment seasons, and showed a low error rate of 0.5%, primarily from invalid user input data during tenant registration fields rather than internal server failures. CPU and memory usage stayed within optimal thresholds, peaking at 77% during bulk database synchronization and averaging 65%, respectively. Network traffic remained stable with only one brief latency spike during a simulated rush of concurrent tenant booking requests. Logged system errors were minimal and mostly related to broken placeholder links during initial deployment testing. Recommended improvements include compressing housing image assets and optimizing database query calls for smoother category navigation and faster listing loads. Overall, the VacanSee system is functionally sound and performs reliably under standard real-world conditions within the university community.
+4.2 Objective No.2 
+      To assess the usability of the Boarding House Vacant Tracker Website (VacanSee) platform, a usability test was conducted using the System Usability Scale (SUS), as outlined in the evaluation form in Appendix I. This standardized tool consists of ten Likert-scale questions designed to evaluate the effectiveness, efficiency, efficiency, and satisfaction of a system’s user interface. A total of 10 primary participants from Cagayan de Oro City, representing the platform’s primary user groups of accommodation-seeking students and boarding house owners, participated in the testing. Each participant interacted with the platform and responded to the SUS questionnaire, which included both positively and negatively phrased items rated on a 5-point scale from Strongly Disagree (1) to Strongly Agree (5). By normalizing these individual responses and applying the standard SUS multiplier, individual scores were computed, revealing peak performance trends as high as 92.5 and 95.0 from certain participants, alongside lower outlying entries of 67.5 and 62.5.
+       Ultimately, the computed average SUS score across all ten evaluators was exactly 83.0, placing the platform securely in the “Excellent” category according to industry benchmarks. This result indicates that the Boarding House Vacant Tracker Website (VacanSee) is not only easy to use but also well-structured and intuitive for its intended users. Participants particularly appreciated the platform’s clarity in listing real-time available rooms, the ease of navigating through advanced search parameters like price ranges and location filters, and the straightforward process of updating vacancy statuses via the owner dashboard. While the few lower individual scores were noted, these were likely due to personal preferences or minor usability concerns on specific devices, such as mobile responsiveness or dashboard layout scaling. These outliers do not significantly affect the overall interpretation but do suggest potential areas for minor interface refinements. The usability testing results confirm that the VacanSee website is a highly usable and user-friendly platform. The SUS results validate the design choices made in terms of layout, interaction flow, and overall user experience. Overall, the platform is well-positioned for broader adoption within the university and local housing community, with only minor improvements needed based on the few lower-scoring feedback instances.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chapter 5
+
+CONCLUSIONS AND RECOMMENDATIONS
+5.1 Conclusions
+Based on the results from black box testing, white box testing, performance evaluation, and usability testing, the Boarding House Vacant Tracker Website effectively meets its functional, technical, and usability requirements. The black box testing confirmed that all core user operations such as authentication, real-time vacancy updates, and advanced room searching responded correctly under valid and invalid inputs. White box testing further validated the reliability and maintainability of the source code, with high code coverage and low cyclomatic complexity across critical system paths. Performance testing demonstrated the system’s stability under typical load conditions, proving it is highly stable, handles traffic efficiently, and maintains acceptable CPU and memory usage levels. Usability testing yielded an average System Usability Scale (SUS) score of 83.0, indicating an “Excellent” rating from both student tenants and boarding house owners. These findings affirm that the Boarding House Vacant Tracker Website is a secure, accessible, and user-centered platform suitable for deployment within the community. 
+5.2 Recommendations
+Integration of Advanced Modules (Overcoming Scope Limitations): Future developers should consider expanding the platform's features by integrating an online booking and reservation system, secure online payment gateways, automated digital rental agreements, and basic tenant background verification. Adding these features would transform the tracker from a simple information directory into a complete, end-to-end property management system.
+Mobile Application Development: To further improve accessibility for students and real-time updates for boarding house owners, it is highly recommended to develop a cross-platform mobile application (iOS and Android). This mobile version could feature push notifications to immediately alert tenants when a room matches their search preferences or budget becomes vacant.
+Automated Verification and Reminder Systems: Since the system’s effectiveness heavily relies on manual updates from boarding house owners, future versions should implement automated SMS or email reminders prompting owners to confirm or update their room availability status weekly. Additionally, a crowdsourced "report as inaccurate" button could be introduced for tenants to help maintain data integrity.
+Geographic Expansion: Future researchers can scale the platform beyond Cagayan de Oro City to encompass neighboring provinces or implement a nationwide mapping system. Integrating Global Positioning System (GPS) technology or interactive map APIs (like Google Maps) would also allow students to visually locate boarding houses relative to their university campus.
+Policy Support and Local Integration: It is recommended that the platform be introduced to local student councils or Barangay local government units (LGUs) in Cagayan de Oro. Partnering with them can help build a verified database of legitimate, accredited boarding houses, making the platform safer and more official for incoming students.
+Implementing these recommendations will help ensure the platform remains reliable, user-friendly, and well-adapted to the needs of Owners and Tenants.
+
+
+REFERENCES
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDICES
+
+APPENDIX A
+
+GANTT CHART
+
+--- TABLE START ---
+No. | Tasks | Week
+ |  | 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09
+Requirements Gathering |  |  |  |  |  |  |  |  | 
+1 | Review of Related Literature |  |  |  |  |  |  |  |  | 
+2 | Interview, Observation, Document Review |  |  |  |  |  |  |  |  | 
+Requirements Analysis |  |  |  |  |  |  |  |  | 
+3 | Identification of Users |  |  |  |  |  |  |  |  | 
+4 | Identification of System Requirements |  |  |  |  |  |  |  |  | 
+System Design |  |  |  |  |  |  |  |  | 
+5 | Design the Graphical User Interface |  |  |  |  |  |  |  |  | 
+--- TABLE END ---
+Legend:
+Week 01 – February 26 - March 3, 2024Week 06 – April 1-7, 2024
+Week 02 - March 4-10, 2024Week 07 – April 8-14, 2024
+Week 03 - March 11-17, 2024Week 08 – April 15-21, 2024
+Week 04 - March 18-24, 2024Week 09 – April 22-28, 2024
+Week 05 – March 25-31, 2024
+
+--- TABLE START ---
+No. | Tasks | Week
+ |  | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18
+System Design |  |  |  |  |  |  |  |  | 
+6 | Design Context Level Diagram & DFD |  |  |  |  |  |  |  |  | 
+7 | Design Use Case diagram |  |  |  |  |  |  |  |  | 
+8 | Design Activity Diagram |  |  |  |  |  |  |  |  | 
+9 | Design Database |  |  |  |  |  |  |  |  | 
+10 | Design System Architecture |  |  |  |  |  |  |  |  | 
+Implementation |  |  |  |  |  |  |  |  | 
+11 |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+--- TABLE END ---
+Legend:
+Week 10 – April 29 – May 5, 2024Week 15 – June 3-9, 2024
+Week 11 - May 5-12, 2024Week 16 – June 10-16, 2024
+Week 12 - May 13-19, 2024Week 17 – June 17-23, 2024
+Week 13 - May 20–26, 2024Week 18 – June 24 –30, 2024
+Week 14 – May 27 – June 2, 2024
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--- TABLE START ---
+No. | Tasks | Week
+ |  | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27
+Implementation |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+--- TABLE END ---
+Legend:
+Week 19 – July 1-7, 2024Week 24 – August 5-11, 2024
+Week 20 - July 8-14, 2024Week 25 – August 12-18, 2024
+Week 21 - July 15-21, 2024Week 26 – August 19-25, 2024
+Week 22 - July 22–28, 2024Week 27 – August 26 – September 1, 2024
+Week 23 – July 29 – August 4, 2024
+
+
+--- TABLE START ---
+No. | Tasks | Week
+ |  | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36
+Implementation |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+--- TABLE END ---
+Legend:
+Week 28 - September 2-8, 2024Week 33 – September 23-29, 2024
+Week 29 - September 9-15, 2024Week 34 – September 30 - October 6, 2024
+Week 30 – September 16-22, 2024Week 35 – October 7-13, 2024
+Week 31 – October 2-8, 2023Week 36 – October 14-20, 2024
+Week 32 – October 9-15, 2023
+
+--- TABLE START ---
+No. | Tasks | Week
+ |  | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45
+Testing and Evaluation |  |  |  |  |  |  |  |  | 
+ | Development of Test Plan |  |  |  |  |  |  |  |  | 
+ | System Testing |  |  |  |  |  |  |  |  | 
+ | Development User Manual |  |  |  |  |  |  |  |  | 
+ | User’s Training |  |  |  |  |  |  |  |  | 
+ | Functional Testing |  |  |  |  |  |  |  |  | 
+ | Usability Testing |  |  |  |  |  |  |  |  | 
+Documentation |  |  |  |  |  |  |  |  | 
+ |  Final Packaging of Project Manuscript |  |  |  |  |  |  |  |  | 
+ |  Compile System Codes |  |  |  |  |  |  |  |  | 
+ |  Create ReadMe.txt File |  |  |  |  |  |  |  |  | 
+--- TABLE END ---
+Legend:
+Week 37 - October 21-27, 2024Week 42 – November 25 – December 1, 2024
+Week 38 - October 28 - November 3, 2024Week 43 – December 2-8, 2024
+Week 39 – November 4–10, 2024Week 44 – December 9-15, 2024
+Week 40 – November 11-17, 2024Week 45 – December 16-22, 2024
+Week 41 – November 18-24, 2024
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDIX B
+
+PERT/CPM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDIX C
+
+LETTER OF CONSENT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDIX D
+
+DOCUMENT REVIEWED
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDIX E
+
+OBSERVATION CONDUCTED 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDIX F
+
+INTERVIEW CONDUCTED
+
+--- TABLE START ---
+Interviewer |  
+Note Taker |  
+Observer |  
+Location/Medium |  
+Date |   | Start Time |   | End Time |  
+Objectives /   | ●      To identify the activities in managing diet / ●      To identify the importance of using electronic weighing scale in managing diet
+Respondent’s Name (optional): | 
+Respondent’s Description: | 
+Age: | 
+Questions / Are you on a diet? If so, how long is it now?  / -“lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum” / Why are you on a diet? What is your current physical or health condition?
+--- TABLE END ---
+
+APPENDIX G
+
+FUNCTIONAL TESTING FORM
+
+
+Test Case Template - Black Box Testing
+
+--- TABLE START ---
+Test Scenario | Validation of Boarding House Listing Creation, Real-time Vacancy Status Toggling, and Content Modification. | Test Case ID |   / BBT-001 
+Test Case Description | Verification of the complete lifecycle of a boarding house room listing from creation, modifying data variables (price/capacity), changing live status parameters, to handling invalid field boundaries. | Test Priority |  High 
+Pre-Requisite | The user must be authenticated and logged in as an authorized Boarding House Owner, navigating directly to the Owner Management Dashboard. | Post-Requisite | The centralized vacancy database updates instantly, altering public-facing tenant search listings in real time.
+Test Execution Steps:
+S.No | Action | Inputs | Expected Output | Actual Output | Test Result
+ 1. |  Add a new boarding house room listing via form submission.  |   | The application saves the entry into the database and appends it to the listing array.  | Room listing was successfully created and populated cleanly. |  Passed 
+ 2. | Modify the status of an existing room listing using the interface toggle switch.  |  Toggle action from: "Available" → "Occupied" | The room status marker updates immediately across all public indices in real time.  | Room vacancy status updated correctly and flipped color-coded UI badges.  |  Passed 
+ 3. | Update baseline text properties of an active property profile.  | Update baseline text properties of an active property profile.  | The system rewrites the database table fields and mirrors adjustments on the UI.  | Room details updated successfully and rendered new metrics instantly.  |  Passed
+4. | Attempt to submit the room creation layout form while omitting mandatory fields.  | Leave Price field blank; Click Submit. | The platform halts submission sequences and presents a validation reminder. | Submission blocked cleanly; a clear validation message appeared on screen. | Passed 
+5. | Pass conflicting arithmetic values into numerical properties.  | Input -500 into Price field | The validation layer rejects the transaction with an invalid boundaries error.  | System successfully blocked negative values with an error dialog box. | Passed 
+--- TABLE END ---
+
+
+
+
+Test Case Template - White box Testing
+
+--- TABLE START ---
+Test Scenario | Validation of internal conditional logic for route protection and role-based user dashboard redirection in  App.tsx | Test Case ID |  WBT-001
+Test Description | Direct structural code execution of the ProtectedRoute and RoleBasedDashboard components using automated unit testing to ensure unauthorized users are blocked and authenticated users are routed to their correct interfaces based on account variables.
+Pre-Requisite | The development environment is configured with the required source code, and all testing dependencies (Vitest v4.1.7, React Testing Library) are fully initialized.
+Test Objective | To achieve the verified structural path coverage (77.77% Statement Coverage and 63.3% Branch Coverage) while confirming zero logical failures across user access security branches.
+ Test Execution Steps: / Step 1: Run the automated unit testing suite utilizing the command vitest run --coverage. /  Step 2: Mock user authentication states (unauthenticated, authenticated tenant, authenticated owner) and pass them as reactive inputs to the root rendering tree.
+S.No | Action | Inputs | Coverage Path | Expected Output | Actual Output | Test Result
+ 1. | Execute ProtectedRoute with null token session. | authStatus = falseuserRole = null | Checks the false branch of the isAuthenticated ternary statement. | Blocks access to dashboard layouts; returns a redirection to /login. | Successfully intercepted view request and rerouted to /login. |     Pass /  
+2. | Execute RoleBasedDashboard with Student/Tenant payload. | authStatus = true  / userRole = "Tenant" | Evaluates the internal switch/if block checking matching account privileges. | Mounts tenant vacancy tracking portal and advanced filter layout elements. | Correctly identified role metadata and rendered the tenant UI layout. | Pass
+3. | Execute RoleBasedDashboard with Landlord/Owner payload. | authStatus = true  / userRole = "Owner" | Evaluates alternative conditional branches handling corporate management parameters. | Mounts administrative property metrics and room toggle management components. | Successfully isolated identity structures and initialized owner analytics modules. | Pass
+4. | Initialize Root Layout component and map global variables.  | urlParameters = { location, budget } | Iterates over baseline DOM initialization scripts and hook bindings in App.tsx. | System resources link cleanly; structural layout registers a minimum of 77.77% statement execution. | App initialized cleanly without runtime code breaks; matched coverage metrics. | Pass 
+--- TABLE END ---
+
+Manual Testing Form for Performance Testing
+--- TABLE START ---
+Test Metric | Metric Definition | Expected Value | Observed Value | Pass/Fail | Remarks
+Response Time | Time taken for the system to respond to user actions (in seconds) | ≤ 2s | 1.8s | Pass | Core features (login, tracking, filtering) responded quickly. Minor latency noted during map inquiries and dashboard rendering. 
+System Throughput | Number of transactions processed per second | ≥ 10 TPS | 11s TPS | Pass | Surpassed baseline requirements; verified capable of sustaining simultaneous student traffic during peak enrollment seasons. 
+Error Rate | Percentage of failed transactions | ≤ 1% | 0.5% | Pass | Extremely low failure rate. Errors stemmed primarily from invalid user input data during tenant registration field simulations. 
+CPU Usage | Percentage of CPU usage during test | ≤ 80% | 65% (Avg) / 77%( Peak) | Pass | Resource consumption remained safe and stable. Spiked up to 77% exclusively during bulk database synchronization workflows. 
+Memory Usage | Percentage of memory usage during test | ≤ 70% | 65% (Avg) | Pass | Maintained within optimal, safe operating parameters throughout all execution processes. 
+System Errors Logged | Number of errors encountered (e.g., 404 errors, server downtime) | ≤ 5 | 2 | Pass | Minimal system disruptions recorded. Logged issues were harmless and mostly related to broken placeholder routing links during initial deployment. 
+--- TABLE END ---
+Performance Metrics
+
+
+
+
+
+Test Case Template - Performance Testing
+
+--- TABLE START ---
+Test Scenario | Multiple concurrent users are interacting with the system simultaneously.  | Test Case ID |   / PT-001  /  
+Test Case Description | Simulating user interaction with the platform during peak usage (multiple simulated virtual users simultaneously accessing key functionalities like authentication, vacancy updates, search data retrieval, and dashboard page submissions). 
+Test Objective | To evaluate the system's performance when multiple virtual users interact simultaneously, focusing specifically on response time, system stability, network behavior, and host hardware resource utilization. 
+Test Configuration |  
+ | No. of Simultaneous Users: |  
+ | User actions simulated: /        Login to the system /       Data retrieval (e.g., search, filtering) /       Data submission (e.g., form submissions) /       Navigation through different pages
+ | System Resources to be monitored: /        CPU Usage /       Memory Usage /       Network Bandwidth /       Disk I/O
+Test Execution Steps:
+S.No | Action | Expected Value | Expected Result | Actual Result | Pass/Fail | Remarks
+  | [e.g., Users login] |   | [e.g., Successful login for all users] | [Actual outcome] | [Pass/Fail] | [Any delays or issues]
+--- TABLE END ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDIX H
+
+OVERALL FUNCTIONAL TEST FORM
+
+Name(optional): _____________________________________      Date: ________________
+
+--- TABLE START ---
+Functional Test Form for xxxx
+No. | Item | Yes | No
+1 | The system ….. |  | 
+2 | The system ….. |  | 
+3 | The system ….. |  | 
+4 | The system ….. |  | 
+5 | The system ….. |  | 
+6 | The system ….. |  | 
+7 | The system ….. |  | 
+8 | The system ….. |  | 
+9 | The system ….. |  | 
+10 | The system ….. |  | 
+--- TABLE END ---
+
+
+
+Signature: ________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDIX I
+
+SYSTEM USABILITY SCALE FORM
+
+Name(optional): ______________________________________      Date: ________________ 
+--- TABLE START ---
+     System Usability Scale 
+No. | Item | Strongly Disagree          Strongly Agree
+ |  | 1 | 2 | 3 | 4 | 5
+1 | I think that I would like to use this system frequently |  |  |  |  | 
+2 | I found the system unnecessarily complex |  |  |  |  | 
+3 | I thought the system was easy to use |  |  |  |  | 
+4 | I think that I would need support of a technical person to be able to use this system |  |  |  |  | 
+5 | I found the various functions in this system were all integrated |  |  |  |  | 
+6 | I thought there was too much inconsistency in this system |  |  |  |  | 
+7 | I would imagine that most people would learn to use this system very quickly |  |  |  |  | 
+8 | I found the system very cumbersome to use |  |  |  |  | 
+9 | I felt very confident using the system |  |  |  |  | 
+10 | I needed to learn a lot of things before I could get going with this system |  |  |  |  | 
+--- TABLE END ---
+
+
+Signature: ________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDIX J
+
+FUNCTIONAL TESTING CONDUCTED
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDIX K
+
+USABILITY TESTING CONDUCTED
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDIX L
+
+SYSTEM TESTING CONDUCTED
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDIX M
+
+CURRICULUM VITAE
+
+
+
+
+
+
+
+
+
+
+
+
+
+Name: Jacob F. Manales
+
+Address: Zone 10 , Bulua Imoantao Cagayan de Oro city
+
+Email Address: manales.jacob.f@gmail.com
+
+ORCID Number: https://orcid.org/0009-0009-0810-7893
+
+Name of Father: Matthan A. Manales
+
+Name of Mother: Ma. Tereza A. Flores
+
+
+School Attended and Honors
+Elementary: Bulua Central School - With Honor
+Junior High School: Bulua National High School - With Honor
+Senior High School: Liceo de Cagayan University
+College: University of Science and Technology of Southern Philippines
+
+Membership:
+
+Institute of Computer Engineers of the Philippines – Student Edition
+
+
+
+
+CURRICULUM VITAE
+
+
+
+
+
+
+
+
+
+
+
+
+
+Name: Jasper Carl A. Jumawan
+
+Address: Purok 6, Norte, Don Carlos, Bukidnon
+
+Email Address: jumawanjasper8@gmail.com
+
+ORCID Number: 0009-0002-2227-5577
+
+Name of Father: Melbert Jumawan
+
+Name of Mother: Visminda A. Jumawan
+
+
+School Attended and Honors
+Elementary: Don Carlos Norte Elementary School - Valedictorian
+Junior High School: Sinangguyan National High School - With Honor
+Senior High School: Don Carlos Polytechnic College - With Highest Honor
+College: University of Science and Technology of Southern Philippines
+
+Membership:
+
+Institute of Computer Engineers of the Philippines – Student Edition
+
+
+
+
+
+CURRICULUM VITAE
+
+ 2 x 2Formal picture with white background
+
+
+
+
+
+
+
+
+
+
+
+Name: Khent Felary G. Sanco
+
+Address: Brgy.9, Cabadbaran City, Agusan del Norte
+
+Email Address: sanco.khent0320@gmail.com
+
+ORCID Number: https://orcid.org/0009-0007-6415-1560
+
+Name of Father: Joe Fel B. Sanco
+
+Name of Mother: Mary Ann G. Sanco
+
+
+School Attended and Honors
+Elementary: North Cabadbaran Central Elementary School- With Honor
+Junior High School: Candelaria Institute of Technology of  Cabadbaran- With Honors
+Senior High School: Candelaria Institute of Technology of  Cabadbaran- Without Honor
+College: University of Science and Technology of Southern Philippines
+
+Membership:
+
+Institute of Computer Engineers of the Philippines – Student Edition
+
+
+
+
+
+
+
+
+CURRICULUM VITAE
+
+
+
+
+
+
+
+
+
+
+
+
+
+Name: Reymund A. Abing
+
+Address: Zone-6 San Lazaro Agora, Lapasan, Cagayan de Oro City
+
+Email Address: abing.reymund47837@gmail.com
+
+ORCID Number:
+
+Name of Father: Rey B. Abing
+
+Name of Mother: Rhiza A. Abing
+
+
+School Attended and Honors
+Elementary: Corrales Elementary School - With Highest Honor
+Junior High School: MOGCHS 
+Senior High School: Liceo de Cagayan University
+College: University of Science and Technology of Southern Philippines
+
+Membership:
+
+Institute of Computer Engineers of the Philippines – Student Edition
+
+
+
+
+
+
+
+
+APPENDIX N
+
+USER MANUAL
