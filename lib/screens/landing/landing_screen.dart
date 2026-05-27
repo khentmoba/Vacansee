@@ -806,9 +806,9 @@ class LandingScreen extends StatelessWidget {
     double padding,
   ) {
     return Container(
-      color: const Color(0xFFF0F9FF),
       padding: EdgeInsets.symmetric(horizontal: padding, vertical: 64),
       decoration: BoxDecoration(
+        color: const Color(0xFFF0F9FF),
         border: Border(
           top: BorderSide(color: AppColors.secondary.withValues(alpha: 0.1)),
           bottom: BorderSide(color: AppColors.secondary.withValues(alpha: 0.1)),
