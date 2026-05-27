@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
+import '../../widgets/auth/auth_background.dart';
+import '../../widgets/auth/glass_card.dart';
+import '../../widgets/auth/auth_input_field.dart';
+import '../../widgets/auth/gradient_button.dart';
 import 'login_screen.dart';
 import 'email_verification_screen.dart';
 
@@ -45,22 +49,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _validateAndSubmit() {
     setState(() {
-      _errors['firstName'] = _firstNameController.text.isEmpty
-          ? 'Required'
-          : null;
-      _errors['lastName'] = _lastNameController.text.isEmpty
-          ? 'Required'
-          : null;
-      _errors['contact'] = _contactController.text.isEmpty ? 'Required' : null;
+      _errors['firstName'] =
+          _firstNameController.text.isEmpty ? 'Required' : null;
+      _errors['lastName'] =
+          _lastNameController.text.isEmpty ? 'Required' : null;
+      _errors['contact'] =
+          _contactController.text.isEmpty ? 'Required' : null;
       _errors['email'] =
           _emailController.text.isEmpty || !_emailController.text.contains('@')
-          ? 'Please enter a valid email'
-          : null;
+              ? 'Please enter a valid email'
+              : null;
       _errors['password'] = _passwordController.text.length < 6
           ? 'Password must be at least 6 characters'
           : null;
-      _errors['role'] = _selectedRole == null ? 'Please select a role' : null;
-      _errors['terms'] = !_agreedToTerms ? 'You must agree to the terms' : null;
+      _errors['role'] =
+          _selectedRole == null ? 'Please select a role' : null;
+      _errors['terms'] =
+          !_agreedToTerms ? 'You must agree to the terms' : null;
     });
 
     if (_errors.values.every((e) => e == null)) {
@@ -107,180 +112,82 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final isMobile = screenWidth < 900;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: isMobile
-          ? _buildMobileLayout(authProvider)
-          : _buildDesktopLayout(authProvider),
+      body: AuthBackground(
+        child: isMobile
+            ? _buildMobileLayout(authProvider)
+            : _buildDesktopLayout(authProvider),
+      ),
     );
   }
 
   Widget _buildDesktopLayout(AuthProvider authProvider) {
     return Row(
       children: [
-        // Left Side - Welcome text with decorative elements
         Expanded(
-          child: Container(
-            color: Colors.white,
-            child: Stack(
-              children: [
-                // Decorative diamond top
-                Positioned(
-                  top: 80,
-                  right: 100,
-                  child: Transform.rotate(
-                    angle: 0.785398,
-                    child: Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppColors.primary.withValues(alpha: 0.6),
-                            AppColors.primary.withValues(alpha: 0.2),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                  ),
-                ),
-                // Decorative diamond middle
-                Positioned(
-                  top: 250,
-                  right: 60,
-                  child: Transform.rotate(
-                    angle: 0.785398,
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppColors.primary.withValues(alpha: 0.4),
-                            AppColors.primary.withValues(alpha: 0.1),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                  ),
-                ),
-                // Large decorative circle bottom left
-                Positioned(
-                  bottom: -150,
-                  left: -100,
-                  child: Container(
-                    width: 400,
-                    height: 400,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 60),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.primary.withValues(alpha: 0.5),
-                          AppColors.primary.withValues(alpha: 0.2),
-                        ],
-                      ),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-                // Content
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 80),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Logo
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.home_work,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'VacanSee',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 60),
-                        const Text(
-                          'Welcome to\nVacanSee',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                            height: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'To keep connected with us please sign\nup with your personal information',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: AppColors.textSecondary,
-                            height: 1.6,
-                          ),
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.25),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
                         ),
                       ],
                     ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.home_work_rounded,
+                        color: Colors.white,
+                        size: 34,
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Join VacanSee',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Create your account and start\nfinding your perfect space',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.textSecondary,
+                      height: 1.6,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-        // Right Side - Sign Up Form
         Expanded(
-          child: Container(
-            color: Colors.white,
-            alignment: Alignment.center,
+          child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 48),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Sign Up',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 500),
-                    child: _buildForm(authProvider),
-                  ),
-                ],
+              padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 48),
+              child: GlassCard(
+                padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 460),
+                  child: _buildForm(authProvider),
+                ),
               ),
             ),
           ),
@@ -290,68 +197,72 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildMobileLayout(AuthProvider authProvider) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 40),
-          // Centered Header
-          Center(
-            child: Column(
-              children: [
-                // Logo
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.home_work,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'VacanSee',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 40),
-                const Text(
-                  'Sign Up',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.25),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
                   ),
+                ],
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.home_work_rounded,
+                  color: Colors.white,
+                  size: 30,
                 ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Welcome to VacanSee! Please sign up with your personal information',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
-                ),
-              ],
+              ),
             ),
-          ),
-          const SizedBox(height: 32),
-          _buildForm(authProvider),
-        ],
+            const SizedBox(height: 12),
+            const Text(
+              'VacanSee',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            GlassCard(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Create Account',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Fill in your details to get started',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  _buildForm(authProvider),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -364,21 +275,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.red[50],
-              borderRadius: BorderRadius.circular(8),
+              color: AppColors.error.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.error.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
-                Icon(Icons.error_outline, color: Colors.red[700]),
-                const SizedBox(width: 8),
+                Icon(Icons.error_outline, color: AppColors.error, size: 20),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     authProvider.errorMessage!,
-                    style: TextStyle(color: Colors.red[700]),
+                    style: const TextStyle(
+                      color: AppColors.error,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 18),
+                  icon: const Icon(Icons.close, size: 18, color: AppColors.error),
                   onPressed: authProvider.clearError,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -386,146 +302,91 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
         ],
 
-        // First & Last Name row
         Row(
           children: [
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildLabel('First Name:'),
-                  TextFormField(
-                    controller: _firstNameController,
-                    onChanged: (_) => _clearError('firstName'),
-                    decoration: _buildInputDecoration(
-                      hintText: 'Enter first name',
-                      error: _errors['firstName'],
-                    ),
-                  ),
-                  if (_errors['firstName'] != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4, left: 4),
-                      child: Text(
-                        _errors['firstName']!,
-                        style: const TextStyle(color: Colors.red, fontSize: 12),
-                      ),
-                    ),
-                ],
+              child: AuthInputField(
+                controller: _firstNameController,
+                label: 'First Name',
+                hintText: 'Juan',
+                prefixIcon: Icons.person_outline,
+                error: _errors['firstName'],
+                onChanged: (_) => _clearError('firstName'),
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildLabel('Last Name:'),
-                  TextFormField(
-                    controller: _lastNameController,
-                    onChanged: (_) => _clearError('lastName'),
-                    decoration: _buildInputDecoration(
-                      hintText: 'Enter last name',
-                      error: _errors['lastName'],
-                    ),
-                  ),
-                  if (_errors['lastName'] != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4, left: 4),
-                      child: Text(
-                        _errors['lastName']!,
-                        style: const TextStyle(color: Colors.red, fontSize: 12),
-                      ),
-                    ),
-                ],
+              child: AuthInputField(
+                controller: _lastNameController,
+                label: 'Last Name',
+                hintText: 'Dela Cruz',
+                prefixIcon: Icons.person_outline,
+                error: _errors['lastName'],
+                onChanged: (_) => _clearError('lastName'),
               ),
             ),
           ],
         ),
         const SizedBox(height: 20),
 
-        // Contact Number
-        _buildLabel('Contact Number:'),
-        TextFormField(
+        AuthInputField(
           controller: _contactController,
+          label: 'Contact Number',
+          hintText: '+63 912 345 6789',
+          prefixIcon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
+          error: _errors['contact'],
           onChanged: (_) => _clearError('contact'),
-          decoration: _buildInputDecoration(
-            hintText: 'Enter contact number',
-            error: _errors['contact'],
-          ),
         ),
-        if (_errors['contact'] != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 4, left: 4),
-            child: Text(
-              _errors['contact']!,
-              style: const TextStyle(color: Colors.red, fontSize: 12),
-            ),
-          ),
         const SizedBox(height: 20),
 
-        // Email
-        _buildLabel('Email:'),
-        TextFormField(
+        AuthInputField(
           controller: _emailController,
+          label: 'Email',
+          hintText: 'you@example.com',
+          prefixIcon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
+          error: _errors['email'],
           onChanged: (_) => _clearError('email'),
-          decoration: _buildInputDecoration(
-            hintText: 'Enter your email',
-            error: _errors['email'],
-          ),
         ),
-        if (_errors['email'] != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 4, left: 4),
-            child: Text(
-              _errors['email']!,
-              style: const TextStyle(color: Colors.red, fontSize: 12),
-            ),
-          ),
         const SizedBox(height: 20),
 
-        // Password
-        _buildLabel('Password:'),
-        TextFormField(
+        AuthInputField(
           controller: _passwordController,
+          label: 'Password',
+          hintText: 'At least 6 characters',
+          prefixIcon: Icons.lock_outlined,
           obscureText: _obscurePassword,
+          error: _errors['password'],
           onChanged: (_) => _clearError('password'),
-          decoration: _buildInputDecoration(
-            hintText: 'Enter your password',
-            error: _errors['password'],
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                color: AppColors.primary,
-              ),
-              onPressed: () =>
-                  setState(() => _obscurePassword = !_obscurePassword),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _obscurePassword
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+              color: AppColors.primary,
+              size: 20,
             ),
+            onPressed: () =>
+                setState(() => _obscurePassword = !_obscurePassword),
           ),
         ),
-        if (_errors['password'] != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 4, left: 4),
-            child: Text(
-              _errors['password']!,
-              style: const TextStyle(color: Colors.red, fontSize: 12),
-            ),
-          ),
         const SizedBox(height: 24),
 
-        // Role Selector (Button tabs - Tenant/Owner only)
         _buildLabel('I am a:'),
         Container(
-          height: 52,
+          height: 50,
           decoration: BoxDecoration(
-            color: const Color(0xFFF5F7FA),
-            borderRadius: BorderRadius.circular(26),
-            border: Border.all(color: AppColors.border, width: 1),
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(
+              color: _errors['role'] != null
+                  ? AppColors.error
+                  : AppColors.border,
+              width: 1.5,
+            ),
           ),
           padding: const EdgeInsets.all(4),
           child: Row(
@@ -544,18 +405,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       color: _selectedRole == UserRole.student
                           ? AppColors.primary
                           : Colors.transparent,
-                      borderRadius: BorderRadius.circular(22),
+                      borderRadius: BorderRadius.circular(21),
                     ),
                     alignment: Alignment.center,
-                    child: Text(
-                      'Tenant',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: _selectedRole == UserRole.student
-                            ? Colors.white
-                            : const Color(0xFF7A7A7A),
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.school_rounded,
+                          size: 18,
+                          color: _selectedRole == UserRole.student
+                              ? Colors.white
+                              : const Color(0xFF7A7A7A),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Tenant',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: _selectedRole == UserRole.student
+                                ? Colors.white
+                                : const Color(0xFF7A7A7A),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -574,18 +448,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       color: _selectedRole == UserRole.owner
                           ? AppColors.primary
                           : Colors.transparent,
-                      borderRadius: BorderRadius.circular(22),
+                      borderRadius: BorderRadius.circular(21),
                     ),
                     alignment: Alignment.center,
-                    child: Text(
-                      'Owner',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: _selectedRole == UserRole.owner
-                            ? Colors.white
-                            : const Color(0xFF7A7A7A),
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.business_rounded,
+                          size: 18,
+                          color: _selectedRole == UserRole.owner
+                              ? Colors.white
+                              : const Color(0xFF7A7A7A),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Owner',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: _selectedRole == UserRole.owner
+                                ? Colors.white
+                                : const Color(0xFF7A7A7A),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -595,23 +482,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         if (_errors['role'] != null)
           Padding(
-            padding: const EdgeInsets.only(top: 6, left: 4),
-            child: Text(
-              _errors['role']!,
-              style: const TextStyle(color: Colors.red, fontSize: 12),
+            padding: const EdgeInsets.only(top: 6, left: 12),
+            child: Row(
+              children: [
+                Icon(Icons.info_rounded, size: 13, color: AppColors.error),
+                const SizedBox(width: 4),
+                Text(
+                  _errors['role']!,
+                  style: const TextStyle(
+                    color: AppColors.error,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         const SizedBox(height: 24),
 
-        // Terms checkbox
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 3),
+              padding: const EdgeInsets.only(top: 2),
               child: SizedBox(
-                width: 20,
-                height: 20,
+                width: 22,
+                height: 22,
                 child: Checkbox(
                   value: _agreedToTerms,
                   onChanged: (v) {
@@ -622,7 +518,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                   activeColor: AppColors.primary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  side: BorderSide(
+                    color: _errors['terms'] != null
+                        ? AppColors.error
+                        : AppColors.border,
+                    width: 1.5,
                   ),
                 ),
               ),
@@ -632,7 +534,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Text.rich(
                 TextSpan(
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 13,
                     color: Color(0xFF666666),
                   ),
                   children: [
@@ -643,7 +545,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       text: 'Terms of Use',
                       style: const TextStyle(
                         color: AppColors.primary,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const TextSpan(text: ' and '),
@@ -651,7 +553,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       text: 'Privacy Policy',
                       style: const TextStyle(
                         color: AppColors.primary,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const TextSpan(text: '.'),
@@ -663,69 +565,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         if (_errors['terms'] != null)
           Padding(
-            padding: const EdgeInsets.only(top: 4, left: 32),
-            child: Text(
-              _errors['terms']!,
-              style: const TextStyle(color: Colors.red, fontSize: 12),
-            ),
-          ),
-        const SizedBox(height: 32),
-
-        // Sign Up Button
-        SizedBox(
-          width: double.infinity,
-          height: 52,
-          child: ElevatedButton(
-            onPressed: authProvider.isLoading ? null : _validateAndSubmit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: authProvider.isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Text(
-                    'SIGN UP',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1,
-                    ),
+            padding: const EdgeInsets.only(top: 6, left: 34),
+            child: Row(
+              children: [
+                Icon(Icons.info_rounded, size: 13, color: AppColors.error),
+                const SizedBox(width: 4),
+                Text(
+                  _errors['terms']!,
+                  style: const TextStyle(
+                    color: AppColors.error,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                   ),
+                ),
+              ],
+            ),
           ),
+
+        const SizedBox(height: 28),
+
+        GradientButton(
+          label: 'SIGN UP',
+          isLoading: authProvider.isLoading,
+          onPressed: _validateAndSubmit,
         ),
         const SizedBox(height: 24),
 
-        // OR Divider
         Row(
           children: [
-            Expanded(child: Divider(color: Colors.grey[300])),
+            Expanded(child: Divider(color: Colors.grey[200])),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 'OR',
-                style: TextStyle(color: Color(0xFF999999), fontSize: 13),
+                style: TextStyle(
+                  color: Color(0xFF999999),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-            Expanded(child: Divider(color: Colors.grey[300])),
+            Expanded(child: Divider(color: Colors.grey[200])),
           ],
         ),
         const SizedBox(height: 24),
 
-        // Google Sign In Button
         SizedBox(
           width: double.infinity,
-          height: 52,
+          height: 50,
           child: OutlinedButton(
             onPressed: authProvider.isLoading
                 ? null
@@ -733,25 +620,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: Colors.grey[300]!, width: 1.5),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
+              backgroundColor: Colors.white,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'Continue with',
-                  style: TextStyle(
-                    color: Color(0xFF1D1B16),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(width: 12),
                 Image.asset(
                   'assets/images/google_logo.png',
-                  height: 24,
-                  width: 24,
+                  height: 22,
+                  width: 22,
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Continue with Google',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -759,29 +647,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         const SizedBox(height: 24),
 
-        // Login Link
         Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
                 "Already have an account? ",
-                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                ),
               ),
-              TextButton(
-                onPressed: () => Navigator.pushReplacement(
+              GestureDetector(
+                onTap: () => Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const LoginScreen()),
                 ),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
                 child: const Text(
                   'Login here',
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
@@ -791,52 +679,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-
-
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
         style: const TextStyle(
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
         ),
       ),
-    );
-  }
-
-  InputDecoration _buildInputDecoration({
-    required String hintText,
-    String? error,
-    Widget? suffixIcon,
-  }) {
-    return InputDecoration(
-      hintText: hintText,
-      hintStyle: const TextStyle(color: Color(0xFF999999)),
-      filled: true,
-      fillColor: error != null ? Colors.red[50] : Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(6),
-        borderSide: BorderSide(
-          color: error != null ? Colors.red : const Color(0xFFE0E0E0),
-          width: 1.5,
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(6),
-        borderSide: BorderSide(
-          color: error != null ? Colors.red : const Color(0xFFE0E0E0),
-          width: 1.5,
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-      ),
-      suffixIcon: suffixIcon,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
   }
 }

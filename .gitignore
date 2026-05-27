@@ -29,8 +29,17 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-# /build/  # Uncommented to allow pre-built Flutter web output for Vercel
 /coverage/
+
+# Keep only build/web for Vercel deployment, ignore intermediate build artifacts
+build/flutter_assets/
+build/native_assets/
+build/native_hooks/
+build/test_cache/
+build/unit_test_assets/
+build/*.cache.dill.track.dill
+build/*/
+!build/web/
 
 # Symbolication related
 app.*.symbols

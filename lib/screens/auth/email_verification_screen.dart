@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
+import '../../widgets/auth/auth_background.dart';
+import '../../widgets/auth/glass_card.dart';
+import '../../widgets/auth/gradient_button.dart';
 import 'login_screen.dart';
 
 class EmailVerificationScreen extends StatelessWidget {
@@ -9,129 +13,110 @@ class EmailVerificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 500),
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 60),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Success Icon
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF5287B2).withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.mark_email_read_outlined,
-                    color: Color(0xFF5287B2),
-                    size: 50,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 40),
-
-              // Title
-              const Text(
-                'Verify your email',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1D1B16),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Description
-              Text.rich(
-                TextSpan(
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF666666),
-                    height: 1.6,
-                  ),
-                  children: [
-                    const TextSpan(
-                      text: 'We have sent a verification link to\n',
-                    ),
-                    TextSpan(
-                      text: email,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1D1B16),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '.\nPlease check your inbox to continue.',
-                    ),
-                  ],
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 60),
-
-              // Action Button
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5287B2),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'BACK TO LOGIN',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Resend Option
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Didn't receive the email? ",
-                    style: TextStyle(fontSize: 14, color: Color(0xFF666666)),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // We could implement resend logic here if needed
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Verification email resent!'),
+      body: AuthBackground(
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 460),
+                child: GlassCard(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 88,
+                        height: 88,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
                         ),
-                      );
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFF5287B2),
-                      padding: EdgeInsets.zero,
-                    ),
-                    child: const Text(
-                      'Resend Link',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                        child: const Icon(
+                          Icons.mark_email_read_outlined,
+                          color: AppColors.primary,
+                          size: 48,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      const Text(
+                        'Verify your email',
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text.rich(
+                        TextSpan(
+                          style: const TextStyle(
+                            fontSize: 15,
+                            color: Color(0xFF666666),
+                            height: 1.6,
+                          ),
+                          children: [
+                            const TextSpan(
+                              text: 'We have sent a verification link to\n',
+                            ),
+                            TextSpan(
+                              text: email,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const TextSpan(
+                              text:
+                                  '.\nPlease check your inbox to continue.',
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 48),
+                      GradientButton(
+                        label: 'BACK TO LOGIN',
+                        onPressed: () => Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "Didn't receive the email? ",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF666666),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Verification email resent!'),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              'Resend Link',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ],
+            ),
           ),
         ),
       ),
