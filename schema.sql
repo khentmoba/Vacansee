@@ -488,7 +488,11 @@ END $$;
 
 -- Booking status sync trigger (handle_booking_acceptance)
 CREATE OR REPLACE FUNCTION public.handle_booking_acceptance()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
     -- If booking is approved
     IF NEW.status = 'approved' AND OLD.status = 'pending' THEN
@@ -549,7 +553,11 @@ CREATE TRIGGER on_booking_status_change
 
 -- Booking Request Notification Trigger
 CREATE OR REPLACE FUNCTION public.notify_owner_on_booking()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 DECLARE
     owner_id UUID;
     room_rate INTEGER;
