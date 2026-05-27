@@ -29,7 +29,7 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+# /build/  # Uncommented to allow pre-built Flutter web output for Vercel
 /coverage/
 
 # Symbolication related
