@@ -22,6 +22,7 @@ import '../../widgets/owner/owner_recent_booking_requests.dart';
 import '../../widgets/owner/owner_promo_card.dart';
 import '../owner/owner_performance_screen.dart';
 import '../owner/owner_payments_screen.dart';
+import '../property/manage_rooms_screen.dart';
 
 class OwnerDashboard extends StatefulWidget {
   const OwnerDashboard({super.key});
@@ -230,7 +231,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                                             p,
                                             totalRooms: propertyProvider.getTotalRoomsForProperty(p.propertyId),
                                             occupiedRooms: propertyProvider.getOccupiedRoomsForProperty(p.propertyId),
-                                            liveVacancy: propertyProvider.hasLiveVacancy(p.propertyId),
+                                            liveVacancy: propertyProvider.hasLiveVacancy(p.propertyId, fallback: p.hasVacancy),
                                           );
                                         },
                                       ),
@@ -515,7 +516,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     p,
                     totalRooms: propertyProvider.getTotalRoomsForProperty(p.propertyId),
                     occupiedRooms: propertyProvider.getOccupiedRoomsForProperty(p.propertyId),
-                    liveVacancy: propertyProvider.hasLiveVacancy(p.propertyId),
+                    liveVacancy: propertyProvider.hasLiveVacancy(p.propertyId, fallback: p.hasVacancy),
                   )),
                   if (topProperties.length < 3)
                     ...List.generate(
@@ -574,7 +575,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   p,
                   totalRooms: propertyProvider.getTotalRoomsForProperty(p.propertyId),
                   occupiedRooms: propertyProvider.getOccupiedRoomsForProperty(p.propertyId),
-                  liveVacancy: propertyProvider.hasLiveVacancy(p.propertyId),
+                  liveVacancy: propertyProvider.hasLiveVacancy(p.propertyId, fallback: p.hasVacancy),
                 );
               },
             ),
@@ -1182,6 +1183,32 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                       ),
                     ),
                   ],
+                  const SizedBox(height: 8),
+                  // Manage Rooms button
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: SizedBox(
+                      height: 28,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ManageRoomsScreen(property: property),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.meeting_room_rounded, size: 14),
+                        label: const Text('Manage Rooms', style: TextStyle(fontSize: 11)),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

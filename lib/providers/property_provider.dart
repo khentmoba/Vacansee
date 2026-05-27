@@ -302,9 +302,9 @@ class PropertyProvider extends ChangeNotifier {
   }
 
   /// Check if a property has vacancy (real-time)
-  bool hasLiveVacancy(String propertyId) {
+  bool hasLiveVacancy(String propertyId, {bool fallback = false}) {
     return _propertyVacancyMap[propertyId] ??
-        (_propertyRoomsMap[propertyId]?.any((r) => r.status == RoomStatus.vacant) ?? false);
+        (_propertyRoomsMap[propertyId]?.any((r) => r.status == RoomStatus.vacant) ?? fallback);
   }
 
   /// Get time since last vacancy update
@@ -734,6 +734,23 @@ class PropertyProvider extends ChangeNotifier {
       _errorMessage = 'Failed to delete room: $e';
       notifyListeners();
       return false;
+    }
+  }
+
+  /// Auto-create rooms for a property on creation (batch, no loading flag)
+  Future<void> autoCreateRooms(String propertyId, int count, int monthlyPrice) async {
+    try {
+      for (int i = 0; i < count; i++) {
+        await _propertyService.addRoom(
+          propertyId: propertyId,
+          capacity: 1,
+          monthlyRate: monthlyPrice,
+        );
+      }
+      _propertyService.syncPropertyRoomCounts(propertyId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Auto-create rooms failed: $e');
     }
   }
 

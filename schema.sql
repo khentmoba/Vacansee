@@ -78,6 +78,12 @@ CREATE TABLE IF NOT EXISTS public.properties (
   images TEXT[] DEFAULT '{}',
   description TEXT,
   rejection_reason TEXT,
+  total_rooms INTEGER NOT NULL DEFAULT 0,
+  available_rooms INTEGER NOT NULL DEFAULT 0,
+  monthly_price INTEGER NOT NULL DEFAULT 0,
+  has_vacancy BOOLEAN NOT NULL DEFAULT true,
+  average_rating DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+  reviews_count INTEGER NOT NULL DEFAULT 0,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_updated TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -203,6 +203,11 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
         await propertyProvider.updateProperty(property);
       }
 
+      // Auto-create room rows for new properties
+      if (!isEditing && totalRooms > 0) {
+        await propertyProvider.autoCreateRooms(property.propertyId, totalRooms, monthlyPrice);
+      }
+
       if (mounted) {
         setState(() => _isUploadingImages = false);
         ScaffoldMessenger.of(context).showSnackBar(
