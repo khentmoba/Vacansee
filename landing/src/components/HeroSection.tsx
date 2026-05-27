@@ -28,7 +28,7 @@ export const HeroSection: React.FC = () => {
         />
         
         {/* Editorial style gradient overlay */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#F5F5F5]/95 via-[#F5F5F5]/75 to-transparent" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#F0F9FF]/95 via-[#F0F9FF]/75 to-transparent" />
 
         {/* Content Container */}
         <div className="relative z-10 w-full max-w-[88rem] mx-auto px-12 md:px-20 h-full flex flex-col justify-center pt-16">
@@ -50,17 +50,17 @@ export const HeroSection: React.FC = () => {
             <div className="flex flex-wrap gap-4 items-center mb-16">
               <a
                 href="/signup.html"
-                className="group inline-flex items-center gap-4 bg-black text-white text-base md:text-lg font-medium pl-8 pr-2.5 py-2.5 rounded-full hover:bg-gray-800 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl"
+                className="group inline-flex items-center gap-4 bg-brand-500 text-white text-base md:text-lg font-medium pl-8 pr-2.5 py-2.5 rounded-full hover:bg-brand-600 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl shadow-brand-500/30"
               >
                 <span>Start browsing</span>
-                <span className="bg-white rounded-full p-2.5 text-black group-hover:translate-x-1 transition-transform duration-300">
+                <span className="bg-white rounded-full p-2.5 text-brand-500 group-hover:translate-x-1 transition-transform duration-300">
                   <ArrowRight className="w-5 h-5" />
                 </span>
               </a>
               
               <a
                 href="#map-view"
-                className="text-black/80 hover:text-black font-semibold text-base py-3 px-6 hover:underline transition-colors duration-200"
+                className="text-black/80 hover:text-brand-500 font-semibold text-base py-3 px-6 hover:underline transition-colors duration-200"
               >
                 View map first
               </a>

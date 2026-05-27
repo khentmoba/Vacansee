@@ -7,7 +7,7 @@ import { Footer } from './components/Footer';
 
 function App() {
   return (
-    <div className="flex flex-col bg-[#F5F5F5] min-h-screen">
+    <div className="flex flex-col bg-[#F0F9FF] min-h-screen">
       {/* Navbar + Hero Container */}
       <div className="h-screen flex flex-col overflow-hidden relative select-none">
         <Navbar />

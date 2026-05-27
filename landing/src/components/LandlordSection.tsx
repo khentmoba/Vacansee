@@ -1,12 +1,12 @@
-import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import { ScrollReveal } from './ScrollReveal';
 
 export const LandlordSection: React.FC = () => {
   return (
-    <section className="bg-[#F5F5F5] px-6 py-28" id="landlords">
+    <section className="bg-[#F0F9FF] px-6 py-28" id="landlords">
       <div className="max-w-[88rem] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         {/* Left Column: Context Copy */}
-        <div className="lg:pr-12">
+        <ScrollReveal className="lg:pr-12">
           <span className="inline-block text-brand-500 font-semibold tracking-wider text-sm uppercase mb-4">
             The Platform in Practice
           </span>
@@ -19,7 +19,7 @@ export const LandlordSection: React.FC = () => {
           <p className="text-black/60 text-base md:text-lg leading-relaxed max-w-md mb-8" style={{ fontFamily: "'Inter', sans-serif" }}>
             Whether you are a student looking for a secure place to stay or a property owner managing multiple rooms, the platform adapts to your needs.
           </p>
-          <div className="border-t border-black/10 pt-8 flex gap-8">
+          <div className="border-t border-brand-500/10 pt-8 flex gap-8">
             <div>
               <div className="text-3xl font-semibold text-black tracking-tight mb-1">0%</div>
               <p className="text-black/50 text-xs uppercase font-medium tracking-wide">Listing Fees</p>
@@ -33,10 +33,10 @@ export const LandlordSection: React.FC = () => {
               <p className="text-black/50 text-xs uppercase font-medium tracking-wide">Vacancy Status</p>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Right Column: Hero Landlord Card Container */}
-        <div className="relative rounded-3xl overflow-hidden min-h-[560px] shadow-xl group cursor-pointer">
+        <ScrollReveal delay={2} className="relative rounded-3xl overflow-hidden min-h-[560px] shadow-xl group cursor-pointer border border-brand-500/10">
           {/* Background image */}
           <img 
             src="/images/property-owner.png" 
@@ -73,7 +73,7 @@ export const LandlordSection: React.FC = () => {
               </a>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

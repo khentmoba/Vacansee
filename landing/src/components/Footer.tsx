@@ -1,14 +1,14 @@
-import React from 'react';
 import { LogoIcon } from './LogoIcon';
+import { ScrollReveal } from './ScrollReveal';
 
 export const Footer: React.FC = () => {
   return (
     <footer className="bg-black text-white px-6 pt-24 pb-12" id="help">
       <div className="max-w-[88rem] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 pb-16 border-b border-white/10">
-          
+
           {/* Brand Info Column */}
-          <div className="lg:col-span-2">
+          <ScrollReveal className="lg:col-span-2">
             <div className="flex items-center gap-2.5 mb-6">
               <LogoIcon className="w-8 h-8 text-brand-400" />
               <span className="text-2xl font-bold tracking-tight text-white">VacanSee</span>
@@ -16,7 +16,7 @@ export const Footer: React.FC = () => {
             <p className="text-white/60 text-sm md:text-base leading-relaxed max-w-sm mb-6" style={{ fontFamily: "'Inter', sans-serif" }}>
               Real-time boarding house and dorm tracker for university students in Cagayan de Oro City. Find verified spaces and connect with landlords.
             </p>
-          </div>
+          </ScrollReveal>
 
           {/* Column 1: For Tenants */}
           <div>

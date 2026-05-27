@@ -1,4 +1,4 @@
-import React from 'react';
+import { ScrollReveal } from './ScrollReveal';
 
 export const FeaturesMarquee: React.FC = () => {
   const items = [
@@ -15,20 +15,20 @@ export const FeaturesMarquee: React.FC = () => {
   const marqueeItems = [...items, ...items, ...items];
 
   return (
-    <section className="bg-[#F5F5F5] py-16 border-t border-b border-black/5 overflow-hidden" id="neighborhoods">
+    <section className="bg-[#F0F9FF] py-16 border-t border-b border-brand-500/10 overflow-hidden" id="neighborhoods">
       <div className="max-w-[88rem] mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
         {/* Left Side: Short Description Column */}
-        <div className="md:col-span-1">
-          <p 
+        <ScrollReveal className="md:col-span-1">
+          <p
             className="text-black/70 text-base leading-relaxed"
             style={{ fontFamily: "'Inter', sans-serif" }}
           >
             Filter by the amenities<br />that matter most to you.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Right Side: Continuous Marquee Column */}
-        <div className="md:col-span-3 overflow-hidden select-none">
+        <ScrollReveal delay={1} className="md:col-span-3 overflow-hidden select-none">
           <div className="backers-track">
             {marqueeItems.map((item, idx) => (
               <div
@@ -40,7 +40,7 @@ export const FeaturesMarquee: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );
