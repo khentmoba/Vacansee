@@ -26,7 +26,7 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="flex flex-col gap-2.5 text-sm">
               <li>
-                <a href="/app/map" className="hover:text-brand-400 transition-colors duration-200">
+                <a href="/app" className="hover:text-brand-400 transition-colors duration-200">
                   Search Map
                 </a>
               </li>
@@ -36,7 +36,7 @@ export const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
-                <a href="/app/signup.html" className="hover:text-brand-400 transition-colors duration-200">
+                <a href="/app" className="hover:text-brand-400 transition-colors duration-200">
                   Create Tenant Account
                 </a>
               </li>
@@ -50,7 +50,7 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="flex flex-col gap-2.5 text-sm">
               <li>
-                <a href="/app/signup.html?role=owner" className="hover:text-brand-400 transition-colors duration-200">
+                <a href="/app" className="hover:text-brand-400 transition-colors duration-200">
                   List Your Property
                 </a>
               </li>
@@ -60,7 +60,7 @@ export const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
-                <a href="/app/login.html" className="hover:text-brand-400 transition-colors duration-200">
+                <a href="/app" className="hover:text-brand-400 transition-colors duration-200">
                   Sign In
                 </a>
               </li>
@@ -74,17 +74,17 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="flex flex-col gap-2.5 text-sm">
               <li>
-                <a href="/app/map?loc=ustp" className="hover:text-brand-400 transition-colors duration-200">
+                <a href="/app" className="hover:text-brand-400 transition-colors duration-200">
                   Near USTP
                 </a>
               </li>
               <li>
-                <a href="/app/map?loc=limketkai" className="hover:text-brand-400 transition-colors duration-200">
+                <a href="/app" className="hover:text-brand-400 transition-colors duration-200">
                   Limketkai Area
                 </a>
               </li>
               <li>
-                <a href="/app/map?loc=carmen" className="hover:text-brand-400 transition-colors duration-200">
+                <a href="/app" className="hover:text-brand-400 transition-colors duration-200">
                   Carmen & Kauswagan
                 </a>
               </li>

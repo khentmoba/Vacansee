@@ -65,7 +65,7 @@ export const Navbar: React.FC = () => {
         {/* Right: CTA Button */}
         <div className="flex items-center gap-4">
           <a
-            href="/app/login.html"
+            href="/app"
             className="hidden md:inline-flex bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-6 py-2.5 rounded-full transition-all duration-300 cursor-pointer shadow-md shadow-brand-500/10 hover:shadow-lg hover:shadow-brand-500/20 hover:scale-[1.02]"
           >
             Find a Room
@@ -112,7 +112,7 @@ export const Navbar: React.FC = () => {
             </div>
             <div className="px-6 pb-8 pt-4 border-t border-slate-100">
               <a
-                href="/app/login.html"
+                href="/app"
                 className="block w-full text-center bg-brand-500 hover:bg-brand-600 text-white text-base font-semibold px-7 py-3.5 rounded-full transition-colors duration-200 cursor-pointer shadow-md shadow-brand-500/10"
               >
                 Find a Room

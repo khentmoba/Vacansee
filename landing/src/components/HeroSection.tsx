@@ -56,7 +56,7 @@ export const HeroSection: React.FC = () => {
 
             <div className="flex flex-wrap gap-4 items-center mb-12">
               <a
-                href="/app/signup.html"
+                href="/app"
                 className="group inline-flex items-center gap-3 bg-brand-500 hover:bg-brand-600 text-white text-base font-semibold pl-6 pr-2 py-2 rounded-full transition-all duration-300 cursor-pointer shadow-lg shadow-brand-500/20 hover:shadow-xl hover:shadow-brand-500/30 hover:scale-[1.02]"
               >
                 <span>Start browsing</span>
@@ -66,7 +66,7 @@ export const HeroSection: React.FC = () => {
               </a>
               
               <a
-                href="/app/map"
+                href="/app"
                 className="group inline-flex items-center gap-1.5 text-slate-700 hover:text-brand-500 font-semibold text-base py-3 px-5 transition-colors duration-200"
               >
                 <MapPin className="w-4.5 h-4.5" />
