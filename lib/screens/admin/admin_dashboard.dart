@@ -21,9 +21,11 @@ import 'widgets/admin_booking_filter_bar.dart';
 import 'widgets/admin_booking_card.dart';
 import 'widgets/admin_user_card.dart';
 import '../../models/admin_stats_model.dart';
-import '../../models/booking_model.dart';
 import '../../models/user_model.dart';
+import '../../models/property_model.dart';
 import '../profile/profile_screen.dart';
+import 'admin_user_detail_screen.dart';
+import 'admin_property_detail_screen.dart';
 
 enum AdminView { dashboard, listings, bookings, users, profile }
 
@@ -36,7 +38,6 @@ class AdminDashboard extends StatefulWidget {
 
 class _AdminDashboardState extends State<AdminDashboard> {
   AdminView _currentView = AdminView.dashboard;
-  BookingStatus? _bookingStatusFilter;
   UserRole? _userRoleFilter;
 
   @override
@@ -59,7 +60,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       propertyProvider.loadProperties();
     }
     if (_currentView == AdminView.bookings) {
-      bookingProvider.loadAdminBookings(statusFilter: _bookingStatusFilter);
+      bookingProvider.loadAdminBookings();
     } else {
       bookingProvider.loadRecentBookings(limit: 4);
     }
@@ -439,66 +440,25 @@ class _AdminDashboardState extends State<AdminDashboard> {
         ]),
         const SizedBox(height: 24),
         // Search + Filter
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.border), boxShadow: [AppShadows.md]),
-          child: isMobile
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextField(
-                      onChanged: (v) => adminProvider.setSearchQuery(v),
-                      decoration: InputDecoration(
-                        hintText: 'Search by name or email...',
-                        prefixIcon: const Icon(Icons.search_rounded),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AppColors.border)),
-                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AppColors.border)),
-                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
-                        filled: true, fillColor: AppColors.background, contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          _buildRoleFilterChip(null, 'All', adminProvider),
-                          const SizedBox(width: 8),
-                          _buildRoleFilterChip(UserRole.student, 'Tenants', adminProvider),
-                          const SizedBox(width: 8),
-                          _buildRoleFilterChip(UserRole.owner, 'Owners', adminProvider),
-                          const SizedBox(width: 8),
-                          _buildRoleFilterChip(UserRole.admin, 'Admins', adminProvider),
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-              : Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        onChanged: (v) => adminProvider.setSearchQuery(v),
-                        decoration: InputDecoration(
-                          hintText: 'Search by name or email...',
-                          prefixIcon: const Icon(Icons.search_rounded),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AppColors.border)),
-                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AppColors.border)),
-                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
-                          filled: true, fillColor: AppColors.background, contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    _buildRoleFilterChip(null, 'All', adminProvider),
-                    const SizedBox(width: 8),
-                    _buildRoleFilterChip(UserRole.student, 'Tenants', adminProvider),
-                    const SizedBox(width: 8),
-                    _buildRoleFilterChip(UserRole.owner, 'Owners', adminProvider),
-                    const SizedBox(width: 8),
-                    _buildRoleFilterChip(UserRole.admin, 'Admins', adminProvider),
-                  ],
-                ),
+        AdminSearchBar(
+          onSearch: (query) => adminProvider.setSearchQuery(query),
+          showFilterButton: false,
+          hintText: 'Search by name or email...',
+        ),
+        const SizedBox(height: 12),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildRoleFilterChip(null, 'All', adminProvider),
+              const SizedBox(width: 8),
+              _buildRoleFilterChip(UserRole.student, 'Tenants', adminProvider),
+              const SizedBox(width: 8),
+              _buildRoleFilterChip(UserRole.owner, 'Owners', adminProvider),
+              const SizedBox(width: 8),
+              _buildRoleFilterChip(UserRole.admin, 'Admins', adminProvider),
+            ],
+          ),
         ),
         const SizedBox(height: 32),
         Text('Showing ${users.length} of ${adminProvider.totalUsersCount} users',
@@ -522,11 +482,117 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   childAspectRatio: isMobile ? 1.4 : (constraints.maxWidth < 1200 ? 2.0 : 2.2),
                 ),
                 itemCount: users.length,
-                itemBuilder: (context, index) => AdminUserCard(user: users[index], onViewDetails: () {}, onEdit: () {}),
+                itemBuilder: (context, index) {
+                  final u = users[index];
+                  return AdminUserCard(
+                    user: u,
+                    onViewDetails: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AdminUserDetailScreen(user: u))),
+                    onEdit: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AdminUserDetailScreen(user: u, editMode: true))),
+                  );
+                },
               );
             },
           ),
       ],
+    );
+  }
+
+  void _showListingsFilterSheet(PropertyProvider provider) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Filter Listings',
+                      style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                  const SizedBox(height: 24),
+                  Text('Gender Orientation',
+                      style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      ChoiceChip(label: const Text('All'), selected: provider.genderFilter == null,
+                        onSelected: (_) { provider.setGenderFilter(null); setSheetState(() {}); },
+                        selectedColor: AppColors.primary, backgroundColor: AppColors.divider,
+                        labelStyle: TextStyle(color: provider.genderFilter == null ? Colors.white : AppColors.textMuted, fontWeight: FontWeight.w600)),
+                      ChoiceChip(label: const Text('Male'), selected: provider.genderFilter == GenderOrientation.male,
+                        onSelected: (_) { provider.setGenderFilter(GenderOrientation.male); setSheetState(() {}); },
+                        selectedColor: AppColors.primary, backgroundColor: AppColors.divider,
+                        labelStyle: TextStyle(color: provider.genderFilter == GenderOrientation.male ? Colors.white : AppColors.textMuted, fontWeight: FontWeight.w600)),
+                      ChoiceChip(label: const Text('Female'), selected: provider.genderFilter == GenderOrientation.female,
+                        onSelected: (_) { provider.setGenderFilter(GenderOrientation.female); setSheetState(() {}); },
+                        selectedColor: AppColors.primary, backgroundColor: AppColors.divider,
+                        labelStyle: TextStyle(color: provider.genderFilter == GenderOrientation.female ? Colors.white : AppColors.textMuted, fontWeight: FontWeight.w600)),
+                      ChoiceChip(label: const Text('Mixed'), selected: provider.genderFilter == GenderOrientation.mixed,
+                        onSelected: (_) { provider.setGenderFilter(GenderOrientation.mixed); setSheetState(() {}); },
+                        selectedColor: AppColors.primary, backgroundColor: AppColors.divider,
+                        labelStyle: TextStyle(color: provider.genderFilter == GenderOrientation.mixed ? Colors.white : AppColors.textMuted, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Text('Vacancy Status',
+                      style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      ChoiceChip(label: const Text('All'), selected: provider.adminVacancyFilter == null,
+                        onSelected: (_) { provider.setAdminVacancyFilter(null); setSheetState(() {}); },
+                        selectedColor: AppColors.primary, backgroundColor: AppColors.divider,
+                        labelStyle: TextStyle(color: provider.adminVacancyFilter == null ? Colors.white : AppColors.textMuted, fontWeight: FontWeight.w600)),
+                      ChoiceChip(label: const Text('Has Vacancy'), selected: provider.adminVacancyFilter == true,
+                        onSelected: (_) { provider.setAdminVacancyFilter(true); setSheetState(() {}); },
+                        selectedColor: AppColors.success, backgroundColor: AppColors.divider,
+                        labelStyle: TextStyle(color: provider.adminVacancyFilter == true ? Colors.white : AppColors.textMuted, fontWeight: FontWeight.w600)),
+                      ChoiceChip(label: const Text('Fully Occupied'), selected: provider.adminVacancyFilter == false,
+                        onSelected: (_) { provider.setAdminVacancyFilter(false); setSheetState(() {}); },
+                        selectedColor: AppColors.error, backgroundColor: AppColors.divider,
+                        labelStyle: TextStyle(color: provider.adminVacancyFilter == false ? Colors.white : AppColors.textMuted, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          provider.clearFilters();
+                          setSheetState(() {});
+                        },
+                        child: Text('Clear All',
+                            style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+                      ),
+                      const Spacer(),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                        ),
+                        child: Text('Apply',
+                            style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -547,7 +613,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildBookingsView(BookingProvider bookingProvider) {
-    final bookings = bookingProvider.bookings;
+    final bookings = bookingProvider.filteredBookings;
     final isMobile = MediaQuery.of(context).size.width < 800;
 
     return ListView(
@@ -560,18 +626,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
           KpiItem(label: 'Rejected Bookings', value: bookingProvider.rejectedBookingCount.toString(), icon: Icons.cancel_rounded, color: AppColors.error),
         ]),
         const SizedBox(height: 24),
+        AdminSearchBar(
+          onSearch: (query) => bookingProvider.setSearchQuery(query),
+          showFilterButton: false,
+          hintText: 'Search by student name, property, or email...',
+        ),
+        const SizedBox(height: 12),
         AdminBookingFilterBar(
-          selectedStatus: _bookingStatusFilter,
-          onStatusChanged: (status) {
-            setState(() => _bookingStatusFilter = status);
-            _refreshData();
-          },
+          selectedStatus: bookingProvider.statusFilter,
+          onStatusChanged: (status) => bookingProvider.setStatusFilter(status),
           totalCount: bookingProvider.totalBookingCount,
           pendingCount: bookingProvider.pendingBookingCount,
           approvedCount: bookingProvider.approvedBookingCount,
           rejectedCount: bookingProvider.rejectedBookingCount,
         ),
         const SizedBox(height: 32),
+        Text('Showing ${bookings.length} of ${bookingProvider.totalBookingCount} bookings',
+            style: GoogleFonts.workSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+        const SizedBox(height: 24),
         if (bookingProvider.isLoading)
           const Center(child: CircularProgressIndicator())
         else if (bookings.isEmpty)
@@ -583,15 +655,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildListingsView(PropertyProvider propertyProvider) {
-    final properties = propertyProvider.properties;
+    final properties = propertyProvider.adminProperties;
     final isMobile = MediaQuery.of(context).size.width < 800;
 
     return ListView(
       padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 40, vertical: isMobile ? 24 : 40),
       children: [
         AdminSearchBar(
-          onSearch: (query) { propertyProvider.setSearchQuery(query); propertyProvider.loadAdminProperties(); },
-          onFilterTap: () {},
+          onSearch: (query) => propertyProvider.setSearchQuery(query),
+          onFilterTap: () => _showListingsFilterSheet(propertyProvider),
         ),
         const SizedBox(height: 24),
         AdminKpiPanel(items: [
@@ -622,7 +694,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   childAspectRatio: isMobile ? 0.7 : (constraints.maxWidth < 1200 ? 0.8 : 0.85),
                 ),
                 itemCount: properties.length,
-                itemBuilder: (context, index) => AdminPropertyCard(property: properties[index], onTap: () {}),
+                itemBuilder: (context, index) => AdminPropertyCard(
+                  property: properties[index],
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AdminPropertyDetailScreen(property: properties[index]))),
+                ),
               );
             },
           ),

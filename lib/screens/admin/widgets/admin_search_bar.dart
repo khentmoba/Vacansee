@@ -1,17 +1,24 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_theme.dart';
 
 class AdminSearchBar extends StatefulWidget {
   final Function(String) onSearch;
-  final VoidCallback onFilterTap;
+  final VoidCallback? onFilterTap;
   final String? initialValue;
+  final String hintText;
+  final bool showFilterButton;
+  final int debounceMilliseconds;
 
   const AdminSearchBar({
     super.key,
     required this.onSearch,
-    required this.onFilterTap,
+    this.onFilterTap,
     this.initialValue,
+    this.hintText = 'Search by name, address, or owner...',
+    this.showFilterButton = true,
+    this.debounceMilliseconds = 300,
   });
 
   @override
@@ -21,6 +28,7 @@ class AdminSearchBar extends StatefulWidget {
 class _AdminSearchBarState extends State<AdminSearchBar> {
   bool _isHovered = false;
   late final TextEditingController _controller;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -30,8 +38,17 @@ class _AdminSearchBarState extends State<AdminSearchBar> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(
+      Duration(milliseconds: widget.debounceMilliseconds),
+      () => widget.onSearch(value),
+    );
   }
 
   @override
@@ -49,14 +66,14 @@ class _AdminSearchBarState extends State<AdminSearchBar> {
           Expanded(
             child: TextField(
               controller: _controller,
-              onChanged: widget.onSearch,
+              onChanged: _onSearchChanged,
               style: GoogleFonts.workSans(
                 fontSize: 14,
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w500,
               ),
               decoration: InputDecoration(
-                hintText: 'Search by name, address, or owner...',
+                hintText: widget.hintText,
                 hintStyle: GoogleFonts.workSans(
                   color: AppColors.textMuted,
                   fontSize: 14,
@@ -88,47 +105,49 @@ class _AdminSearchBarState extends State<AdminSearchBar> {
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          MouseRegion(
-            onEnter: (_) => setState(() => _isHovered = true),
-            onExit: (_) => setState(() => _isHovered = false),
-            child: AnimatedContainer(
-              duration: AppDurations.fast,
-              decoration: BoxDecoration(
-                color: _isHovered ? AppColors.primary.withValues(alpha: 0.1) : AppColors.divider,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: _isHovered ? AppColors.primary.withValues(alpha: 0.2) : Colors.transparent,
-                  width: 1.5,
+          if (widget.showFilterButton) ...[
+            const SizedBox(width: 12),
+            MouseRegion(
+              onEnter: (_) => setState(() => _isHovered = true),
+              onExit: (_) => setState(() => _isHovered = false),
+              child: AnimatedContainer(
+                duration: AppDurations.fast,
+                decoration: BoxDecoration(
+                  color: _isHovered ? AppColors.primary.withValues(alpha: 0.1) : AppColors.divider,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: _isHovered ? AppColors.primary.withValues(alpha: 0.2) : Colors.transparent,
+                    width: 1.5,
+                  ),
                 ),
-              ),
-              child: InkWell(
-                onTap: widget.onFilterTap,
-                borderRadius: BorderRadius.circular(14),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.tune_rounded,
-                        color: _isHovered ? AppColors.primary : AppColors.textMuted,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Filters',
-                        style: GoogleFonts.outfit(
+                child: InkWell(
+                  onTap: widget.onFilterTap,
+                  borderRadius: BorderRadius.circular(14),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.tune_rounded,
                           color: _isHovered ? AppColors.primary : AppColors.textMuted,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
+                          size: 18,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Text(
+                          'Filters',
+                          style: GoogleFonts.outfit(
+                            color: _isHovered ? AppColors.primary : AppColors.textMuted,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );

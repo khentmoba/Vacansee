@@ -55,6 +55,29 @@ class NotificationService {
     }
   }
 
+  /// Create a notification
+  Future<void> createNotification({
+    required String userId,
+    required String title,
+    required String message,
+    required String type,
+    Map<String, dynamic>? metadata,
+  }) async {
+    try {
+      await _supabase.from('notifications').insert({
+        'user_id': userId,
+        'title': title,
+        'message': message,
+        'type': type,
+        'is_read': false,
+        'created_at': DateTime.now().toIso8601String(),
+        if (metadata != null) 'metadata': metadata,
+      });
+    } catch (e) {
+      // Silent failure for notification creation
+    }
+  }
+
   /// Delete a notification
   Future<void> deleteNotification(String notificationId) async {
     try {

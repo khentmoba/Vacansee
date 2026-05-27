@@ -19,12 +19,46 @@ class BookingProvider extends ChangeNotifier {
   StreamSubscription<List<BookingModel>>? _bookingsSubscription;
   StreamSubscription<int>? _pendingCountSubscription;
 
+  // Search & Filters
+  String _searchQuery = '';
+  BookingStatus? _statusFilter;
+
   // Getters
   List<BookingModel> get bookings => _bookings;
   BookingModel? get selectedBooking => _selectedBooking;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   int get pendingCount => _pendingCount;
+  BookingStatus? get statusFilter => _statusFilter;
+
+  /// Client-side filtered bookings (status + text search)
+  List<BookingModel> get filteredBookings {
+    var filtered = _bookings;
+    if (_searchQuery.isNotEmpty) {
+      final q = _searchQuery.toLowerCase();
+      filtered = filtered.where((b) =>
+        b.studentName.toLowerCase().contains(q) ||
+        b.propertyName.toLowerCase().contains(q) ||
+        b.studentEmail.toLowerCase().contains(q)
+      ).toList();
+    }
+    if (_statusFilter != null) {
+      filtered = filtered.where((b) => b.status == _statusFilter).toList();
+    }
+    return filtered;
+  }
+
+  /// Set text search query
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
+
+  /// Set status filter
+  void setStatusFilter(BookingStatus? status) {
+    _statusFilter = status;
+    notifyListeners();
+  }
 
   /// Clear error message
   void clearError() {
@@ -284,13 +318,13 @@ class BookingProvider extends ChangeNotifier {
   int get rejectedBookingCount => _bookings.where((b) => b.status == BookingStatus.rejected).length;
 
   /// Load all bookings for admin
-  Future<void> loadAdminBookings({BookingStatus? statusFilter}) async {
+  Future<void> loadAdminBookings() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      _bookings = await _bookingService.getAdminBookings(statusFilter: statusFilter);
+      _bookings = await _bookingService.getAdminBookings();
       _isLoading = false;
       notifyListeners();
     } catch (e) {

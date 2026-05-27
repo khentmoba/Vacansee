@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../widgets/notifications/notification_badge.dart';
+import '../../notifications/notifications_screen.dart';
 import '../admin_dashboard.dart';
 
 class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
@@ -150,30 +152,19 @@ class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
           // Notifications
-          IconButton(
-            hoverColor: AppColors.primary.withValues(alpha: 0.05),
-            icon: Stack(
-              children: [
-                const Icon(
-                  Icons.notifications_none_rounded,
-                  color: AppColors.textMuted,
-                  size: 22,
-                ),
-                Positioned(
-                  right: 2,
-                  top: 2,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: AppColors.error,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ],
+          NotificationBadge(
+            child: IconButton(
+              hoverColor: AppColors.primary.withValues(alpha: 0.05),
+              icon: const Icon(
+                Icons.notifications_none_rounded,
+                color: AppColors.textMuted,
+                size: 22,
+              ),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+              ),
             ),
-            onPressed: () {},
           ),
           const SizedBox(width: 8),
           // User avatar pill

@@ -894,16 +894,20 @@ class _PropertyCardState extends State<_PropertyCard> with SingleTickerProviderS
             ),
           );
         },
-        child: AnimatedContainer(
-          duration: AppDurations.fast,
-          transform: _isHovered ? (Matrix4.identity()..translateByDouble(0, -6, 0, 0)) : Matrix4.identity(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image with Overlays
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          color: Colors.transparent,
+          child: AnimatedContainer(
+            duration: AppDurations.fast,
+            curve: Curves.easeOutCubic,
+            transform: _isHovered ? Matrix4.translationValues(0.0, -6.0, 0.0) : Matrix4.identity(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image with Overlays
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
                   child: Stack(
                     children: [
                       Positioned.fill(
@@ -1081,8 +1085,9 @@ class _PropertyCardState extends State<_PropertyCard> with SingleTickerProviderS
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildPlaceholder() {
     return Container(

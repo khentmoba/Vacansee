@@ -15,6 +15,14 @@ enum NotificationType {
   bookingDeclined,
   @JsonValue('booking_expired')
   bookingExpired,
+  @JsonValue('property_submitted')
+  propertySubmitted,
+  @JsonValue('property_verified')
+  propertyVerified,
+  @JsonValue('property_rejected')
+  propertyRejected,
+  @JsonValue('owner_verification_request')
+  ownerVerificationRequest,
   @JsonValue('system')
   system,
 }
@@ -47,6 +55,14 @@ class NotificationModel with _$NotificationModel {
         return Icons.cancel;
       case NotificationType.bookingExpired:
         return Icons.timer_off;
+      case NotificationType.propertySubmitted:
+        return Icons.add_home_work_rounded;
+      case NotificationType.propertyVerified:
+        return Icons.verified_rounded;
+      case NotificationType.propertyRejected:
+        return Icons.do_not_disturb_alt_rounded;
+      case NotificationType.ownerVerificationRequest:
+        return Icons.verified_user_rounded;
       case NotificationType.system:
         return Icons.notifications;
     }
@@ -62,6 +78,14 @@ class NotificationModel with _$NotificationModel {
         return Colors.red;
       case NotificationType.bookingExpired:
         return Colors.grey;
+      case NotificationType.propertySubmitted:
+        return Colors.orange;
+      case NotificationType.propertyVerified:
+        return Colors.green;
+      case NotificationType.propertyRejected:
+        return Colors.red;
+      case NotificationType.ownerVerificationRequest:
+        return Colors.purple;
       case NotificationType.system:
         return Colors.orange;
     }

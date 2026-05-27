@@ -71,4 +71,34 @@ class AdminService {
       throw Exception('Failed to fetch users: $e');
     }
   }
+
+  /// Update a user's fields
+  Future<void> updateUser(String uid, Map<String, dynamic> fields) async {
+    try {
+      await _supabase.from('users').update(fields).eq('id', uid);
+    } catch (e) {
+      throw Exception('Failed to update user: $e');
+    }
+  }
+
+  /// Delete a user
+  Future<void> deleteUser(String uid) async {
+    try {
+      await _supabase.from('users').delete().eq('id', uid);
+    } catch (e) {
+      throw Exception('Failed to delete user: $e');
+    }
+  }
+
+  /// Toggle user verification status
+  Future<void> toggleUserVerification(String uid, bool isVerified) async {
+    try {
+      await _supabase
+          .from('users')
+          .update({'is_verified': isVerified})
+          .eq('id', uid);
+    } catch (e) {
+      throw Exception('Failed to toggle verification: $e');
+    }
+  }
 }

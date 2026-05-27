@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/property_model.dart';
 
@@ -23,223 +23,212 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(symbol: '₱', decimalDigits: 0);
-    final statusColor = widget.property.hasVacancy ? AppColors.success : AppColors.error;
-    final statusText = widget.property.hasVacancy ? 'Available' : 'Full';
-    final occupancyPercent = widget.property.totalRooms > 0
-        ? (widget.property.totalRooms - widget.property.availableRooms) / widget.property.totalRooms
-        : 0.0;
+    final hasLiveVacancy = widget.property.hasVacancy;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: AppDurations.medium,
-        curve: Curves.easeOutCubic,
-        transform: _isHovered ? Matrix4.translationValues(0, -6, 0) : Matrix4.identity(),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: _isHovered ? AppColors.primary.withValues(alpha: 0.15) : AppColors.border,
-            width: 1.5,
-          ),
-          boxShadow: [
-            _isHovered ? AppShadows.lg : AppShadows.md,
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: widget.onTap,
-          borderRadius: BorderRadius.circular(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image
-              Stack(
-                children: [
-                  AnimatedScale(
-                    duration: const Duration(milliseconds: 400),
-                    scale: _isHovered ? 1.05 : 1.0,
-                    curve: Curves.easeOutCubic,
-                    child: Container(
-                      height: 180,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            widget.property.coverImageUrl ?? 'https://via.placeholder.com/400x200?text=No+Image',
-                          ),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Gradient scrim
-                  Container(
-                    height: 180,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, Colors.black.withValues(alpha: 0.5)],
-                      ),
-                    ),
-                  ),
-                  // Owner badge
-                  Positioned(
-                    top: 14,
-                    left: 14,
-                    right: 110,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        color: Colors.white.withValues(alpha: 0.9),
-                        child: Text(
-                          'Owner: ${widget.property.ownerName ?? 'Unknown'}',
-                          style: GoogleFonts.outfit(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Status badge
-                  Positioned(
-                    top: 14,
-                    right: 14,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: statusColor.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(100),
-                        border: Border.all(color: statusColor, width: 1.5),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            statusText,
-                            style: GoogleFonts.outfit(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: statusColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.property.name,
-                      style: GoogleFonts.outfit(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.2,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          color: Colors.transparent,
+          child: AnimatedContainer(
+            duration: AppDurations.fast,
+            curve: Curves.easeOutCubic,
+            transform: _isHovered ? Matrix4.translationValues(0.0, -6.0, 0.0) : Matrix4.identity(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Stack(
                       children: [
-                        Icon(Icons.location_on_outlined, size: 14, color: AppColors.textMuted),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            widget.property.address,
-                            style: GoogleFonts.workSans(
-                              fontSize: 12,
-                              color: AppColors.textMuted,
-                              fontWeight: FontWeight.w500,
+                        Positioned.fill(
+                          child: AnimatedScale(
+                            scale: _isHovered ? 1.06 : 1.0,
+                            duration: AppDurations.slow,
+                            curve: Curves.easeOutCubic,
+                            child: widget.property.coverImageUrl != null
+                                ? CachedNetworkImage(
+                                    imageUrl: widget.property.coverImageUrl!,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(color: Colors.grey[100]),
+                                    errorWidget: (context, url, error) => _buildPlaceholder(),
+                                  )
+                                : _buildPlaceholder(),
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.transparent, Color(0x66000000)],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        // Admin status badge (top-left)
+                        Positioned(
+                          top: 12,
+                          left: 12,
+                          child: _buildStatusBadge(widget.property.status),
+                        ),
+                        // Availability pill (bottom-right)
+                        Positioned(
+                          bottom: 12,
+                          right: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              gradient: hasLiveVacancy ? AppGradients.successGradient : AppGradients.dangerGradient,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: const [AppShadows.sm],
+                            ),
+                            child: Text(
+                              hasLiveVacancy ? 'VACANT' : 'FULL',
+                              style: GoogleFonts.workSans(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    // Occupancy bar
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: occupancyPercent,
-                        backgroundColor: AppColors.divider,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          occupancyPercent > 0.8 ? AppColors.error : AppColors.success,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.property.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.outfit(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: AppColors.textPrimary,
                         ),
-                        minHeight: 4,
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    const Divider(height: 1, color: AppColors.divider),
-                    const SizedBox(height: 12),
+                    const SizedBox(width: 4),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: currencyFormat.format(widget.property.priceRange.min),
-                                style: GoogleFonts.outfit(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '/mo',
-                                style: GoogleFonts.workSans(
-                                  fontSize: 12,
-                                  color: AppColors.textMuted,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(
-                            Icons.arrow_forward_rounded,
-                            size: 16,
-                            color: AppColors.primary,
+                        const Icon(Icons.star_rounded, size: 16, color: Colors.amber),
+                        const SizedBox(width: 2),
+                        Text(
+                          widget.property.averageRating > 0
+                              ? widget.property.averageRating.toStringAsFixed(1)
+                              : 'New',
+                          style: GoogleFonts.workSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 3),
+                Text(
+                  widget.property.address,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.workSans(fontSize: 13, color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      'Owner: ${widget.property.ownerName ?? "Unknown"}',
+                      style: GoogleFonts.workSans(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '₱${widget.property.monthlyPrice > 0 ? widget.property.monthlyPrice : widget.property.priceRange.min}',
+                        style: GoogleFonts.workSans(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                          fontSize: 15,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' /month',
+                        style: GoogleFonts.workSans(
+                          color: AppColors.textSecondary,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(PropertyStatus status) {
+    Color color;
+    String label;
+    switch (status) {
+      case PropertyStatus.pending:
+        color = AppColors.warning;
+        label = 'PENDING';
+        break;
+      case PropertyStatus.verified:
+        color = AppColors.success;
+        label = 'VERIFIED';
+        break;
+      case PropertyStatus.rejected:
+        color = AppColors.error;
+        label = 'REJECTED';
+        break;
+      case PropertyStatus.deleted:
+        color = AppColors.textMuted;
+        label = 'DELETED';
+        break;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.95),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [AppShadows.sm],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(width: 6, height: 6, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+          const SizedBox(width: 5),
+          Text(label, style: GoogleFonts.workSans(fontSize: 10, fontWeight: FontWeight.bold, color: color)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      color: Colors.grey[100],
+      child: const Center(
+        child: Icon(Icons.home_work_outlined, size: 40, color: Colors.grey),
       ),
     );
   }

@@ -19,6 +19,7 @@ class PropertyProvider extends ChangeNotifier {
 
   // State
   List<PropertyModel> _properties = [];
+  List<PropertyModel> _allAdminProperties = [];
   PropertyModel? _selectedProperty;
   List<RoomModel> _rooms = [];
   List<RatingModel> _studentRatings = [];
@@ -39,6 +40,7 @@ class PropertyProvider extends ChangeNotifier {
   // Filters
   String? _searchQuery;
   GenderOrientation? _genderFilter;
+  bool? _adminVacancyFilter;
   int? _minPrice;
   int? _maxPrice;
   List<String> _selectedAmenities = [];
@@ -55,11 +57,37 @@ class PropertyProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String? get searchQuery => _searchQuery;
   GenderOrientation? get genderFilter => _genderFilter;
+  bool? get adminVacancyFilter => _adminVacancyFilter;
   int? get minPrice => _minPrice;
   int? get maxPrice => _maxPrice;
   List<String> get selectedAmenities => _selectedAmenities;
   Map<String, bool> get propertyVacancyMap => _propertyVacancyMap;
   Map<String, DateTime> get lastVacancyUpdate => _lastVacancyUpdate;
+
+  /// Admin properties with client-side filtering
+  List<PropertyModel> get adminProperties {
+    if (_allAdminProperties.isEmpty) return [];
+    var filtered = List<PropertyModel>.from(_allAdminProperties);
+    if (_searchQuery != null && _searchQuery!.isNotEmpty) {
+      final q = _searchQuery!.toLowerCase();
+      filtered = filtered.where((p) =>
+        p.name.toLowerCase().contains(q) ||
+        p.address.toLowerCase().contains(q) ||
+        (p.ownerName?.toLowerCase().contains(q) ?? false)
+      ).toList();
+    }
+    if (_genderFilter != null) {
+      filtered = filtered.where((p) => p.genderOrientation == _genderFilter).toList();
+    }
+    if (_adminVacancyFilter != null) {
+      if (_adminVacancyFilter == true) {
+        filtered = filtered.where((p) => p.hasVacancy).toList();
+      } else {
+        filtered = filtered.where((p) => !p.hasVacancy).toList();
+      }
+    }
+    return filtered;
+  }
 
   // Stats getters
   RoomStatus? getRoomStatusFromCache(String roomId) {
@@ -136,10 +164,17 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Set admin vacancy filter
+  void setAdminVacancyFilter(bool? value) {
+    _adminVacancyFilter = value;
+    notifyListeners();
+  }
+
   /// Clear all filters
   void clearFilters() {
     _searchQuery = null;
     _genderFilter = null;
+    _adminVacancyFilter = null;
     _minPrice = null;
     _maxPrice = null;
     _selectedAmenities = [];
@@ -222,10 +257,10 @@ class PropertyProvider extends ChangeNotifier {
   }
 
   // Admin stats
-  int get totalListings => _properties.length;
-  int get availableListings => _properties.where((p) => p.hasVacancy).length;
-  int get fullListings => _properties.where((p) => !p.hasVacancy).length;
-  int get totalAvailableRoomCount => _properties.fold(0, (sum, p) => sum + p.availableRooms);
+  int get totalListings => _allAdminProperties.length;
+  int get availableListings => _allAdminProperties.where((p) => p.hasVacancy).length;
+  int get fullListings => _allAdminProperties.where((p) => !p.hasVacancy).length;
+  int get totalAvailableRoomCount => _allAdminProperties.fold(0, (sum, p) => sum + p.availableRooms);
 
   /// Load all properties with owner names for admin
   Future<void> loadAdminProperties() async {
@@ -234,10 +269,8 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _properties = await _propertyService.getPropertiesWithOwners(
-        searchQuery: _searchQuery,
-        genderOrientation: _genderFilter,
-      );
+      _allAdminProperties = await _propertyService.getPropertiesWithOwners();
+      _properties = _allAdminProperties;
       _isLoading = false;
       notifyListeners();
     } catch (e) {

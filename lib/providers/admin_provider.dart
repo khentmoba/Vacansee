@@ -89,6 +89,69 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Update a user's profile
+  Future<void> updateUser(String uid, Map<String, dynamic> fields) async {
+    try {
+      await _adminService.updateUser(uid, fields);
+      final index = _users.indexWhere((u) => u.uid == uid);
+      if (index != -1) {
+        _users[index] = _users[index].copyWith(
+          displayName: fields['display_name'] as String?,
+          email: fields['email'] as String?,
+          phoneNumber: fields['phone_number'] as String?,
+          role: fields['role'] != null
+              ? UserRole.values.firstWhere((r) => r.name == fields['role'])
+              : null,
+          isVerified: fields['is_verified'] as bool? ?? _users[index].isVerified,
+          gender: fields['gender'] as String?,
+          firstName: fields['first_name'] as String?,
+          lastName: fields['last_name'] as String?,
+          address: fields['address'] as String?,
+          businessName: fields['business_name'] as String?,
+          businessPermitNo: fields['business_permit_no'] as String?,
+          emergencyContactName: fields['emergency_contact_name'] as String?,
+          emergencyContactPhone: fields['emergency_contact_phone'] as String?,
+        );
+      }
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  /// Delete a user
+  Future<void> deleteUser(String uid) async {
+    try {
+      await _adminService.deleteUser(uid);
+      _users.removeWhere((u) => u.uid == uid);
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  /// Toggle verification status
+  Future<void> toggleVerification(String uid) async {
+    final user = _users.firstWhere((u) => u.uid == uid);
+    final newStatus = !user.isVerified;
+    try {
+      await _adminService.toggleUserVerification(uid, newStatus);
+      final index = _users.indexWhere((u) => u.uid == uid);
+      if (index != -1) {
+        _users[index] = _users[index].copyWith(isVerified: newStatus);
+      }
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   /// Clear error message
   void clearError() {
     _errorMessage = null;
