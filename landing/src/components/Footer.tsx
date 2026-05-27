@@ -22,10 +22,10 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="text-sm font-semibold tracking-wider uppercase text-white mb-6">For Tenants</h4>
             <ul className="space-y-4 text-sm text-white/50" style={{ fontFamily: "'Inter', sans-serif" }}>
-              <li><a href="/login.html" className="hover:text-brand-400 transition-colors duration-200">Search Rooms</a></li>
-              <li><a href="/login.html" className="hover:text-brand-400 transition-colors duration-200">Near USTP</a></li>
-              <li><a href="/login.html" className="hover:text-brand-400 transition-colors duration-200">Near Xavier</a></li>
-              <li><a href="/login.html" className="hover:text-brand-400 transition-colors duration-200">Student Guides</a></li>
+              <li><a href="/app/login.html" className="hover:text-brand-400 transition-colors duration-200">Search Rooms</a></li>
+              <li><a href="/app/login.html" className="hover:text-brand-400 transition-colors duration-200">Near USTP</a></li>
+              <li><a href="/app/login.html" className="hover:text-brand-400 transition-colors duration-200">Near Xavier</a></li>
+              <li><a href="/app/login.html" className="hover:text-brand-400 transition-colors duration-200">Student Guides</a></li>
             </ul>
           </div>
 
@@ -33,10 +33,10 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="text-sm font-semibold tracking-wider uppercase text-white mb-6">For Owners</h4>
             <ul className="space-y-4 text-sm text-white/50" style={{ fontFamily: "'Inter', sans-serif" }}>
-              <li><a href="/signup.html?role=owner" className="hover:text-brand-400 transition-colors duration-200">List Property</a></li>
-              <li><a href="/login.html" className="hover:text-brand-400 transition-colors duration-200">Owner Dashboard</a></li>
-              <li><a href="/login.html" className="hover:text-brand-400 transition-colors duration-200">Resource Center</a></li>
-              <li><a href="/login.html" className="hover:text-brand-400 transition-colors duration-200">Premium Listing</a></li>
+              <li><a href="/app/signup.html?role=owner" className="hover:text-brand-400 transition-colors duration-200">List Property</a></li>
+              <li><a href="/app/login.html" className="hover:text-brand-400 transition-colors duration-200">Owner Dashboard</a></li>
+              <li><a href="/app/login.html" className="hover:text-brand-400 transition-colors duration-200">Resource Center</a></li>
+              <li><a href="/app/login.html" className="hover:text-brand-400 transition-colors duration-200">Premium Listing</a></li>
             </ul>
           </div>
 

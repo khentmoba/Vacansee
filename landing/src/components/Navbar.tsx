@@ -50,7 +50,7 @@ export const Navbar: React.FC = () => {
         {/* Right: CTA Button (desktop) + Hamburger (mobile) */}
         <div className="flex items-center gap-4">
           <a
-            href="/login.html"
+            href="/app/login.html"
             className="hidden md:inline-block bg-brand-500 text-white text-base font-medium px-7 py-2.5 rounded-full hover:bg-brand-600 transition-colors duration-200 cursor-pointer shadow-sm shadow-brand-500/30"
           >
             Find a Room
@@ -99,7 +99,7 @@ export const Navbar: React.FC = () => {
             </div>
             <div className="px-6 pb-8 pt-4 border-t border-brand-500/10">
               <a
-                href="/login.html"
+                href="/app/login.html"
                 className="block w-full text-center bg-brand-500 text-white text-base font-medium px-7 py-3 rounded-full hover:bg-brand-600 transition-colors duration-200 cursor-pointer shadow-sm shadow-brand-500/30"
               >
                 Find a Room

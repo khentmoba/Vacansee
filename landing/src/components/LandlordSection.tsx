@@ -63,7 +63,7 @@ export const LandlordSection: React.FC = () => {
             
             <div>
               <a 
-                href="/signup.html?role=owner" 
+                href="/app/signup.html?role=owner" 
                 className="group inline-flex items-center gap-3.5 text-white font-medium text-base hover:text-brand-400 transition-colors duration-200"
               >
                 <span>List your property</span>

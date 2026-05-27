@@ -15,7 +15,7 @@ export const InfoSection: React.FC = () => {
               Smart Student Living.
             </h2>
             <a
-              href="/map"
+              href="/app/map"
               className="group inline-flex items-center gap-3 bg-brand-500 text-white text-sm font-medium pl-6 pr-1.5 py-1.5 rounded-full hover:bg-brand-600 transition-colors duration-200 cursor-pointer shadow-sm shadow-brand-500/20"
             >
               <span>Explore map</span>
