@@ -8,9 +8,7 @@ macos/
 windows/
 web/.dart_tool/
 
-# Keep build/web/ for deployment — only exclude intermediate build artifacts
-build/*/
-!build/web/
+# Keep build/web/ for deployment
 
 # Node
 landing/node_modules/
