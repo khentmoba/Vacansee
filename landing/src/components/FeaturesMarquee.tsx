@@ -1,46 +1,79 @@
+import React from 'react';
 import { ScrollReveal } from './ScrollReveal';
 
 export const FeaturesMarquee: React.FC = () => {
-  const items = [
-    { name: 'Free High-Speed WiFi', style: { fontFamily: '"Times New Roman", Times, serif', fontWeight: 400, letterSpacing: '0.02em', fontSize: '14px' } },
-    { name: 'No Curfew', style: { fontFamily: '"Arial Black", Gadget, sans-serif', fontWeight: 900, letterSpacing: '0.08em', fontSize: '16px' } },
-    { name: 'Cooking Allowed', style: { fontFamily: 'Impact, Charcoal, sans-serif', fontWeight: 700, letterSpacing: '0.05em', fontSize: '18px' } },
-    { name: 'Inclusive Utilities', style: { fontFamily: 'Georgia, serif', fontWeight: 600, letterSpacing: '-0.02em', fontSize: '17px' } },
-    { name: 'CCTV Security', style: { fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif', fontWeight: 700, letterSpacing: '-0.01em', fontSize: '15px' } },
-    { name: 'In-house Laundry', style: { fontFamily: 'Verdana, Geneva, sans-serif', fontWeight: 700, letterSpacing: '0.06em', fontSize: '14px', textTransform: 'uppercase' as const } },
-    { name: 'Solo Rooms', style: { fontFamily: 'Palatino, "Palatino Linotype", serif', fontWeight: 500, letterSpacing: '0.03em', fontSize: '15px' } },
+  const row1 = [
+    'Free High-Speed WiFi',
+    'No Curfew Rules',
+    'Cooking Allowed',
+    'Inclusive Utility Bills',
+    'CCTV Security 24/7',
+    'In-house Laundry Space',
+    'Solo Rooms Available',
   ];
 
-  // Tripled for seamless scrolling
-  const marqueeItems = [...items, ...items, ...items];
+  const row2 = [
+    'Study Table Included',
+    'AC Rooms Available',
+    'Visitors Allowed',
+    'Shared Kitchen Space',
+    'Motorcycle Parking',
+    'Water Purifier Access',
+    'Male & Female Orientation',
+  ];
+
+  const marqueeRow1 = [...row1, ...row1, ...row1];
+  const marqueeRow2 = [...row2, ...row2, ...row2];
 
   return (
-    <section className="bg-[#F0F9FF] py-16 border-t border-b border-brand-500/10 overflow-hidden" id="neighborhoods">
-      <div className="max-w-[88rem] mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
-        {/* Left Side: Short Description Column */}
-        <ScrollReveal className="md:col-span-1">
-          <p
-            className="text-black/70 text-base leading-relaxed"
-            style={{ fontFamily: "'Inter', sans-serif" }}
-          >
-            Filter by the amenities<br />that matter most to you.
+    <section className="bg-white py-20 border-t border-b border-slate-100 overflow-hidden">
+      <div className="max-w-[88rem] mx-auto px-6 mb-12">
+        <ScrollReveal className="max-w-xl">
+          <span className="text-brand-500 font-bold uppercase tracking-wider text-xs block mb-3">Custom Amenities</span>
+          <h2 className="text-slate-900 text-3xl md:text-4xl font-bold tracking-tight font-heading">
+            Filter by what matters to you.
+          </h2>
+          <p className="text-slate-500 text-base mt-2">
+            Every boarding house features detailed tags, letting you filter and find matching options instantly.
           </p>
         </ScrollReveal>
+      </div>
 
-        {/* Right Side: Continuous Marquee Column */}
-        <ScrollReveal delay={1} className="md:col-span-3 overflow-hidden select-none">
-          <div className="backers-track">
-            {marqueeItems.map((item, idx) => (
+      <div className="flex flex-col gap-6 select-none">
+        {/* Row 1: Left-to-Right Marquee */}
+        <div className="overflow-hidden w-full relative py-2">
+          {/* Subtle gradient mask to fade items on left and right edges */}
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+          
+          <div className="marquee-track-ltr">
+            {marqueeRow1.map((item, idx) => (
               <div
                 key={idx}
-                style={item.style}
-                className="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default"
+                className="mx-4 shrink-0 bg-slate-50 border border-slate-200/80 text-slate-700 hover:text-brand-500 hover:border-brand-500/30 hover:bg-brand-500/5 px-6 py-3 rounded-full text-sm font-semibold tracking-wide transition-all duration-300 cursor-default shadow-sm shadow-slate-100/50"
               >
-                {item.name}
+                {item}
               </div>
             ))}
           </div>
-        </ScrollReveal>
+        </div>
+
+        {/* Row 2: Right-to-Left Marquee */}
+        <div className="overflow-hidden w-full relative py-2">
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+          <div className="marquee-track-rtl">
+            {marqueeRow2.map((item, idx) => (
+              <div
+                key={idx}
+                className="mx-4 shrink-0 bg-slate-50 border border-slate-200/80 text-slate-700 hover:text-brand-500 hover:border-brand-500/30 hover:bg-brand-500/5 px-6 py-3 rounded-full text-sm font-semibold tracking-wide transition-all duration-300 cursor-default shadow-sm shadow-slate-100/50"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

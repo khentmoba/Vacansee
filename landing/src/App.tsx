@@ -7,12 +7,12 @@ import { Footer } from './components/Footer';
 
 function App() {
   return (
-    <div className="flex flex-col bg-[#F0F9FF] min-h-screen">
-      {/* Navbar + Hero Container */}
-      <div className="h-screen flex flex-col overflow-hidden relative select-none">
-        <Navbar />
-        <HeroSection />
-      </div>
+    <div className="flex flex-col bg-[#FAFDFE] min-h-screen text-slate-900 select-none">
+      {/* Floating Navbar */}
+      <Navbar />
+
+      {/* Hero Section Container */}
+      <HeroSection />
 
       {/* Other Sections */}
       <InfoSection />

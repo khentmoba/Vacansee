@@ -1,3 +1,5 @@
+@import url('https://api.fontshare.com/v2/css?family=satoshi@300,400,500,700,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -11,58 +13,98 @@
 }
 
 @layer base {
-  @font-face {
-    font-family: 'TT Norms Pro';
-    src: url('/fonts/tt-norms-pro-regular.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: 'TT Norms Pro';
-    src: url('/fonts/tt-norms-pro-semibold.woff2') format('woff2');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-  }
-
   html, body, #root {
-    font-family: 'TT Norms Pro', 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: #f0f9ff;
-    color: #000000;
+    font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #fafbfd;
+    color: #0f172a;
     margin: 0;
     padding: 0;
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4, .font-heading {
+    font-family: 'Satoshi', 'DM Sans', sans-serif;
   }
 }
 
-/* Scoped Marquee Keyframes */
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
+/* Glassmorphism Styles (Light Mode) */
+.glass-nav-light {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.02),
+    0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 
+    0 10px 30px rgba(14, 165, 233, 0.04),
+    0 1px 8px rgba(0, 0, 0, 0.01);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-light:hover {
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-4px);
+  border-color: rgba(14, 165, 233, 0.2);
+  box-shadow: 
+    0 20px 40px rgba(14, 165, 233, 0.08),
+    0 1px 12px rgba(14, 165, 233, 0.02);
+}
+
+/* Floating Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
   }
-  100% {
-    transform: translateX(-50%);
+  50% {
+    transform: translateY(-6px);
   }
 }
 
-.marquee-track {
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 4s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+/* Continuous Marquees */
+@keyframes marquee-ltr {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes marquee-rtl {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-track-ltr {
   display: flex;
   width: max-content;
-  animation: marquee 25s linear infinite;
+  animation: marquee-ltr 28s linear infinite;
 }
 
-.backers-track {
+.marquee-track-rtl {
   display: flex;
   width: max-content;
-  animation: marquee 30s linear infinite;
+  animation: marquee-rtl 28s linear infinite;
 }
 
 /* Scroll reveal animations */
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  transform: translateY(20px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .scroll-reveal.is-visible {
@@ -73,32 +115,17 @@
 .scroll-reveal-delay-1 { transition-delay: 0.1s; }
 .scroll-reveal-delay-2 { transition-delay: 0.2s; }
 .scroll-reveal-delay-3 { transition-delay: 0.3s; }
-.scroll-reveal-delay-4 { transition-delay: 0.4s; }
 
-/* Nav drawer animations */
-.nav-drawer {
-  transform: translateX(100%);
-  transition: transform 0.3s ease-in-out;
-}
-.nav-drawer.open {
-  transform: translateX(0);
-}
-
-/* Accessibility: respect user preferences for reduced motion */
+/* Responsive styles */
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track,
-  .backers-track {
+  .marquee-track-ltr,
+  .marquee-track-rtl {
     animation-play-state: paused;
     transform: none;
   }
-
   .scroll-reveal {
     transition: none;
     opacity: 1;
     transform: none;
-  }
-
-  .nav-drawer {
-    transition: none;
   }
 }
