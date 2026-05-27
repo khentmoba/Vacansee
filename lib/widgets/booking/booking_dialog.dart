@@ -59,6 +59,7 @@ class _BookingDialogState extends State<BookingDialog> {
         studentName: student.displayName,
         studentEmail: student.email,
         studentPhone: student.phoneNumber,
+        studentGender: student.gender ?? '',
         studentNotes: _notesController.text.trim(),
       );
 

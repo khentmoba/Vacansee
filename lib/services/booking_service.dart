@@ -43,6 +43,7 @@ class BookingService {
     required String studentName,
     required String studentEmail,
     String? studentPhone,
+    required String studentGender,
     String? studentNotes,
     DateTime? moveInDate,
     int durationMonths = 1,
@@ -59,13 +60,11 @@ class BookingService {
       }
 
       // 2. Gender Enforcement
-      final studentData = await _supabase.from('users').select('gender').eq('id', studentId).single();
       final propertyData = await _supabase.from('properties').select('gender_orientation').eq('id', propertyId).single();
       
-      final studentGender = studentData['gender'] as String?;
       final propertyOrientation = propertyData['gender_orientation'] as String;
 
-      if (propertyOrientation != 'mixed' && studentGender != null) {
+      if (propertyOrientation != 'mixed' && studentGender.isNotEmpty) {
         if (propertyOrientation != studentGender) {
           throw BookingException(
             'This property is for ${propertyOrientation}s only. Your profile gender ($studentGender) does not match.',
@@ -93,9 +92,7 @@ class BookingService {
       final data = await _supabase
           .from('bookings')
           .insert(bookingJson)
-          .select(
-            '*, properties(name), rooms(description), users:student_id(display_name, email, phone_number)',
-          )
+          .select('*, properties(name), rooms(description)')
           .single();
 
       return BookingModel.fromJson(data);

@@ -103,6 +103,7 @@ class _BookingScreenState extends State<BookingScreen> {
         studentName: _nameController.text.trim(),
         studentEmail: _emailController.text.trim(),
         studentPhone: _phoneController.text.trim(),
+        studentGender: student.gender ?? '',
         studentNotes: _notesController.text.trim(),
         moveInDate: _selectedDate,
         durationMonths: _selectedDuration,
