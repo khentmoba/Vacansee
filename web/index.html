@@ -1,67 +1,323 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <base href="$FLUTTER_BASE_HREF">
-
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Primary SEO -->
-  <title>VacanSee | Real-time Boarding House Finder in CDO</title>
-  <meta name="description" content="Find verified boarding houses near your university in Cagayan de Oro. Filter by price, location, and gender orientation. See real-time room availability. Free for students.">
-  <meta name="keywords" content="boarding house CDO, boarding house Cagayan de Oro, student accommodation, room for rent CDO, vacansee">
-  <meta name="author" content="VacanSee">
-  <meta name="theme-color" content="#5287B2">
-
-  <!-- Open Graph (Facebook, Messenger, Viber) -->
-  <meta property="og:title" content="VacanSee | Real-time Boarding House Finder">
-  <meta property="og:description" content="Find and book verified boarding houses near your university in Cagayan de Oro. Real-time vacancy updates.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://vacansee-xi.vercel.app">
-  <meta property="og:image" content="https://vacansee-xi.vercel.app/icons/Icon-512.png">
-  <meta property="og:image:width" content="512">
-  <meta property="og:image:height" content="512">
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="VacanSee | Real-time Boarding House Finder">
-  <meta name="twitter:description" content="Find verified boarding houses near your university in CDO. Real-time vacancy tracking.">
-  <meta name="twitter:image" content="https://vacansee-xi.vercel.app/icons/Icon-512.png">
-
-  <!-- iOS PWA -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="VacanSee">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-  <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VacanSee is a real-time boarding house, dorm, and pad vacancy tracker for university students near USTP, Xavier, and across Cagayan de Oro.">
+    <title>VacanSee — Find Your Perfect Boarding House in CDO</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="landing.css">
 </head>
-<body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+<body class="bg-[#F0F9FF] text-black font-sans antialiased" style="font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
-  <script src="flutter_bootstrap.js" async></script>
+    <!-- Navbar -->
+    <nav class="absolute top-0 left-0 right-0 z-20 px-6 py-5" id="navbar">
+        <div class="max-w-[88rem] mx-auto flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2.5 cursor-pointer no-underline">
+                <svg class="w-7 h-7 text-black" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="2" width="20" height="20" rx="5" fill="currentColor"/>
+                    <path d="M8 14V10M12 16V8M16 14V10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span class="text-2xl font-semibold tracking-tight text-black">VacanSee</span>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#map-view" class="text-base text-gray-700 hover:text-brand-500 font-medium transition-colors duration-200 no-underline">Map View</a>
+                <a href="#neighborhoods" class="text-base text-gray-700 hover:text-brand-500 font-medium transition-colors duration-200 no-underline">Neighborhoods</a>
+                <a href="#landlords" class="text-base text-gray-700 hover:text-brand-500 font-medium transition-colors duration-200 no-underline">Landlords</a>
+                <a href="#help" class="text-base text-gray-700 hover:text-brand-500 font-medium transition-colors duration-200 no-underline">Help</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="/app" class="hidden md:inline-block bg-brand-500 text-white text-base font-medium px-7 py-2.5 rounded-full hover:bg-brand-600 transition-colors duration-200 cursor-pointer shadow-sm no-underline" style="box-shadow: 0 1px 3px rgba(14,165,233,0.3);">Find a Room</a>
+                <button id="menu-btn" class="md:hidden p-2 text-black hover:text-brand-500 transition-colors duration-200" aria-label="Open menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Drawer -->
+    <div id="mobile-drawer" class="nav-drawer fixed top-0 right-0 bottom-0 w-[280px] bg-[#F0F9FF] z-50 shadow-2xl flex flex-col md:hidden">
+        <div class="flex items-center justify-between px-6 py-5 border-b" style="border-color: rgba(14,165,233,0.1);">
+            <span class="text-xl font-semibold text-black">Menu</span>
+            <button id="close-menu" class="p-2 text-black hover:text-brand-500 transition-colors duration-200" aria-label="Close menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <div class="flex-1 flex flex-col px-6 pt-8 gap-6">
+            <a href="#map-view" class="menu-link text-lg text-gray-700 hover:text-brand-500 font-medium transition-colors duration-200 no-underline">Map View</a>
+            <a href="#neighborhoods" class="menu-link text-lg text-gray-700 hover:text-brand-500 font-medium transition-colors duration-200 no-underline">Neighborhoods</a>
+            <a href="#landlords" class="menu-link text-lg text-gray-700 hover:text-brand-500 font-medium transition-colors duration-200 no-underline">Landlords</a>
+            <a href="#help" class="menu-link text-lg text-gray-700 hover:text-brand-500 font-medium transition-colors duration-200 no-underline">Help</a>
+        </div>
+        <div class="px-6 pb-8 pt-4 border-t" style="border-color: rgba(14,165,233,0.1);">
+            <a href="/app" class="block w-full text-center bg-brand-500 text-white text-base font-medium px-7 py-3 rounded-full hover:bg-brand-600 transition-colors duration-200 cursor-pointer no-underline" style="box-shadow: 0 1px 3px rgba(14,165,233,0.3);">Find a Room</a>
+        </div>
+    </div>
+    <div id="drawer-backdrop" class="fixed inset-0 bg-black/40 z-40 hidden md:hidden"></div>
+
+    <!-- Hero Section -->
+    <section class="px-6 pt-24 pb-6 flex items-end min-h-[600px]">
+        <div class="relative w-full rounded-3xl overflow-hidden shadow-2xl flex items-center w-full" style="height: calc(100vh - 120px); min-height: 520px;">
+            <img src="images/hero-bg.png" alt="Modern study space" class="absolute inset-0 w-full h-full object-cover object-center select-none" />
+            <div class="absolute inset-0 z-10" style="background: linear-gradient(to right, rgba(240,249,255,0.95) 0%, rgba(240,249,255,0.75) 50%, transparent 100%);"></div>
+
+            <div class="relative z-10 w-full max-w-[88rem] mx-auto px-12 md:px-20 h-full flex flex-col justify-center pt-16">
+                <div class="max-w-2xl">
+                    <h1 class="text-black text-5xl md:text-7xl font-semibold leading-[1.08] mb-6 tracking-tight" style="letter-spacing: -0.04em;">
+                        Your Next Home<br />Awaits
+                    </h1>
+                    <p class="text-black/80 text-lg md:text-xl max-w-lg mb-10 leading-relaxed font-normal">
+                        A seamless, map-driven tracker to find the best boarding houses, dorms, and pad spaces near USTP and across Cagayan de Oro.
+                    </p>
+
+                    <div class="flex flex-wrap gap-4 items-center mb-16">
+                        <a href="/app" class="group inline-flex items-center gap-4 bg-brand-500 text-white text-base md:text-lg font-medium pl-8 pr-2.5 py-2.5 rounded-full hover:bg-brand-600 transition-all duration-300 cursor-pointer no-underline" style="box-shadow: 0 10px 15px -3px rgba(14,165,233,0.3);">
+                            <span>Start browsing</span>
+                            <span class="bg-white rounded-full p-2.5 text-brand-500 group-hover:translate-x-1 transition-transform duration-300 inline-flex">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                            </span>
+                        </a>
+                        <a href="/app" class="text-black/80 hover:text-brand-500 font-semibold text-base py-3 px-6 hover:underline transition-colors duration-200 no-underline">View map first</a>
+                    </div>
+                </div>
+
+                <div class="mt-auto w-full max-w-4xl overflow-hidden border-t border-black/10 pt-6 pb-2">
+                    <div class="marquee-track">
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: Georgia, serif; font-weight: 700; letter-spacing: -0.02em; font-size: 15px;">USTP Campus</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: Arial, sans-serif; font-weight: 900; letter-spacing: 0.08em; font-size: 13px; text-transform: uppercase;">Limketkai Center</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: 'Trebuchet MS', sans-serif; font-weight: 600; letter-spacing: 0.01em; font-size: 15px; font-style: italic;">Divisoria</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: 'Courier New', monospace; font-weight: 700; letter-spacing: 0.12em; font-size: 13px; text-transform: uppercase;">Xavier University</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: Palatino, 'Book Antiqua', serif; font-weight: 400; letter-spacing: -0.01em; font-size: 16px;">Liceo de Cagayan</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: Impact, 'Arial Narrow', sans-serif; font-weight: 400; letter-spacing: 0.04em; font-size: 14px;">Carmen Market</span>
+                        <!-- Duplicate for seamless loop -->
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: Georgia, serif; font-weight: 700; letter-spacing: -0.02em; font-size: 15px;">USTP Campus</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: Arial, sans-serif; font-weight: 900; letter-spacing: 0.08em; font-size: 13px; text-transform: uppercase;">Limketkai Center</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: 'Trebuchet MS', sans-serif; font-weight: 600; letter-spacing: 0.01em; font-size: 15px; font-style: italic;">Divisoria</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: 'Courier New', monospace; font-weight: 700; letter-spacing: 0.12em; font-size: 13px; text-transform: uppercase;">Xavier University</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: Palatino, 'Book Antiqua', serif; font-weight: 400; letter-spacing: -0.01em; font-size: 16px;">Liceo de Cagayan</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: Impact, 'Arial Narrow', sans-serif; font-weight: 400; letter-spacing: 0.04em; font-size: 14px;">Carmen Market</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: Georgia, serif; font-weight: 700; letter-spacing: -0.02em; font-size: 15px;">USTP Campus</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: Arial, sans-serif; font-weight: 900; letter-spacing: 0.08em; font-size: 13px; text-transform: uppercase;">Limketkai Center</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: 'Trebuchet MS', sans-serif; font-weight: 600; letter-spacing: 0.01em; font-size: 15px; font-style: italic;">Divisoria</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: 'Courier New', monospace; font-weight: 700; letter-spacing: 0.12em; font-size: 13px; text-transform: uppercase;">Xavier University</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: Palatino, 'Book Antiqua', serif; font-weight: 400; letter-spacing: -0.01em; font-size: 16px;">Liceo de Cagayan</span>
+                        <span class="mx-8 shrink-0 text-black/60 hover:text-brand-500 transition-colors duration-200 select-none cursor-default" style="font-family: Impact, 'Arial Narrow', sans-serif; font-weight: 400; letter-spacing: 0.04em; font-size: 14px;">Carmen Market</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Section -->
+    <section class="bg-[#F0F9FF] px-6 py-28" id="map-view">
+        <div class="max-w-[88rem] mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20 items-start">
+                <div class="scroll-reveal">
+                    <h2 class="text-black text-5xl md:text-6xl font-semibold leading-tight mb-8" style="letter-spacing: -0.03em;">
+                        Smart Student Living.
+                    </h2>
+                    <a href="/app" class="group inline-flex items-center gap-3 bg-brand-500 text-white text-sm font-medium pl-6 pr-1.5 py-1.5 rounded-full hover:bg-brand-600 transition-colors duration-200 cursor-pointer no-underline" style="box-shadow: 0 1px 2px rgba(14,165,233,0.2);">
+                        <span>Explore map</span>
+                        <span class="bg-white rounded-full p-2 text-brand-500 group-hover:translate-x-0.5 transition-transform duration-300 inline-flex">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </span>
+                    </a>
+                </div>
+                <div class="scroll-reveal scroll-reveal-delay-1">
+                    <p class="text-black/70 text-2xl md:text-3xl md:leading-relaxed font-light mt-1">
+                        Find verified boarding houses that fit your budget, complete with transparent pricing, accurate amenity filters, and direct landlord contact.
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="scroll-reveal relative lg:col-span-2 rounded-3xl overflow-hidden min-h-[360px] p-8 flex flex-col justify-between shadow-md group hover:shadow-lg transition-all duration-300 cursor-pointer" style="border: 1px solid rgba(14,165,233,0.1);">
+                    <img src="images/desk-setup.png" alt="Cozy study area" class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 select-none" />
+                    <div class="absolute inset-0 z-10" style="background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);"></div>
+                    <div class="relative z-20 flex justify-start items-center">
+                        <span class="bg-white/90 backdrop-blur text-black text-xs font-semibold px-4 py-1.5 rounded-full tracking-wide uppercase">Amenities Focus</span>
+                    </div>
+                    <div class="relative z-20 mt-auto flex flex-col items-start gap-4">
+                        <h3 class="text-white text-3xl font-semibold leading-snug tracking-tight" style="letter-spacing: -0.02em;">Designed for focus</h3>
+                        <p class="text-white/90 text-sm md:text-base max-w-sm bg-black/40 backdrop-blur-md rounded-2xl p-4" style="border: 1px solid rgba(255,255,255,0.1);">Filter by essential amenities like inclusive WiFi, study areas, and curfew rules to match your academic schedule.</p>
+                    </div>
+                </div>
+
+                <div class="scroll-reveal scroll-reveal-delay-2 rounded-3xl p-8 min-h-[360px] flex flex-col justify-between shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group" style="background: #1E293B; border: 1px solid rgba(14,165,233,0.2);">
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style="background: rgba(14,165,233,0.15);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <div class="mt-auto">
+                        <h3 class="text-white text-2xl font-semibold leading-snug tracking-tight mb-3">Walk to class,<br />save time.</h3>
+                        <p class="text-white/60 text-base leading-relaxed">View exact distances to major university gates and local transport routes.</p>
+                    </div>
+                </div>
+
+                <div class="scroll-reveal scroll-reveal-delay-3 rounded-3xl p-8 min-h-[360px] flex flex-col justify-between shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group" style="background: #1E293B; border: 1px solid rgba(14,165,233,0.2);">
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style="background: rgba(14,165,233,0.15);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
+                    <div class="mt-auto">
+                        <h3 class="text-white text-2xl font-semibold leading-snug tracking-tight mb-3">Verified<br />listings.</h3>
+                        <p class="text-white/60 text-base leading-relaxed">Every pad is checked for accuracy. Say goodbye to outdated photos and hidden utility fees.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Marquee -->
+    <section class="bg-[#F0F9FF] py-16 overflow-hidden" id="neighborhoods" style="border-top: 1px solid rgba(14,165,233,0.1); border-bottom: 1px solid rgba(14,165,233,0.1);">
+        <div class="max-w-[88rem] mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
+            <div class="scroll-reveal md:col-span-1">
+                <p class="text-black/70 text-base leading-relaxed">Filter by the amenities<br>that matter most to you.</p>
+            </div>
+            <div class="scroll-reveal scroll-reveal-delay-1 md:col-span-3 overflow-hidden select-none">
+                <div class="backers-track">
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: 'Times New Roman', Times, serif; font-weight: 400; letter-spacing: 0.02em; font-size: 14px;">Free High-Speed WiFi</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: 'Arial Black', Gadget, sans-serif; font-weight: 900; letter-spacing: 0.08em; font-size: 16px;">No Curfew</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: Impact, Charcoal, sans-serif; font-weight: 700; letter-spacing: 0.05em; font-size: 18px;">Cooking Allowed</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: Georgia, serif; font-weight: 600; letter-spacing: -0.02em; font-size: 17px;">Inclusive Utilities</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 700; letter-spacing: -0.01em; font-size: 15px;">CCTV Security</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: Verdana, Geneva, sans-serif; font-weight: 700; letter-spacing: 0.06em; font-size: 14px; text-transform: uppercase;">In-house Laundry</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: Palatino, 'Palatino Linotype', serif; font-weight: 500; letter-spacing: 0.03em; font-size: 15px;">Solo Rooms</span>
+                    <!-- Duplicates for seamless loop -->
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: 'Times New Roman', Times, serif; font-weight: 400; letter-spacing: 0.02em; font-size: 14px;">Free High-Speed WiFi</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: 'Arial Black', Gadget, sans-serif; font-weight: 900; letter-spacing: 0.08em; font-size: 16px;">No Curfew</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: Impact, Charcoal, sans-serif; font-weight: 700; letter-spacing: 0.05em; font-size: 18px;">Cooking Allowed</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: Georgia, serif; font-weight: 600; letter-spacing: -0.02em; font-size: 17px;">Inclusive Utilities</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 700; letter-spacing: -0.01em; font-size: 15px;">CCTV Security</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: Verdana, Geneva, sans-serif; font-weight: 700; letter-spacing: 0.06em; font-size: 14px; text-transform: uppercase;">In-house Laundry</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: Palatino, 'Palatino Linotype', serif; font-weight: 500; letter-spacing: 0.03em; font-size: 15px;">Solo Rooms</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: 'Times New Roman', Times, serif; font-weight: 400; letter-spacing: 0.02em; font-size: 14px;">Free High-Speed WiFi</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: 'Arial Black', Gadget, sans-serif; font-weight: 900; letter-spacing: 0.08em; font-size: 16px;">No Curfew</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: Impact, Charcoal, sans-serif; font-weight: 700; letter-spacing: 0.05em; font-size: 18px;">Cooking Allowed</span>
+                    <span class="mx-10 shrink-0 text-black/50 hover:text-brand-500 hover:scale-105 transition-all duration-200 cursor-default" style="font-family: Georgia, serif; font-weight: 600; letter-spacing: -0.02em; font-size: 17px;">Inclusive Utilities</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Landlord Section -->
+    <section class="bg-[#F0F9FF] px-6 py-28" id="landlords">
+        <div class="max-w-[88rem] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="scroll-reveal lg:pr-12">
+                <span class="inline-block text-brand-500 font-semibold tracking-wider text-sm uppercase mb-4">The Platform in Practice</span>
+                <h2 class="text-black text-5xl md:text-6xl font-semibold leading-[1.05] mb-8" style="letter-spacing: -0.04em;">Built for Everyone</h2>
+                <p class="text-black/60 text-base md:text-lg leading-relaxed max-w-md mb-8">Whether you are a student looking for a secure place to stay or a property owner managing multiple rooms, the platform adapts to your needs.</p>
+                <div class="border-t pt-8 flex gap-8" style="border-color: rgba(14,165,233,0.1);">
+                    <div>
+                        <div class="text-3xl font-semibold text-black tracking-tight mb-1">0%</div>
+                        <p class="text-black/50 text-xs uppercase font-medium tracking-wide">Listing Fees</p>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-semibold text-black tracking-tight mb-1">100%</div>
+                        <p class="text-black/50 text-xs uppercase font-medium tracking-wide">Verified Landlords</p>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-semibold text-black tracking-tight mb-1">Real-time</div>
+                        <p class="text-black/50 text-xs uppercase font-medium tracking-wide">Vacancy Status</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scroll-reveal scroll-reveal-delay-2 relative rounded-3xl overflow-hidden min-h-[560px] shadow-xl group cursor-pointer" style="border: 1px solid rgba(14,165,233,0.1);">
+                <img src="images/property-owner.png" alt="Beautiful property entry" class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 select-none" />
+                <div class="absolute inset-0 z-10" style="background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);"></div>
+                <div class="relative z-20 p-10 md:p-14 h-full flex flex-col justify-end min-h-[560px]">
+                    <span class="self-start bg-brand-500 text-white text-xs font-semibold px-4 py-1.5 rounded-full tracking-wide uppercase mb-6">Owner Dashboard</span>
+                    <h3 class="text-white text-4xl md:text-5xl font-semibold leading-tight mb-4" style="letter-spacing: -0.03em;">For Property Owners</h3>
+                    <p class="text-white/80 text-base leading-relaxed max-w-md mb-8">Fill your vacant beds faster. Showcase your property with high-quality galleries, list clear house rules, and manage tenant inquiries directly from your customized owner dashboard.</p>
+                    <div>
+                        <a href="/app" class="group inline-flex items-center gap-3.5 text-white font-medium text-base hover:text-brand-400 transition-colors duration-200 no-underline">
+                            <span>List your property</span>
+                            <span class="w-10 h-10 rounded-full bg-white/10 group-hover:bg-white text-white group-hover:text-black flex items-center justify-center transition-all duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white px-6 pt-24 pb-12" id="help">
+        <div class="max-w-[88rem] mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 pb-16" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <div class="scroll-reveal lg:col-span-2">
+                    <div class="flex items-center gap-2.5 mb-6">
+                        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" style="color: #38bdf8;"><rect x="2" y="2" width="20" height="20" rx="5" fill="currentColor"/><path d="M8 14V10M12 16V8M16 14V10" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+                        <span class="text-2xl font-bold tracking-tight text-white">VacanSee</span>
+                    </div>
+                    <p class="text-white/60 text-sm md:text-base leading-relaxed max-w-sm mb-6">Real-time boarding house and dorm tracker for university students in Cagayan de Oro City. Find verified spaces and connect with landlords.</p>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-semibold tracking-wider uppercase text-white mb-6">For Tenants</h4>
+                    <ul class="space-y-4 text-sm text-white/50" style="font-family: 'Inter', sans-serif; list-style: none; padding: 0; margin: 0;">
+                        <li><a href="/app" class="hover:text-brand-400 transition-colors duration-200 no-underline" style="color: rgba(255,255,255,0.5);">Search Rooms</a></li>
+                        <li><a href="/app" class="hover:text-brand-400 transition-colors duration-200 no-underline" style="color: rgba(255,255,255,0.5);">Near USTP</a></li>
+                        <li><a href="/app" class="hover:text-brand-400 transition-colors duration-200 no-underline" style="color: rgba(255,255,255,0.5);">Near Xavier</a></li>
+                        <li><a href="/app" class="hover:text-brand-400 transition-colors duration-200 no-underline" style="color: rgba(255,255,255,0.5);">Student Guides</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-semibold tracking-wider uppercase text-white mb-6">For Owners</h4>
+                    <ul class="space-y-4 text-sm text-white/50" style="font-family: 'Inter', sans-serif; list-style: none; padding: 0; margin: 0;">
+                        <li><a href="/app" class="hover:text-brand-400 transition-colors duration-200 no-underline" style="color: rgba(255,255,255,0.5);">List Property</a></li>
+                        <li><a href="/app" class="hover:text-brand-400 transition-colors duration-200 no-underline" style="color: rgba(255,255,255,0.5);">Owner Dashboard</a></li>
+                        <li><a href="/app" class="hover:text-brand-400 transition-colors duration-200 no-underline" style="color: rgba(255,255,255,0.5);">Resource Center</a></li>
+                        <li><a href="/app" class="hover:text-brand-400 transition-colors duration-200 no-underline" style="color: rgba(255,255,255,0.5);">Premium Listing</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-semibold tracking-wider uppercase text-white mb-6">Company</h4>
+                    <ul class="space-y-4 text-sm text-white/50" style="font-family: 'Inter', sans-serif; list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" class="hover:text-brand-400 transition-colors duration-200 no-underline" style="color: rgba(255,255,255,0.5);">About Us</a></li>
+                        <li><a href="#" class="hover:text-brand-400 transition-colors duration-200 no-underline" style="color: rgba(255,255,255,0.5);">Contact Support</a></li>
+                        <li><a href="#" class="hover:text-brand-400 transition-colors duration-200 no-underline" style="color: rgba(255,255,255,0.5);">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-brand-400 transition-colors duration-200 no-underline" style="color: rgba(255,255,255,0.5);">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-12 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs" style="color: rgba(255,255,255,0.4); font-family: 'Inter', sans-serif;">
+                <div>&copy; 2026 VacanSee. All rights reserved.</div>
+                <div class="flex gap-6">
+                    <span class="hover:text-white transition-colors duration-200 cursor-pointer">Designed for CDO Students</span>
+                    <span class="hover:text-white transition-colors duration-200 cursor-pointer">Academic Year 2025-2026</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="landing.js"></script>
 </body>
 </html>
