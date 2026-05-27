@@ -57,10 +57,9 @@ class RoomProvider extends ChangeNotifier {
   /// Check if a specific property has any live vacancies
   /// Uses modelHasVacancy as fallback when stream hasn't loaded yet
   bool hasVacancyForProperty(String propertyId, {bool fallback = false}) {
-    if (_vacantRooms.isEmpty) return fallback;
-    return _vacantRooms.any(
-      (room) => room.propertyId == propertyId && room.status == RoomStatus.vacant,
-    );
+    final propertyRooms = _vacantRooms.where((r) => r.propertyId == propertyId).toList();
+    if (propertyRooms.isEmpty) return fallback;
+    return propertyRooms.any((room) => room.status == RoomStatus.vacant);
   }
 
   /// Update vacancy status for a room (Owner action)
