@@ -210,7 +210,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                         ),
                         delegate: SliverChildBuilderDelegate((context, index) {
                           final property = properties[index];
-                          final isLiveVacant = roomProvider.hasVacancyForProperty(property.propertyId);
+                          final isLiveVacant = roomProvider.hasVacancyForProperty(property.propertyId, fallback: property.hasVacancy);
                           final isFavorited = _favoritedPropertyIds.contains(property.propertyId);
 
                           return _PropertyCard(
@@ -280,7 +280,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
                         ),
                         itemBuilder: (context, index) {
                           final property = properties[index];
-                          final isLiveVacant = roomProvider.hasVacancyForProperty(property.propertyId);
+                          final isLiveVacant = roomProvider.hasVacancyForProperty(property.propertyId, fallback: property.hasVacancy);
                           final isFavorited = _favoritedPropertyIds.contains(property.propertyId);
 
                           return _PropertyCard(
@@ -360,7 +360,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
         itemCount: carouselProps.length,
         itemBuilder: (context, index) {
           final property = carouselProps[index];
-          final isLiveVacant = roomProvider.hasVacancyForProperty(property.propertyId);
+          final isLiveVacant = roomProvider.hasVacancyForProperty(property.propertyId, fallback: property.hasVacancy);
           final isFavorited = _favoritedPropertyIds.contains(property.propertyId);
 
           return Container(

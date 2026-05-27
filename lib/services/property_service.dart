@@ -478,4 +478,23 @@ class PropertyService {
         .order('created_at', ascending: false)
         .map((data) => data.cast<Map<String, dynamic>>());
   }
+
+  /// Submit a report for a property
+  Future<void> submitReport({
+    required String propertyId,
+    required String reporterId,
+    required String reason,
+    String? details,
+  }) async {
+    try {
+      await _supabase.from('reports').insert({
+        'property_id': propertyId,
+        'reporter_id': reporterId,
+        'reason': reason,
+        'details': details,
+      });
+    } catch (e) {
+      throw PropertyException('Failed to submit report: $e');
+    }
+  }
 }

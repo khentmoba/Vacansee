@@ -7,9 +7,11 @@ import 'package:shimmer/shimmer.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/property_model.dart';
 import '../../models/room_model.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/property_provider.dart';
 import '../booking/booking_screen.dart';
 import '../../utils/transitions.dart';
+import '../../widgets/fullscreen_image_viewer.dart';
 
 class PropertyDetailScreen extends StatefulWidget {
   final PropertyModel property;
@@ -42,6 +44,18 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
     super.dispose();
   }
 
+  void _openFullscreen(int index) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FullscreenImageViewer(
+          images: widget.property.images,
+          initialIndex: index,
+        ),
+      ),
+    );
+  }
+
   void _shareListing(BuildContext context) {
     final String shareUrl = 'https://vacansee.com/property/${widget.property.propertyId}';
     final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -64,6 +78,118 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         ),
       );
     });
+  }
+
+  void _showReportDialog(BuildContext context) {
+    final reasons = [
+      'Inappropriate content',
+      'Misleading information',
+      'Spam or scam',
+      'Safety concern',
+      'Inaccurate vacancy info',
+      'Other',
+    ];
+    String selectedReason = reasons.first;
+    final detailsController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Row(
+            children: [
+              Icon(Icons.flag_outlined, color: AppColors.error),
+              SizedBox(width: 12),
+              Text('Report this listing', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: SizedBox(
+            width: 400,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Reason', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: selectedReason,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                    items: reasons.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+                    onChanged: (v) {
+                      if (v != null) {
+                        setDialogState(() => selectedReason = v);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Additional details (optional)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: detailsController,
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      hintText: 'Describe the issue...',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            FilledButton.icon(
+              onPressed: () async {
+                final authProvider = context.read<AuthProvider>();
+                final messenger = ScaffoldMessenger.of(context);
+                final propertyProvider = context.read<PropertyProvider>();
+                if (authProvider.user == null) {
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Please sign in to report a listing')),
+                  );
+                  return;
+                }
+                try {
+                  await propertyProvider.submitReport(
+                    propertyId: widget.property.propertyId,
+                    reporterId: authProvider.user!.uid,
+                    reason: selectedReason,
+                    details: detailsController.text.isNotEmpty ? detailsController.text : null,
+                  );
+                  if (dialogContext.mounted) Navigator.pop(dialogContext);
+                  messenger.showSnackBar(
+                    SnackBar(
+                      backgroundColor: AppColors.success,
+                      content: const Text('Report submitted. An admin will review it shortly.'),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  );
+                } catch (e) {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      backgroundColor: AppColors.error,
+                      content: Text('Failed to submit report: $e'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(Icons.send_rounded, size: 16),
+              label: const Text('Submit Report'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _toggleSave() {
@@ -375,13 +501,16 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
     if (allImages.length == 1) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: CachedNetworkImage(
-          imageUrl: allImages[0],
-          height: 400,
-          width: double.infinity,
-          fit: BoxFit.contain,
-          placeholder: (context, url) => _buildShimmerBox(height: 400),
-          errorWidget: (context, url, error) => _buildPlaceholder(),
+        child: GestureDetector(
+          onTap: () => _openFullscreen(0),
+          child: CachedNetworkImage(
+            imageUrl: allImages[0],
+            height: 400,
+            width: double.infinity,
+            fit: BoxFit.contain,
+            placeholder: (context, url) => _buildShimmerBox(height: 400),
+            errorWidget: (context, url, error) => _buildPlaceholder(),
+          ),
         ),
       );
     }
@@ -400,7 +529,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             Expanded(
               flex: 2,
               child: GestureDetector(
-                onTap: () => setState(() => _selectedImageIndex = 0),
+                onTap: () => _openFullscreen(0),
                 child: CachedNetworkImage(
                   imageUrl: allImages[0],
                   height: double.infinity,
@@ -420,20 +549,26 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: CachedNetworkImage(
-                            imageUrl: allImages[1],
-                            height: double.infinity,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => _buildShimmerBox(),
+                          child: GestureDetector(
+                            onTap: () => _openFullscreen(1),
+                            child: CachedNetworkImage(
+                              imageUrl: allImages[1],
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => _buildShimmerBox(),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: CachedNetworkImage(
-                            imageUrl: allImages[2],
-                            height: double.infinity,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => _buildShimmerBox(),
+                          child: GestureDetector(
+                            onTap: () => _openFullscreen(2),
+                            child: CachedNetworkImage(
+                              imageUrl: allImages[2],
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => _buildShimmerBox(),
+                            ),
                           ),
                         ),
                       ],
@@ -444,11 +579,14 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: CachedNetworkImage(
-                            imageUrl: allImages[3],
-                            height: double.infinity,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => _buildShimmerBox(),
+                          child: GestureDetector(
+                            onTap: () => _openFullscreen(3),
+                            child: CachedNetworkImage(
+                              imageUrl: allImages[3],
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => _buildShimmerBox(),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -456,19 +594,20 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           child: Stack(
                             children: [
                               Positioned.fill(
-                                child: CachedNetworkImage(
-                                  imageUrl: allImages[4],
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => _buildShimmerBox(),
+                                child: GestureDetector(
+                                  onTap: () => _openFullscreen(4),
+                                  child: CachedNetworkImage(
+                                    imageUrl: allImages[4],
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => _buildShimmerBox(),
+                                  ),
                                 ),
                               ),
                               Positioned(
                                 bottom: 16,
                                 right: 16,
                                 child: ElevatedButton.icon(
-                                  onPressed: () {
-                                    // Show full photos view
-                                  },
+                                  onPressed: () => _openFullscreen(0),
                                   icon: const Icon(Icons.grid_view_rounded, size: 16, color: AppColors.textPrimary),
                                   label: const Text(
                                     'Show all photos',
@@ -512,11 +651,14 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             margin: const EdgeInsets.only(right: 12),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: CachedNetworkImage(
-                imageUrl: allImages[index],
-                fit: BoxFit.cover,
-                placeholder: (context, url) => _buildShimmerBox(),
-                errorWidget: (context, url, error) => const Icon(Icons.image),
+              child: GestureDetector(
+                onTap: () => _openFullscreen(index),
+                child: CachedNetworkImage(
+                  imageUrl: allImages[index],
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => _buildShimmerBox(),
+                  errorWidget: (context, url, error) => const Icon(Icons.image),
+                ),
               ),
             ),
           );
@@ -552,13 +694,16 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                   ),
                 );
               }
-              return CachedNetworkImage(
-                imageUrl: imgUrl,
-                fit: BoxFit.contain,
-                placeholder: (context, url) => _buildShimmerBox(height: 280),
-                errorWidget: (context, url, error) => Container(
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.broken_image, size: 48),
+              return GestureDetector(
+                onTap: () => _openFullscreen(index),
+                child: CachedNetworkImage(
+                  imageUrl: imgUrl,
+                  fit: BoxFit.contain,
+                  placeholder: (context, url) => _buildShimmerBox(height: 280),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[200],
+                    child: const Icon(Icons.broken_image, size: 48),
+                  ),
                 ),
               );
             },
@@ -1085,7 +1230,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           // Report
           Center(
             child: TextButton.icon(
-              onPressed: () {},
+              onPressed: () => _showReportDialog(context),
               icon: const Icon(Icons.flag_outlined, size: 16, color: AppColors.textSecondary),
               label: const Text(
                 'Report this listing',

@@ -51,6 +51,7 @@ dependencies:
 
   # Utilities
   cached_network_image: ^3.4.1
+  photo_view: ^0.15.0
   image_picker: ^1.1.2
   flutter_dotenv: ^6.0.0
   shimmer: ^3.0.0

@@ -9,6 +9,7 @@ import '../../core/theme/app_theme.dart';
 import '../../models/property_model.dart';
 import '../../models/room_model.dart';
 import '../../providers/property_provider.dart';
+import '../../widgets/fullscreen_image_viewer.dart';
 import 'widgets/rejection_dialog.dart';
 
 class AdminPropertyDetailScreen extends StatefulWidget {
@@ -40,6 +41,18 @@ class _AdminPropertyDetailScreenState extends State<AdminPropertyDetailScreen> {
   void dispose() {
     _mobilePageController.dispose();
     super.dispose();
+  }
+
+  void _openFullscreen(int index) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FullscreenImageViewer(
+          images: widget.property.images,
+          initialIndex: index,
+        ),
+      ),
+    );
   }
 
   void _shareListing() {
@@ -317,30 +330,35 @@ class _AdminPropertyDetailScreenState extends State<AdminPropertyDetailScreen> {
     if (allImages.isEmpty) return _buildPlaceholder();
     if (allImages.length == 1) {
       return ClipRRect(borderRadius: BorderRadius.circular(16),
-        child: CachedNetworkImage(imageUrl: allImages[0], height: 400, width: double.infinity, fit: BoxFit.contain,
-            placeholder: (context, url) => _buildShimmerBox(height: 400), errorWidget: (context, url, error) => _buildPlaceholder()));
+        child: GestureDetector(onTap: () => _openFullscreen(0),
+          child: CachedNetworkImage(imageUrl: allImages[0], height: 400, width: double.infinity, fit: BoxFit.contain,
+              placeholder: (context, url) => _buildShimmerBox(height: 400), errorWidget: (context, url, error) => _buildPlaceholder())));
     }
     if (allImages.length >= 5) {
       return Container(height: 420, decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)), clipBehavior: Clip.antiAlias,
         child: Row(children: [
-          Expanded(flex: 2, child: GestureDetector(onTap: () => setState(() => _selectedImageIndex = 0),
+          Expanded(flex: 2, child: GestureDetector(onTap: () => _openFullscreen(0),
               child: CachedNetworkImage(imageUrl: allImages[0], height: double.infinity, fit: BoxFit.cover,
                   placeholder: (context, url) => _buildShimmerBox(), errorWidget: (context, url, error) => const Icon(Icons.broken_image)))),
           const SizedBox(width: 8),
           Expanded(flex: 2, child: Column(children: [
             Expanded(child: Row(children: [
-              Expanded(child: CachedNetworkImage(imageUrl: allImages[1], height: double.infinity, fit: BoxFit.cover, placeholder: (context, url) => _buildShimmerBox())),
+              Expanded(child: GestureDetector(onTap: () => _openFullscreen(1),
+                  child: CachedNetworkImage(imageUrl: allImages[1], height: double.infinity, fit: BoxFit.cover, placeholder: (context, url) => _buildShimmerBox()))),
               const SizedBox(width: 8),
-              Expanded(child: CachedNetworkImage(imageUrl: allImages[2], height: double.infinity, fit: BoxFit.cover, placeholder: (context, url) => _buildShimmerBox())),
+              Expanded(child: GestureDetector(onTap: () => _openFullscreen(2),
+                  child: CachedNetworkImage(imageUrl: allImages[2], height: double.infinity, fit: BoxFit.cover, placeholder: (context, url) => _buildShimmerBox()))),
             ])),
             const SizedBox(height: 8),
             Expanded(child: Row(children: [
-              Expanded(child: CachedNetworkImage(imageUrl: allImages[3], height: double.infinity, fit: BoxFit.cover, placeholder: (context, url) => _buildShimmerBox())),
+              Expanded(child: GestureDetector(onTap: () => _openFullscreen(3),
+                  child: CachedNetworkImage(imageUrl: allImages[3], height: double.infinity, fit: BoxFit.cover, placeholder: (context, url) => _buildShimmerBox()))),
               const SizedBox(width: 8),
               Expanded(child: Stack(children: [
-                Positioned.fill(child: CachedNetworkImage(imageUrl: allImages[4], fit: BoxFit.cover, placeholder: (context, url) => _buildShimmerBox())),
+                Positioned.fill(child: GestureDetector(onTap: () => _openFullscreen(4),
+                    child: CachedNetworkImage(imageUrl: allImages[4], fit: BoxFit.cover, placeholder: (context, url) => _buildShimmerBox()))),
                 Positioned(bottom: 16, right: 16,
-                    child: ElevatedButton.icon(onPressed: () {}, icon: const Icon(Icons.grid_view_rounded, size: 16, color: AppColors.textPrimary),
+                    child: ElevatedButton.icon(onPressed: () => _openFullscreen(0), icon: const Icon(Icons.grid_view_rounded, size: 16, color: AppColors.textPrimary),
                         label: const Text('Show all photos', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 2, side: const BorderSide(color: AppColors.border),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12)))),
@@ -354,8 +372,9 @@ class _AdminPropertyDetailScreenState extends State<AdminPropertyDetailScreen> {
         child: ListView.builder(scrollDirection: Axis.horizontal, itemCount: allImages.length, itemBuilder: (context, index) {
           return Container(width: 400, margin: const EdgeInsets.only(right: 12),
               child: ClipRRect(borderRadius: BorderRadius.circular(12),
-                  child: CachedNetworkImage(imageUrl: allImages[index], fit: BoxFit.cover,
-                      placeholder: (context, url) => _buildShimmerBox(), errorWidget: (context, url, error) => const Icon(Icons.image))));
+                  child: GestureDetector(onTap: () => _openFullscreen(index),
+                    child: CachedNetworkImage(imageUrl: allImages[index], fit: BoxFit.cover,
+                        placeholder: (context, url) => _buildShimmerBox(), errorWidget: (context, url, error) => const Icon(Icons.image)))));
         }));
   }
 
@@ -368,9 +387,10 @@ class _AdminPropertyDetailScreenState extends State<AdminPropertyDetailScreen> {
             itemBuilder: (context, index) {
               final imgUrl = allImages[index];
               if (imgUrl.isEmpty) return Container(color: Colors.grey[200], child: const Center(child: Icon(Icons.home_work_rounded, size: 64, color: Colors.grey)));
-              return CachedNetworkImage(imageUrl: imgUrl, fit: BoxFit.contain,
-                  placeholder: (context, url) => _buildShimmerBox(height: 280),
-                  errorWidget: (context, url, error) => Container(color: Colors.grey[200], child: const Icon(Icons.broken_image, size: 48)));
+              return GestureDetector(onTap: () => _openFullscreen(index),
+                child: CachedNetworkImage(imageUrl: imgUrl, fit: BoxFit.contain,
+                    placeholder: (context, url) => _buildShimmerBox(height: 280),
+                    errorWidget: (context, url, error) => Container(color: Colors.grey[200], child: const Icon(Icons.broken_image, size: 48))));
             }),
       ),
       Positioned(top: MediaQuery.of(context).padding.top + 10, left: 16,

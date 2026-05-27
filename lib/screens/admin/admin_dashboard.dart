@@ -8,6 +8,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/property_provider.dart';
 import '../../providers/booking_provider.dart';
 import '../../providers/admin_provider.dart';
+import '../../providers/room_provider.dart';
 import 'widgets/admin_top_nav_bar.dart';
 import 'widgets/admin_sidebar.dart';
 import 'widgets/admin_bottom_nav.dart';
@@ -731,6 +732,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 itemCount: properties.length,
                 itemBuilder: (context, index) => AdminPropertyCard(
                   property: properties[index],
+                  liveVacancy: (() {
+                    try {
+                      return context.read<RoomProvider>().hasVacancyForProperty(properties[index].propertyId, fallback: properties[index].hasVacancy);
+                    } catch (_) {
+                      return properties[index].hasVacancy;
+                    }
+                  })(),
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AdminPropertyDetailScreen(property: properties[index]))),
                 ),
               );

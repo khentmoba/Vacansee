@@ -7,11 +7,13 @@ import '../../../models/property_model.dart';
 class AdminPropertyCard extends StatefulWidget {
   final PropertyModel property;
   final VoidCallback onTap;
+  final bool? liveVacancy;
 
   const AdminPropertyCard({
     super.key,
     required this.property,
     required this.onTap,
+    this.liveVacancy,
   });
 
   @override
@@ -23,7 +25,7 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
 
   @override
   Widget build(BuildContext context) {
-    final hasLiveVacancy = widget.property.hasVacancy;
+    final hasLiveVacancy = widget.liveVacancy ?? widget.property.hasVacancy;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),

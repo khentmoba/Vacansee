@@ -822,6 +822,27 @@ class PropertyProvider extends ChangeNotifier {
       },
     );
   }
+
+  /// Submit a report for a property
+  Future<void> submitReport({
+    required String propertyId,
+    required String reporterId,
+    required String reason,
+    String? details,
+  }) async {
+    try {
+      await _propertyService.submitReport(
+        propertyId: propertyId,
+        reporterId: reporterId,
+        reason: reason,
+        details: details,
+      );
+    } catch (e) {
+      _errorMessage = 'Failed to submit report: $e';
+      notifyListeners();
+      rethrow;
+    }
+  }
 }
 
 /// Exception for property operations
