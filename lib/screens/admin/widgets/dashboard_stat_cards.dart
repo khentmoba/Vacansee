@@ -31,12 +31,15 @@ class _AdminStatCardState extends State<AdminStatCard> {
   @override
   Widget build(BuildContext context) {
     final isSmall = MediaQuery.of(context).size.width < 500;
-    
+
     // Parse numeric value for animation if possible
     final numericOnly = widget.value.replaceAll(RegExp(r'[^0-9.]'), '');
     final double? endValue = double.tryParse(numericOnly);
     final isPercent = widget.value.contains('%');
-    final prefix = widget.value.startsWith(RegExp(r'[^0-9]')) && !isPercent && widget.value.isNotEmpty
+    final prefix =
+        widget.value.startsWith(RegExp(r'[^0-9]')) &&
+            !isPercent &&
+            widget.value.isNotEmpty
         ? widget.value.substring(0, 1)
         : '';
     final suffix = isPercent ? '%' : '';
@@ -47,19 +50,23 @@ class _AdminStatCardState extends State<AdminStatCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutCubic,
-        transform: _isHovered ? Matrix4.translationValues(0, -6, 0) : Matrix4.identity(),
+        transform: _isHovered
+            ? Matrix4.translationValues(0, -6, 0)
+            : Matrix4.identity(),
         padding: EdgeInsets.all(isSmall ? 16 : 24),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: _isHovered ? widget.iconColor.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.05),
+            color: _isHovered
+                ? widget.iconColor.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.05),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: _isHovered 
-                  ? widget.iconColor.withValues(alpha: 0.08) 
+              color: _isHovered
+                  ? widget.iconColor.withValues(alpha: 0.08)
                   : Colors.black.withValues(alpha: 0.03),
               blurRadius: _isHovered ? 24 : 12,
               offset: _isHovered ? const Offset(0, 12) : const Offset(0, 6),
@@ -77,18 +84,19 @@ class _AdminStatCardState extends State<AdminStatCard> {
                   duration: const Duration(milliseconds: 250),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: _isHovered ? widget.iconColor.withValues(alpha: 0.15) : widget.iconBgColor,
+                    color: _isHovered
+                        ? widget.iconColor.withValues(alpha: 0.15)
+                        : widget.iconBgColor,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Icon(
-                    widget.icon, 
-                    color: widget.iconColor, 
-                    size: 22,
-                  ),
+                  child: Icon(widget.icon, color: widget.iconColor, size: 22),
                 ),
                 if (widget.trendPercent != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: (widget.isPositiveTrend ?? true)
                           ? const Color(0xFFECFDF5)
@@ -99,7 +107,9 @@ class _AdminStatCardState extends State<AdminStatCard> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          (widget.isPositiveTrend ?? true) ? Icons.arrow_upward : Icons.arrow_downward,
+                          (widget.isPositiveTrend ?? true)
+                              ? Icons.arrow_upward
+                              : Icons.arrow_downward,
                           size: 12,
                           color: (widget.isPositiveTrend ?? true)
                               ? const Color(0xFF059669)
@@ -200,12 +210,15 @@ class _AdminSolidStatCardState extends State<AdminSolidStatCard> {
   @override
   Widget build(BuildContext context) {
     final isSmall = MediaQuery.of(context).size.width < 500;
-    
+
     // Parse numeric value for animation if possible
     final numericOnly = widget.value.replaceAll(RegExp(r'[^0-9.]'), '');
     final double? endValue = double.tryParse(numericOnly);
     final isPercent = widget.value.contains('%');
-    final prefix = widget.value.startsWith(RegExp(r'[^0-9]')) && !isPercent && widget.value.isNotEmpty
+    final prefix =
+        widget.value.startsWith(RegExp(r'[^0-9]')) &&
+            !isPercent &&
+            widget.value.isNotEmpty
         ? widget.value.substring(0, 1)
         : '';
     final suffix = isPercent ? '%' : '';
@@ -216,14 +229,18 @@ class _AdminSolidStatCardState extends State<AdminSolidStatCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutCubic,
-        transform: _isHovered ? Matrix4.translationValues(0, -6, 0) : Matrix4.identity(),
+        transform: _isHovered
+            ? Matrix4.translationValues(0, -6, 0)
+            : Matrix4.identity(),
         padding: EdgeInsets.all(isSmall ? 16 : 24),
         decoration: BoxDecoration(
           color: widget.backgroundColor,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: widget.backgroundColor.withValues(alpha: _isHovered ? 0.35 : 0.25),
+              color: widget.backgroundColor.withValues(
+                alpha: _isHovered ? 0.35 : 0.25,
+              ),
               blurRadius: _isHovered ? 24 : 12,
               offset: _isHovered ? const Offset(0, 12) : const Offset(0, 6),
             ),
@@ -320,4 +337,3 @@ class _AdminSolidStatCardState extends State<AdminSolidStatCard> {
     );
   }
 }
-

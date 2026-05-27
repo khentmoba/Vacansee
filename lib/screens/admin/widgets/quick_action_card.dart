@@ -33,7 +33,9 @@ class _QuickActionCardState extends State<QuickActionCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
-        transform: _isHovered ? Matrix4.translationValues(4, 0, 0) : Matrix4.identity(),
+        transform: _isHovered
+            ? Matrix4.translationValues(4, 0, 0)
+            : Matrix4.identity(),
         child: InkWell(
           onTap: widget.onTap,
           borderRadius: BorderRadius.circular(16),
@@ -43,12 +45,16 @@ class _QuickActionCardState extends State<QuickActionCard> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: _isHovered ? themeColor.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.05),
+                color: _isHovered
+                    ? themeColor.withValues(alpha: 0.3)
+                    : Colors.black.withValues(alpha: 0.05),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: _isHovered ? themeColor.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.01),
+                  color: _isHovered
+                      ? themeColor.withValues(alpha: 0.06)
+                      : Colors.black.withValues(alpha: 0.01),
                   blurRadius: 16,
                   offset: const Offset(0, 6),
                 ),
@@ -60,14 +66,12 @@ class _QuickActionCardState extends State<QuickActionCard> {
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: _isHovered ? themeColor.withValues(alpha: 0.15) : themeColor.withValues(alpha: 0.08),
+                    color: _isHovered
+                        ? themeColor.withValues(alpha: 0.15)
+                        : themeColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    widget.icon, 
-                    size: 24, 
-                    color: themeColor,
-                  ),
+                  child: Icon(widget.icon, size: 24, color: themeColor),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -111,4 +115,3 @@ class _QuickActionCardState extends State<QuickActionCard> {
     );
   }
 }
-

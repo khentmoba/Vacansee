@@ -34,17 +34,23 @@ class _AdminBookingCardState extends State<AdminBookingCard> {
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
         margin: const EdgeInsets.only(bottom: 16),
-        transform: _isHovered ? Matrix4.translationValues(0, -3, 0) : Matrix4.identity(),
+        transform: _isHovered
+            ? Matrix4.translationValues(0, -3, 0)
+            : Matrix4.identity(),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: _isHovered ? AppColors.primary.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.05),
+            color: _isHovered
+                ? AppColors.primary.withValues(alpha: 0.15)
+                : Colors.black.withValues(alpha: 0.05),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: _isHovered ? Colors.black.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.02),
+              color: _isHovered
+                  ? Colors.black.withValues(alpha: 0.06)
+                  : Colors.black.withValues(alpha: 0.02),
               blurRadius: _isHovered ? 16 : 8,
               offset: _isHovered ? const Offset(0, 6) : const Offset(0, 3),
             ),
@@ -132,7 +138,11 @@ class _AdminBookingCardState extends State<AdminBookingCard> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
+                        const Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: Color(0xFFF1F5F9),
+                        ),
                         const SizedBox(height: 16),
                         Row(
                           children: [
@@ -285,10 +295,7 @@ class _StatusChip extends StatelessWidget {
           Container(
             width: 6,
             height: 6,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 6),
           Text(
@@ -304,4 +311,3 @@ class _StatusChip extends StatelessWidget {
     );
   }
 }
-

@@ -32,17 +32,23 @@ class _AdminUserCardState extends State<AdminUserCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
-        transform: _isHovered ? Matrix4.translationValues(0, -4, 0) : Matrix4.identity(),
+        transform: _isHovered
+            ? Matrix4.translationValues(0, -4, 0)
+            : Matrix4.identity(),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: _isHovered ? AppColors.primary.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.05),
+            color: _isHovered
+                ? AppColors.primary.withValues(alpha: 0.15)
+                : Colors.black.withValues(alpha: 0.05),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: _isHovered ? Colors.black.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.02),
+              color: _isHovered
+                  ? Colors.black.withValues(alpha: 0.06)
+                  : Colors.black.withValues(alpha: 0.02),
               blurRadius: _isHovered ? 16 : 8,
               offset: _isHovered ? const Offset(0, 6) : const Offset(0, 3),
             ),
@@ -100,7 +106,7 @@ class _AdminUserCardState extends State<AdminUserCard> {
                   child: Text(
                     widget.user.email,
                     style: TextStyle(
-                      fontSize: 12, 
+                      fontSize: 12,
                       color: Colors.grey[600],
                       fontWeight: FontWeight.w500,
                     ),
@@ -119,7 +125,7 @@ class _AdminUserCardState extends State<AdminUserCard> {
                   child: Text(
                     widget.user.phoneNumber ?? 'No phone number',
                     style: TextStyle(
-                      fontSize: 12, 
+                      fontSize: 12,
                       color: Colors.grey[600],
                       fontWeight: FontWeight.w500,
                     ),
@@ -146,7 +152,10 @@ class _AdminUserCardState extends State<AdminUserCard> {
                     ),
                     child: const Text(
                       'View Details',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -160,7 +169,11 @@ class _AdminUserCardState extends State<AdminUserCard> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  icon: Icon(Icons.edit_outlined, size: 16, color: Colors.grey[700]),
+                  icon: Icon(
+                    Icons.edit_outlined,
+                    size: 16,
+                    color: Colors.grey[700],
+                  ),
                 ),
               ],
             ),
@@ -211,10 +224,7 @@ class _RoleBadge extends StatelessWidget {
           Container(
             width: 5,
             height: 5,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 5),
           Text(
@@ -230,4 +240,3 @@ class _RoleBadge extends StatelessWidget {
     );
   }
 }
-

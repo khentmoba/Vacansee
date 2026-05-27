@@ -27,7 +27,10 @@ class AdminBookingFilterBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.05), width: 1.5),
+        border: Border.all(
+          color: Colors.black.withValues(alpha: 0.05),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -46,7 +49,11 @@ class AdminBookingFilterBar extends StatelessWidget {
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(Icons.filter_list_rounded, color: Colors.grey[700], size: 18),
+              child: Icon(
+                Icons.filter_list_rounded,
+                color: Colors.grey[700],
+                size: 18,
+              ),
             ),
             const SizedBox(width: 12),
             Text(
@@ -140,10 +147,14 @@ class _FilterChipState extends State<_FilterChip> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
-          color: widget.isSelected ? activeBg : (_isHovered ? Colors.grey[50] : inactiveBg),
+          color: widget.isSelected
+              ? activeBg
+              : (_isHovered ? Colors.grey[50] : inactiveBg),
           borderRadius: BorderRadius.circular(100),
           border: Border.all(
-            color: widget.isSelected ? activeBorder : (_isHovered ? Colors.grey[300]! : inactiveBorder),
+            color: widget.isSelected
+                ? activeBorder
+                : (_isHovered ? Colors.grey[300]! : inactiveBorder),
             width: 1.5,
           ),
         ),
@@ -170,15 +181,22 @@ class _FilterChipState extends State<_FilterChip> {
                   widget.label,
                   style: TextStyle(
                     color: widget.isSelected ? activeText : inactiveText,
-                    fontWeight: widget.isSelected ? FontWeight.w800 : FontWeight.w600,
+                    fontWeight: widget.isSelected
+                        ? FontWeight.w800
+                        : FontWeight.w600,
                     fontSize: 13,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
-                    color: widget.isSelected ? widget.activeColor.withValues(alpha: 0.2) : Colors.grey[100],
+                    color: widget.isSelected
+                        ? widget.activeColor.withValues(alpha: 0.2)
+                        : Colors.grey[100],
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(
@@ -198,4 +216,3 @@ class _FilterChipState extends State<_FilterChip> {
     );
   }
 }
-

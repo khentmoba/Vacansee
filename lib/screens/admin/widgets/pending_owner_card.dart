@@ -73,16 +73,17 @@ class PendingOwnerCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         user.email,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
                       ),
                       if (user.phoneNumber != null) ...[
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(Icons.phone_android, size: 14, color: Colors.grey[400]),
+                            Icon(
+                              Icons.phone_android,
+                              size: 14,
+                              color: Colors.grey[400],
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               user.phoneNumber!,

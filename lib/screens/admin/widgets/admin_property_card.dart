@@ -23,7 +23,9 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(symbol: '₱', decimalDigits: 0);
-    final statusColor = widget.property.hasVacancy ? AppColors.success : AppColors.error;
+    final statusColor = widget.property.hasVacancy
+        ? AppColors.success
+        : AppColors.error;
     final statusText = widget.property.hasVacancy ? 'Available' : 'Full';
 
     return MouseRegion(
@@ -32,17 +34,23 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutCubic,
-        transform: _isHovered ? Matrix4.translationValues(0, -6, 0) : Matrix4.identity(),
+        transform: _isHovered
+            ? Matrix4.translationValues(0, -6, 0)
+            : Matrix4.identity(),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: _isHovered ? AppColors.primary.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.05),
+            color: _isHovered
+                ? AppColors.primary.withValues(alpha: 0.15)
+                : Colors.black.withValues(alpha: 0.05),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: _isHovered ? Colors.black.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.03),
+              color: _isHovered
+                  ? Colors.black.withValues(alpha: 0.08)
+                  : Colors.black.withValues(alpha: 0.03),
               blurRadius: _isHovered ? 24 : 12,
               offset: _isHovered ? const Offset(0, 10) : const Offset(0, 4),
             ),
@@ -67,7 +75,10 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: NetworkImage(widget.property.coverImageUrl ?? 'https://via.placeholder.com/400x200?text=No+Image'),
+                          image: NetworkImage(
+                            widget.property.coverImageUrl ??
+                                'https://via.placeholder.com/400x200?text=No+Image',
+                          ),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -94,7 +105,10 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
                         color: Colors.white.withValues(alpha: 0.9),
                         child: Text(
                           'Owner: ${widget.property.ownerName ?? 'Unknown'}',
@@ -114,7 +128,10 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                     top: 14,
                     right: 14,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(100),
@@ -165,7 +182,11 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(Icons.location_on_outlined, size: 14, color: Colors.grey[500]),
+                        Icon(
+                          Icons.location_on_outlined,
+                          size: 14,
+                          color: Colors.grey[500],
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
@@ -182,7 +203,11 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
+                    const Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: Color(0xFFF1F5F9),
+                    ),
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -191,7 +216,9 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                           text: TextSpan(
                             children: [
                               TextSpan(
-                                text: currencyFormat.format(widget.property.priceRange.min),
+                                text: currencyFormat.format(
+                                  widget.property.priceRange.min,
+                                ),
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w900,
@@ -233,4 +260,3 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
     );
   }
 }
-

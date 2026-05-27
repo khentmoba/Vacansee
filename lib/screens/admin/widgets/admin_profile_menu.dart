@@ -21,7 +21,9 @@ class AdminProfileMenu extends StatelessWidget {
       },
       icon: CircleAvatar(
         radius: 16,
-        backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.primary.withValues(alpha: 0.1),
         child: Text(
           (user?.displayName.isNotEmpty ?? false)
               ? user!.displayName[0].toUpperCase()
@@ -48,10 +50,7 @@ class AdminProfileMenu extends StatelessWidget {
               ),
               Text(
                 user?.email ?? '',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
               const Divider(),
             ],

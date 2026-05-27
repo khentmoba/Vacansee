@@ -53,7 +53,11 @@ class PendingPropertyCard extends StatelessWidget {
                         : null,
                   ),
                   child: property.images.isEmpty
-                      ? Icon(Icons.image_not_supported_outlined, color: Colors.grey[400], size: 32)
+                      ? Icon(
+                          Icons.image_not_supported_outlined,
+                          color: Colors.grey[400],
+                          size: 32,
+                        )
                       : null,
                 ),
                 const SizedBox(width: 20),
@@ -75,7 +79,11 @@ class PendingPropertyCard extends StatelessWidget {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(Icons.location_on_outlined, size: 16, color: Colors.grey[500]),
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: 16,
+                            color: Colors.grey[500],
+                          ),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
@@ -92,7 +100,10 @@ class PendingPropertyCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.secondary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),

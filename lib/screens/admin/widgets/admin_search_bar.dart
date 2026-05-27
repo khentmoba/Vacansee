@@ -40,7 +40,10 @@ class _AdminSearchBarState extends State<AdminSearchBar> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.05), width: 1.5),
+        border: Border.all(
+          color: Colors.black.withValues(alpha: 0.05),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -63,25 +66,36 @@ class _AdminSearchBarState extends State<AdminSearchBar> {
               decoration: InputDecoration(
                 hintText: 'Search by name, address, or owner...',
                 hintStyle: TextStyle(
-                  color: Colors.grey[400], 
+                  color: Colors.grey[400],
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
                 prefixIcon: Container(
                   padding: const EdgeInsets.all(10),
-                  child: Icon(Icons.search_rounded, color: Colors.grey[400], size: 20),
+                  child: Icon(
+                    Icons.search_rounded,
+                    color: Colors.grey[400],
+                    size: 20,
+                  ),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: Colors.black.withValues(alpha: 0.05)),
+                  borderSide: BorderSide(
+                    color: Colors.black.withValues(alpha: 0.05),
+                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: Colors.black.withValues(alpha: 0.05)),
+                  borderSide: BorderSide(
+                    color: Colors.black.withValues(alpha: 0.05),
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                  borderSide: const BorderSide(
+                    color: AppColors.primary,
+                    width: 1.5,
+                  ),
                 ),
                 fillColor: const Color(0xFFF8FAFC),
                 filled: true,
@@ -96,10 +110,14 @@ class _AdminSearchBarState extends State<AdminSearchBar> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
               decoration: BoxDecoration(
-                color: _isHovered ? AppColors.primary.withValues(alpha: 0.1) : const Color(0xFFF1F5F9),
+                color: _isHovered
+                    ? AppColors.primary.withValues(alpha: 0.1)
+                    : const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: _isHovered ? AppColors.primary.withValues(alpha: 0.2) : Colors.transparent,
+                  color: _isHovered
+                      ? AppColors.primary.withValues(alpha: 0.2)
+                      : Colors.transparent,
                   width: 1.5,
                 ),
               ),
@@ -107,19 +125,26 @@ class _AdminSearchBarState extends State<AdminSearchBar> {
                 onTap: widget.onFilterTap,
                 borderRadius: BorderRadius.circular(14),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 14,
+                  ),
                   child: Row(
                     children: [
                       Icon(
-                        Icons.tune_rounded, 
-                        color: _isHovered ? AppColors.primary : Colors.grey[700], 
+                        Icons.tune_rounded,
+                        color: _isHovered
+                            ? AppColors.primary
+                            : Colors.grey[700],
                         size: 18,
                       ),
                       const SizedBox(width: 8),
                       Text(
                         'Filters',
                         style: TextStyle(
-                          color: _isHovered ? AppColors.primary : Colors.grey[700],
+                          color: _isHovered
+                              ? AppColors.primary
+                              : Colors.grey[700],
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
                         ),
@@ -135,4 +160,3 @@ class _AdminSearchBarState extends State<AdminSearchBar> {
     );
   }
 }
-

@@ -7,16 +7,16 @@ import '../../providers/property_provider.dart';
 import '../../providers/booking_provider.dart';
 import '../../providers/admin_provider.dart';
 import 'widgets/admin_top_nav_bar.dart';
+import 'widgets/admin_sidebar.dart';
+import 'widgets/admin_bottom_nav.dart';
+import 'widgets/admin_kpi_panel.dart';
 import 'widgets/dashboard_stat_cards.dart';
 import 'widgets/quick_action_card.dart';
 import 'widgets/recent_booking_row.dart';
-import 'widgets/admin_listings_stats.dart';
 import 'widgets/admin_search_bar.dart';
 import 'widgets/admin_property_card.dart';
-import 'widgets/admin_booking_stats.dart';
 import 'widgets/admin_booking_filter_bar.dart';
 import 'widgets/admin_booking_card.dart';
-import 'widgets/admin_user_stats.dart';
 import 'widgets/admin_user_card.dart';
 
 import '../../models/admin_stats_model.dart';
@@ -47,19 +47,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Future<void> _refreshData() async {
+    if (!mounted) return;
     final adminProvider = context.read<AdminProvider>();
     final propertyProvider = context.read<PropertyProvider>();
     final authProvider = context.read<AuthProvider>();
     final bookingProvider = context.read<BookingProvider>();
 
     adminProvider.loadStats();
-    
+
     if (_currentView == AdminView.listings) {
       propertyProvider.loadAdminProperties();
     } else {
       propertyProvider.loadProperties();
     }
-    
+
     if (_currentView == AdminView.bookings) {
       bookingProvider.loadAdminBookings(statusFilter: _bookingStatusFilter);
     } else {
@@ -69,8 +70,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
     if (_currentView == AdminView.users) {
       adminProvider.loadAllUsers();
     }
-    
+
     authProvider.loadPendingOwners();
+  }
+
+  void _onViewChanged(AdminView view) {
+    setState(() {
+      _currentView = view;
+    });
+    _refreshData();
   }
 
   @override
@@ -81,102 +89,88 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final authProvider = context.watch<AuthProvider>();
     final stats = adminProvider.stats;
 
+    final isMobile = MediaQuery.of(context).size.width < 900;
+
+    Widget mainContent = adminProvider.isLoading && stats == null
+        ? const Center(child: CircularProgressIndicator())
+        : RefreshIndicator(
+            onRefresh: _refreshData,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: KeyedSubtree(
+                key: ValueKey<AdminView>(_currentView),
+                child: _buildCurrentView(
+                  stats,
+                  bookingProvider,
+                  propertyProvider,
+                  adminProvider,
+                  authProvider,
+                ),
+              ),
+            ),
+          );
+
+    if (isMobile) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AdminTopNavBar(
+          currentView: _currentView,
+          onViewChanged: _onViewChanged,
+          isMobile: true,
+        ),
+        drawer: Drawer(
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.horizontal(right: Radius.circular(24)),
+          ),
+          child: AdminSidebar(
+            currentView: _currentView,
+            onViewChanged: _onViewChanged,
+            inDrawer: true,
+          ),
+        ),
+        bottomNavigationBar: AdminBottomNav(
+          currentView: _currentView,
+          onViewChanged: _onViewChanged,
+        ),
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: mainContent,
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AdminTopNavBar(
-        currentView: _currentView,
-        onViewChanged: (view) {
-          setState(() => _currentView = view);
-          _refreshData();
-        },
+      body: Row(
+        children: [
+          AdminSidebar(
+            currentView: _currentView,
+            onViewChanged: _onViewChanged,
+          ),
+          Expanded(
+            child: Column(
+              children: [
+                AdminTopNavBar(
+                  currentView: _currentView,
+                  onViewChanged: _onViewChanged,
+                  isMobile: false,
+                ),
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1200),
+                      child: mainContent,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      drawer: Drawer(
-        backgroundColor: Colors.white,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.horizontal(right: Radius.circular(24)),
-        ),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.primary, AppColors.secondary],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'VacanSee',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Admin Portal',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            _buildDrawerItem(Icons.dashboard_rounded, 'Dashboard', AdminView.dashboard),
-            _buildDrawerItem(Icons.list_alt_rounded, 'All Listings', AdminView.listings),
-            _buildDrawerItem(Icons.calendar_month_rounded, 'All Bookings', AdminView.bookings),
-            _buildDrawerItem(Icons.people_rounded, 'User Management', AdminView.users),
-            _buildDrawerItem(Icons.person_rounded, 'Profile', AdminView.profile),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Divider(),
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout_rounded, color: AppColors.error),
-              title: const Text(
-                'Logout', 
-                style: TextStyle(
-                  color: AppColors.error,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onTap: () async {
-                final navigator = Navigator.of(context);
-                await authProvider.signOut();
-                if (mounted) {
-                  navigator.popUntil((route) => route.isFirst);
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-      body: adminProvider.isLoading && stats == null
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _refreshData,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1200),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: KeyedSubtree(
-                      key: ValueKey<AdminView>(_currentView),
-                      child: _buildCurrentView(stats, bookingProvider, propertyProvider, adminProvider, authProvider),
-                    ),
-                  ),
-                ),
-              ),
-            ),
     );
   }
 
@@ -227,24 +221,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
         vertical: isMobile ? 24 : 40,
       ),
       children: [
-        GestureDetector(
-          onTap: () => setState(() => _currentView = AdminView.dashboard),
-          child: Row(
-            children: [
-              Icon(Icons.arrow_back_rounded, size: 20, color: Colors.grey[600]),
-              const SizedBox(width: 8),
-              Text(
-                'Back to Dashboard',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 32),
         // Profile Header Card
         Container(
           width: double.infinity,
@@ -274,7 +250,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.shield_outlined, color: AppColors.primary, size: 40),
+                      child: const Icon(
+                        Icons.shield_outlined,
+                        color: AppColors.primary,
+                        size: 40,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     Text(
@@ -305,7 +285,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.shield_outlined, color: AppColors.primary, size: 50),
+                      child: const Icon(
+                        Icons.shield_outlined,
+                        color: AppColors.primary,
+                        size: 50,
+                      ),
                     ),
                     const SizedBox(width: 32),
                     Column(
@@ -327,12 +311,23 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             color: Colors.white.withValues(alpha: 0.9),
                           ),
                         ),
-                        Text(
-                          'Super Admin',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withValues(alpha: 0.7),
-                            fontWeight: FontWeight.w500,
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            'Super Admin',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
@@ -347,7 +342,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.black.withValues(alpha: 0.05), width: 1.5),
+            border: Border.all(
+              color: Colors.black.withValues(alpha: 0.05),
+              width: 1.5,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.02),
@@ -401,32 +399,78 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ),
               const SizedBox(height: 32),
               if (isMobile) ...[
-                _buildProfileField('First Name', user.firstName ?? user.displayName.split(' ').first),
+                _buildProfileField(
+                  'First Name',
+                  user.firstName ?? user.displayName.split(' ').first,
+                ),
                 const SizedBox(height: 24),
-                _buildProfileField('Last Name', user.lastName ?? (user.displayName.split(' ').length > 1 ? user.displayName.split(' ')[1] : '')),
+                _buildProfileField(
+                  'Last Name',
+                  user.lastName ??
+                      (user.displayName.split(' ').length > 1
+                          ? user.displayName.split(' ')[1]
+                          : ''),
+                ),
                 const SizedBox(height: 24),
-                _buildProfileField('Email Address', user.email, icon: Icons.email_outlined),
+                _buildProfileField(
+                  'Email Address',
+                  user.email,
+                  icon: Icons.email_outlined,
+                ),
                 const SizedBox(height: 24),
-                _buildProfileField('Phone Number', user.phoneNumber ?? 'Not provided', icon: Icons.phone_outlined),
+                _buildProfileField(
+                  'Phone Number',
+                  user.phoneNumber ?? 'Not provided',
+                  icon: Icons.phone_outlined,
+                ),
               ] else ...[
                 Row(
                   children: [
-                    Expanded(child: _buildProfileField('First Name', user.firstName ?? user.displayName.split(' ').first)),
+                    Expanded(
+                      child: _buildProfileField(
+                        'First Name',
+                        user.firstName ?? user.displayName.split(' ').first,
+                      ),
+                    ),
                     const SizedBox(width: 24),
-                    Expanded(child: _buildProfileField('Last Name', user.lastName ?? (user.displayName.split(' ').length > 1 ? user.displayName.split(' ')[1] : ''))),
+                    Expanded(
+                      child: _buildProfileField(
+                        'Last Name',
+                        user.lastName ??
+                            (user.displayName.split(' ').length > 1
+                                ? user.displayName.split(' ')[1]
+                                : ''),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24),
                 Row(
                   children: [
-                    Expanded(child: _buildProfileField('Email Address', user.email, icon: Icons.email_outlined)),
+                    Expanded(
+                      child: _buildProfileField(
+                        'Email Address',
+                        user.email,
+                        icon: Icons.email_outlined,
+                      ),
+                    ),
                     const SizedBox(width: 24),
-                    Expanded(child: _buildProfileField('Phone Number', user.phoneNumber ?? 'Not provided', icon: Icons.phone_outlined)),
+                    Expanded(
+                      child: _buildProfileField(
+                        'Phone Number',
+                        user.phoneNumber ?? 'Not provided',
+                        icon: Icons.phone_outlined,
+                      ),
+                    ),
                   ],
                 ),
               ],
               const SizedBox(height: 24),
-              _buildProfileField('Admin Level', 'Super Admin', icon: Icons.shield_outlined),
+              _buildProfileField(
+                'Admin Level',
+                'Super Admin',
+                icon: Icons.shield_outlined,
+              ),
               const SizedBox(height: 8),
               Text(
                 'Admin level cannot be changed through this interface',
@@ -486,7 +530,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
           decoration: BoxDecoration(
             color: const Color(0xFFF8FAFC),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.black.withValues(alpha: 0.05), width: 1.5),
+            border: Border.all(
+              color: Colors.black.withValues(alpha: 0.05),
+              width: 1.5,
+            ),
           ),
           child: Text(
             value,
@@ -511,29 +558,33 @@ class _AdminDashboardState extends State<AdminDashboard> {
         vertical: isMobile ? 24 : 40,
       ),
       children: [
-        Text(
-          'User Management',
-          style: TextStyle(
-            fontSize: isMobile ? 24 : 32,
-            fontWeight: FontWeight.w900,
-            color: AppColors.textPrimary,
-            letterSpacing: -0.5,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Manage all users registered on the platform',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[600],
-          ),
-        ),
-        const SizedBox(height: 32),
-        AdminUserStats(
-          total: adminProvider.totalUsersCount,
-          tenants: adminProvider.tenantsCount,
-          owners: adminProvider.ownersCount,
-          admins: adminProvider.adminsCount,
+        AdminKpiPanel(
+          items: [
+            KpiItem(
+              label: 'Total Users',
+              value: adminProvider.totalUsersCount.toString(),
+              icon: Icons.people_rounded,
+              color: AppColors.primary,
+            ),
+            KpiItem(
+              label: 'Tenants',
+              value: adminProvider.tenantsCount.toString(),
+              icon: Icons.person_rounded,
+              color: AppColors.secondary,
+            ),
+            KpiItem(
+              label: 'Property Owners',
+              value: adminProvider.ownersCount.toString(),
+              icon: Icons.business_center_rounded,
+              color: Colors.amber,
+            ),
+            KpiItem(
+              label: 'Administrators',
+              value: adminProvider.adminsCount.toString(),
+              icon: Icons.shield_rounded,
+              color: Colors.purple,
+            ),
+          ],
         ),
         const SizedBox(height: 24),
         Container(
@@ -541,7 +592,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.black.withValues(alpha: 0.05), width: 1.5),
+            border: Border.all(
+              color: Colors.black.withValues(alpha: 0.05),
+              width: 1.5,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.02),
@@ -550,85 +604,127 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ),
             ],
           ),
-          child: isMobile 
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    onChanged: (v) => adminProvider.setSearchQuery(v),
-                    decoration: InputDecoration(
-                      hintText: 'Search by name or email...',
-                      prefixIcon: const Icon(Icons.search_rounded),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: Colors.black.withValues(alpha: 0.05)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: Colors.black.withValues(alpha: 0.05)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-                      ),
-                      filled: true,
-                      fillColor: const Color(0xFFF8FAFC),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _buildRoleFilterChip(null, 'All', adminProvider),
-                        const SizedBox(width: 8),
-                        _buildRoleFilterChip(UserRole.student, 'Tenants', adminProvider),
-                        const SizedBox(width: 8),
-                        _buildRoleFilterChip(UserRole.owner, 'Owners', adminProvider),
-                        const SizedBox(width: 8),
-                        _buildRoleFilterChip(UserRole.admin, 'Admins', adminProvider),
-                      ],
-                    ),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: TextField(
+          child: isMobile
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
                       onChanged: (v) => adminProvider.setSearchQuery(v),
                       decoration: InputDecoration(
                         hintText: 'Search by name or email...',
                         prefixIcon: const Icon(Icons.search_rounded),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(color: Colors.black.withValues(alpha: 0.05)),
+                          borderSide: BorderSide(
+                            color: Colors.black.withValues(alpha: 0.05),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(color: Colors.black.withValues(alpha: 0.05)),
+                          borderSide: BorderSide(
+                            color: Colors.black.withValues(alpha: 0.05),
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
                         ),
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  _buildRoleFilterChip(null, 'All', adminProvider),
-                  const SizedBox(width: 8),
-                  _buildRoleFilterChip(UserRole.student, 'Tenants', adminProvider),
-                  const SizedBox(width: 8),
-                  _buildRoleFilterChip(UserRole.owner, 'Owners', adminProvider),
-                  const SizedBox(width: 8),
-                  _buildRoleFilterChip(UserRole.admin, 'Admins', adminProvider),
-                ],
-              ),
+                    const SizedBox(height: 12),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          _buildRoleFilterChip(null, 'All', adminProvider),
+                          const SizedBox(width: 8),
+                          _buildRoleFilterChip(
+                            UserRole.student,
+                            'Tenants',
+                            adminProvider,
+                          ),
+                          const SizedBox(width: 8),
+                          _buildRoleFilterChip(
+                            UserRole.owner,
+                            'Owners',
+                            adminProvider,
+                          ),
+                          const SizedBox(width: 8),
+                          _buildRoleFilterChip(
+                            UserRole.admin,
+                            'Admins',
+                            adminProvider,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onChanged: (v) => adminProvider.setSearchQuery(v),
+                        decoration: InputDecoration(
+                          hintText: 'Search by name or email...',
+                          prefixIcon: const Icon(Icons.search_rounded),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: Colors.black.withValues(alpha: 0.05),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: Colors.black.withValues(alpha: 0.05),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: AppColors.primary,
+                              width: 1.5,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: const Color(0xFFF8FAFC),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    _buildRoleFilterChip(null, 'All', adminProvider),
+                    const SizedBox(width: 8),
+                    _buildRoleFilterChip(
+                      UserRole.student,
+                      'Tenants',
+                      adminProvider,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildRoleFilterChip(
+                      UserRole.owner,
+                      'Owners',
+                      adminProvider,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildRoleFilterChip(
+                      UserRole.admin,
+                      'Admins',
+                      adminProvider,
+                    ),
+                  ],
+                ),
         ),
         const SizedBox(height: 32),
         Text(
@@ -661,7 +757,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
         else
           LayoutBuilder(
             builder: (context, constraints) {
-              final crossAxisCount = constraints.maxWidth < 600 ? 1 : (constraints.maxWidth < 1200 ? 2 : 3);
+              final crossAxisCount = constraints.maxWidth < 600
+                  ? 1
+                  : (constraints.maxWidth < 1200 ? 2 : 3);
               return GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -669,7 +767,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   crossAxisCount: crossAxisCount,
                   crossAxisSpacing: isMobile ? 16 : 24,
                   mainAxisSpacing: isMobile ? 16 : 24,
-                  childAspectRatio: isMobile ? 1.4 : (constraints.maxWidth < 1200 ? 2.0 : 2.2),
+                  childAspectRatio: isMobile
+                      ? 1.4
+                      : (constraints.maxWidth < 1200 ? 2.0 : 2.2),
                 ),
                 itemCount: users.length,
                 itemBuilder: (context, index) {
@@ -686,7 +786,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Widget _buildRoleFilterChip(UserRole? role, String label, AdminProvider adminProvider) {
+  Widget _buildRoleFilterChip(
+    UserRole? role,
+    String label,
+    AdminProvider adminProvider,
+  ) {
     final isSelected = _userRoleFilter == role;
     return ChoiceChip(
       label: Text(label),
@@ -718,29 +822,33 @@ class _AdminDashboardState extends State<AdminDashboard> {
         vertical: isMobile ? 24 : 40,
       ),
       children: [
-        Text(
-          'All Bookings',
-          style: TextStyle(
-            fontSize: isMobile ? 24 : 32,
-            fontWeight: FontWeight.w900,
-            color: AppColors.textPrimary,
-            letterSpacing: -0.5,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Monitor and manage all booking requests across the platform',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[600],
-          ),
-        ),
-        const SizedBox(height: 32),
-        AdminBookingStats(
-          total: bookingProvider.totalBookingCount,
-          pending: bookingProvider.pendingBookingCount,
-          approved: bookingProvider.approvedBookingCount,
-          rejected: bookingProvider.rejectedBookingCount,
+        AdminKpiPanel(
+          items: [
+            KpiItem(
+              label: 'Total Bookings',
+              value: bookingProvider.totalBookingCount.toString(),
+              icon: Icons.calendar_month_rounded,
+              color: AppColors.primary,
+            ),
+            KpiItem(
+              label: 'Pending Requests',
+              value: bookingProvider.pendingBookingCount.toString(),
+              icon: Icons.pending_actions_rounded,
+              color: Colors.amber,
+            ),
+            KpiItem(
+              label: 'Approved Bookings',
+              value: bookingProvider.approvedBookingCount.toString(),
+              icon: Icons.check_circle_rounded,
+              color: AppColors.success,
+            ),
+            KpiItem(
+              label: 'Rejected Bookings',
+              value: bookingProvider.rejectedBookingCount.toString(),
+              icon: Icons.cancel_rounded,
+              color: AppColors.error,
+            ),
+          ],
         ),
         const SizedBox(height: 24),
         AdminBookingFilterBar(
@@ -763,7 +871,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
               padding: const EdgeInsets.symmetric(vertical: 80),
               child: Column(
                 children: [
-                  Icon(Icons.calendar_month_outlined, size: 64, color: Colors.grey[300]),
+                  Icon(
+                    Icons.calendar_month_outlined,
+                    size: 64,
+                    color: Colors.grey[300],
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'No bookings found',
@@ -774,12 +886,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
           )
         else
-          ...bookings.map((booking) => AdminBookingCard(
-            booking: booking,
-            onTap: () {
-              // Navigate to booking detail
-            },
-          )),
+          ...bookings.map(
+            (booking) => AdminBookingCard(
+              booking: booking,
+              onTap: () {
+                // Navigate to booking detail
+              },
+            ),
+          ),
       ],
     );
   }
@@ -794,24 +908,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
         vertical: isMobile ? 24 : 40,
       ),
       children: [
-        Text(
-          'All Listings',
-          style: TextStyle(
-            fontSize: isMobile ? 24 : 32,
-            fontWeight: FontWeight.w900,
-            color: AppColors.textPrimary,
-            letterSpacing: -0.5,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Manage all boarding house listings across the platform',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[600],
-          ),
-        ),
-        const SizedBox(height: 32),
         AdminSearchBar(
           onSearch: (query) {
             propertyProvider.setSearchQuery(query);
@@ -822,11 +918,33 @@ class _AdminDashboardState extends State<AdminDashboard> {
           },
         ),
         const SizedBox(height: 24),
-        AdminListingStats(
-          total: propertyProvider.totalListings,
-          available: propertyProvider.availableListings,
-          full: propertyProvider.fullListings,
-          availableRooms: propertyProvider.totalAvailableRoomCount,
+        AdminKpiPanel(
+          items: [
+            KpiItem(
+              label: 'Total Listings',
+              value: propertyProvider.totalListings.toString(),
+              icon: Icons.home_work_rounded,
+              color: AppColors.primary,
+            ),
+            KpiItem(
+              label: 'Available Listings',
+              value: propertyProvider.availableListings.toString(),
+              icon: Icons.home_rounded,
+              color: AppColors.success,
+            ),
+            KpiItem(
+              label: 'Fully Occupied',
+              value: propertyProvider.fullListings.toString(),
+              icon: Icons.house_rounded,
+              color: AppColors.error,
+            ),
+            KpiItem(
+              label: 'Available Rooms',
+              value: propertyProvider.totalAvailableRoomCount.toString(),
+              icon: Icons.single_bed_rounded,
+              color: AppColors.secondary,
+            ),
+          ],
         ),
         const SizedBox(height: 32),
         Text(
@@ -846,7 +964,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
               padding: const EdgeInsets.symmetric(vertical: 80),
               child: Column(
                 children: [
-                  Icon(Icons.home_work_outlined, size: 64, color: Colors.grey[300]),
+                  Icon(
+                    Icons.home_work_outlined,
+                    size: 64,
+                    color: Colors.grey[300],
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'No listings found',
@@ -859,7 +981,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
         else
           LayoutBuilder(
             builder: (context, constraints) {
-              final crossAxisCount = constraints.maxWidth < 600 ? 1 : (constraints.maxWidth < 1200 ? 2 : 3);
+              final crossAxisCount = constraints.maxWidth < 600
+                  ? 1
+                  : (constraints.maxWidth < 1200 ? 2 : 3);
               return GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -867,7 +991,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   crossAxisCount: crossAxisCount,
                   crossAxisSpacing: isMobile ? 16 : 24,
                   mainAxisSpacing: isMobile ? 16 : 24,
-                  childAspectRatio: isMobile ? 0.7 : (constraints.maxWidth < 1200 ? 0.8 : 0.85),
+                  childAspectRatio: isMobile
+                      ? 0.7
+                      : (constraints.maxWidth < 1200 ? 0.8 : 0.85),
                 ),
                 itemCount: properties.length,
                 itemBuilder: (context, index) {
@@ -905,7 +1031,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
         const SizedBox(height: 6),
         Row(
           children: [
-            Icon(Icons.calendar_today_rounded, size: 14, color: Colors.grey[500]),
+            Icon(
+              Icons.calendar_today_rounded,
+              size: 14,
+              color: Colors.grey[500],
+            ),
             const SizedBox(width: 8),
             Text(
               formattedDate,
@@ -1005,7 +1135,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Widget _buildBottomGrids(BookingProvider bookingProvider) {
     final isMobile = MediaQuery.of(context).size.width < 800;
-    
+
     if (isMobile) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1021,16 +1151,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Quick Actions
-        Expanded(
-          flex: 4,
-          child: _buildQuickActions(),
-        ),
+        Expanded(flex: 4, child: _buildQuickActions()),
         const SizedBox(width: 48),
         // Recent Bookings
-        Expanded(
-          flex: 5,
-          child: _buildRecentBookings(bookingProvider),
-        ),
+        Expanded(flex: 5, child: _buildRecentBookings(bookingProvider)),
       ],
     );
   }
@@ -1062,28 +1186,28 @@ class _AdminDashboardState extends State<AdminDashboard> {
               subLabel: 'Approve & view listings',
               icon: Icons.home_work_outlined,
               accentColor: AppColors.primary,
-              onTap: () => setState(() => _currentView = AdminView.listings),
+              onTap: () => _onViewChanged(AdminView.listings),
             ),
             QuickActionCard(
               label: 'View Bookings',
               subLabel: 'Track request stats',
               icon: Icons.calendar_month_outlined,
               accentColor: const Color(0xFFF59E0B),
-              onTap: () => setState(() => _currentView = AdminView.bookings),
+              onTap: () => _onViewChanged(AdminView.bookings),
             ),
             QuickActionCard(
               label: 'User Management',
               subLabel: 'Review owner verifications',
               icon: Icons.group_outlined,
               accentColor: const Color(0xFF8B5CF6),
-              onTap: () => setState(() => _currentView = AdminView.users),
+              onTap: () => _onViewChanged(AdminView.users),
             ),
             QuickActionCard(
               label: 'Admin Profile',
               subLabel: 'System permissions & settings',
               icon: Icons.person_outline,
               accentColor: AppColors.secondary,
-              onTap: () => setState(() => _currentView = AdminView.profile),
+              onTap: () => _onViewChanged(AdminView.profile),
             ),
           ],
         ),
@@ -1109,7 +1233,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ),
             ),
             TextButton(
-              onPressed: () => setState(() => _currentView = AdminView.bookings),
+              onPressed: () => _onViewChanged(AdminView.bookings),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.primary,
                 textStyle: const TextStyle(fontWeight: FontWeight.bold),
@@ -1124,7 +1248,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.black.withValues(alpha: 0.05), width: 1.5),
+            border: Border.all(
+              color: Colors.black.withValues(alpha: 0.05),
+              width: 1.5,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.02),
@@ -1147,36 +1274,21 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: bookingProvider.bookings.length > 4 ? 4 : bookingProvider.bookings.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 8),
+                  itemCount: bookingProvider.bookings.length > 4
+                      ? 4
+                      : bookingProvider.bookings.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8),
                   itemBuilder: (context, index) {
-                    return RecentBookingRow(booking: bookingProvider.bookings[index]);
+                    return RecentBookingRow(
+                      booking: bookingProvider.bookings[index],
+                    );
                   },
                 ),
             ],
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildDrawerItem(IconData icon, String label, AdminView view) {
-    final isSelected = _currentView == view;
-    return ListTile(
-      leading: Icon(icon, color: isSelected ? AppColors.primary : Colors.grey[600]),
-      title: Text(
-        label,
-        style: TextStyle(
-          color: isSelected ? AppColors.primary : AppColors.textSecondary,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        ),
-      ),
-      selected: isSelected,
-      onTap: () {
-        setState(() => _currentView = view);
-        _refreshData();
-        Navigator.pop(context); // Close drawer
-      },
     );
   }
 
@@ -1198,11 +1310,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
           decoration: BoxDecoration(
             color: const Color(0xFFF8FAFC),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.black.withValues(alpha: 0.05), width: 1.5),
+            border: Border.all(
+              color: Colors.black.withValues(alpha: 0.05),
+              width: 1.5,
+            ),
           ),
-          child: Column(
-            children: items.map((item) => item).toList(),
-          ),
+          child: Column(children: items.map((item) => item).toList()),
         ),
       ],
     );
@@ -1213,10 +1326,7 @@ class _PermissionItem extends StatelessWidget {
   final String label;
   final bool isEnabled;
 
-  const _PermissionItem({
-    required this.label,
-    required this.isEnabled,
-  });
+  const _PermissionItem({required this.label, required this.isEnabled});
 
   @override
   Widget build(BuildContext context) {
@@ -1237,4 +1347,3 @@ class _PermissionItem extends StatelessWidget {
     );
   }
 }
-

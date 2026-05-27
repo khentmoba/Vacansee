@@ -18,7 +18,10 @@ class RecentBookingRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: Colors.black.withValues(alpha: 0.03), width: 1),
+          bottom: BorderSide(
+            color: Colors.black.withValues(alpha: 0.03),
+            width: 1,
+          ),
         ),
       ),
       child: Row(
@@ -120,5 +123,3 @@ class RecentBookingRow extends StatelessWidget {
     }
   }
 }
-
-
