@@ -3,9 +3,6 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/app",         "destination": "/app/index.html" },
-    { "source": "/app/(.*)",    "destination": "/app/index.html" },
-    { "source": "/login.html",  "destination": "/app/index.html" },
-    { "source": "/signup.html", "destination": "/app/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

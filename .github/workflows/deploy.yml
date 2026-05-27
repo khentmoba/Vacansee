@@ -32,30 +32,8 @@ jobs:
       - name: Run Analysis
         run: flutter analyze
 
-      - name: Build Flutter Web (base-href /app/)
-        run: flutter build web --release --base-href /app/
-
-      - name: Relocate Flutter output to build/web/app/
-        run: |
-          mkdir -p /tmp/flutter-out
-          cp -r build/web/. /tmp/flutter-out/
-          rm -rf build/web
-          mkdir -p build/web/app
-          cp -r /tmp/flutter-out/. build/web/app/
-
-      - name: Install React landing dependencies
-        run: cd landing && npm ci
-
-      - name: Build React Landing Page
-        run: cd landing && npm run build
-
-      - name: Copy React output to build/web root
-        run: |
-          cp landing/dist/index.html build/web/index.html
-          cp -r landing/dist/assets/. build/web/assets/
-          mkdir -p build/web/images
-          cp -r landing/public/images/. build/web/images/
-          cp landing/public/favicon.png build/web/favicon.png
+      - name: Build Flutter Web
+        run: flutter build web --release --base-href /
 
       - name: Install Vercel CLI
         run: npm install -g vercel
