@@ -9,9 +9,9 @@ import 'booking_success_screen.dart';
 
 class BookingScreen extends StatefulWidget {
   final PropertyModel property;
-  final RoomModel room;
+  final RoomModel? room;
 
-  const BookingScreen({super.key, required this.property, required this.room});
+  const BookingScreen({super.key, required this.property, this.room});
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -97,9 +97,9 @@ class _BookingScreenState extends State<BookingScreen> {
       await bookingService.createBooking(
         studentId: student!.uid,
         propertyId: widget.property.propertyId,
-        roomId: widget.room.roomId,
+        roomId: widget.room?.roomId,
         propertyName: widget.property.name,
-        roomDescription: widget.room.description ?? 'Room',
+        roomDescription: widget.room?.description ?? 'Room',
         studentName: _nameController.text.trim(),
         studentEmail: _emailController.text.trim(),
         studentPhone: _phoneController.text.trim(),
@@ -392,7 +392,7 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Widget _buildBookingSummary() {
-    final double monthlyRate = widget.room.monthlyRate?.toDouble() ?? 0.0;
+    final double monthlyRate = widget.room?.monthlyRate?.toDouble() ?? widget.property.monthlyPrice.toDouble();
     final double total = monthlyRate * _selectedDuration;
 
     return Container(

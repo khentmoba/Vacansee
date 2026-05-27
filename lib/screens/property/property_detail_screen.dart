@@ -1188,16 +1188,6 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             child: ElevatedButton(
               onPressed: isVacant
                   ? () {
-                      final firstVacantRoom = rooms.cast<RoomModel?>().firstWhere(
-                        (r) => r!.status == RoomStatus.vacant,
-                        orElse: () => null,
-                      );
-                      if (firstVacantRoom == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('No vacant rooms available')),
-                        );
-                        return;
-                      }
                       final authProvider = context.read<AuthProvider>();
                       if (authProvider.user == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -1205,6 +1195,10 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                         );
                         return;
                       }
+                      final firstVacantRoom = rooms.cast<RoomModel?>().firstWhere(
+                        (r) => r!.status == RoomStatus.vacant,
+                        orElse: () => null,
+                      );
                       Navigator.push(
                         context,
                         SharedAxisPageRoute(
@@ -1690,16 +1684,6 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
               child: ElevatedButton(
                 onPressed: isVacant
                     ? () {
-                        final firstVacantRoom = rooms.cast<RoomModel?>().firstWhere(
-                          (r) => r!.status == RoomStatus.vacant,
-                          orElse: () => null,
-                        );
-                        if (firstVacantRoom == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('No vacant rooms available')),
-                          );
-                          return;
-                        }
                         final authProvider = context.read<AuthProvider>();
                         if (authProvider.user == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -1707,6 +1691,10 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           );
                           return;
                         }
+                        final firstVacantRoom = rooms.cast<RoomModel?>().firstWhere(
+                          (r) => r!.status == RoomStatus.vacant,
+                          orElse: () => null,
+                        );
                         Navigator.push(
                           context,
                           SharedAxisPageRoute(

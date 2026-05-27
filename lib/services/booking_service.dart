@@ -36,7 +36,7 @@ class BookingService {
   Future<BookingModel> createBooking({
     required String studentId,
     required String propertyId,
-    required String roomId,
+    String? roomId,
     required String propertyName,
     required String roomDescription,
     required String studentName,
@@ -47,12 +47,14 @@ class BookingService {
     int durationMonths = 1,
   }) async {
     try {
-      // 1. Check room availability
-      final isAvailable = await isRoomAvailable(roomId);
-      if (!isAvailable) {
-        throw BookingException(
-          'This room is no longer available.',
-        );
+      // 1. Check room availability (skip if no roomId — property-level booking)
+      if (roomId != null) {
+        final isAvailable = await isRoomAvailable(roomId);
+        if (!isAvailable) {
+          throw BookingException(
+            'This room is no longer available.',
+          );
+        }
       }
 
       // 2. Gender Enforcement
@@ -73,7 +75,7 @@ class BookingService {
       final Map<String, dynamic> bookingJson = {
         'student_id': studentId,
         'property_id': propertyId,
-        'room_id': roomId,
+        if (roomId != null) 'room_id': roomId,
         'property_name': propertyName,
         'room_description': roomDescription,
         'student_name': studentName,
