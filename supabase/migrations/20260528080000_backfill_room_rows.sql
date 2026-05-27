@@ -1,3 +1,9 @@
+-- Ensure has_vacancy column exists (may not have been added for existing databases)
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS has_vacancy BOOLEAN NOT NULL DEFAULT true;
+
+-- Ensure monthly_price column exists (fallback safety)
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS monthly_price INTEGER NOT NULL DEFAULT 0;
+
 -- Backfill room rows for existing properties that have total_rooms > 0
 -- but no actual room records in the rooms table.
 
