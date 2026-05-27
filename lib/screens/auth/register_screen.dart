@@ -156,36 +156,10 @@ class _RegisterScreenState extends State<RegisterScreen>
                         Center(
                           child: Column(
                             children: [
-                              Container(
+                              Image.asset(
+                                'assets/images/vacansee_logo.png',
                                 width: 56,
                                 height: 56,
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      AppColors.primary,
-                                      AppColors.secondary,
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(14),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.primary.withValues(
-                                        alpha: 0.25,
-                                      ),
-                                      blurRadius: 16,
-                                      offset: const Offset(0, 6),
-                                    ),
-                                  ],
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.home_work_rounded,
-                                    color: Colors.white,
-                                    size: 30,
-                                  ),
-                                ),
                               ),
                               const SizedBox(height: 12),
                               const Text(

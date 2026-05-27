@@ -115,36 +115,10 @@ class _LoginScreenState extends State<LoginScreen>
                         Center(
                           child: Column(
                             children: [
-                              Container(
+                              Image.asset(
+                                'assets/images/vacansee_logo.png',
                                 width: 60,
                                 height: 60,
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      AppColors.primary,
-                                      AppColors.secondary,
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.primary.withValues(
-                                        alpha: 0.25,
-                                      ),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 8),
-                                    ),
-                                  ],
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.home_work_rounded,
-                                    color: Colors.white,
-                                    size: 32,
-                                  ),
-                                ),
                               ),
                               const SizedBox(height: 16),
                               const Text(
