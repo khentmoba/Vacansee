@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/booking_model.dart';
 
-class AdminBookingCard extends StatelessWidget {
+class AdminBookingCard extends StatefulWidget {
   final BookingModel booking;
   final VoidCallback onTap;
 
@@ -14,167 +14,232 @@ class AdminBookingCard extends StatelessWidget {
   });
 
   @override
+  State<AdminBookingCard> createState() => _AdminBookingCardState();
+}
+
+class _AdminBookingCardState extends State<AdminBookingCard> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(symbol: '₱', decimalDigits: 0);
     final dateFormat = DateFormat('MMM d, yyyy');
+    final name = widget.booking.studentName;
+    final initial = name.isNotEmpty ? name[0].toUpperCase() : 'B';
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        margin: const EdgeInsets.only(bottom: 16),
+        transform: _isHovered ? (Matrix4.identity()..translate(0, -3, 0)) : Matrix4.identity(),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: _isHovered ? AppColors.primary.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.05),
+            width: 1.5,
           ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Row(
-              children: [
-                // Student Avatar
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.person, color: Colors.white, size: 24),
-                ),
-                const SizedBox(width: 20),
-                // Booking Info
-                Expanded(
-                  flex: 3,
-                  child: Column(
+          boxShadow: [
+            BoxShadow(
+              color: _isHovered ? Colors.black.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.02),
+              blurRadius: _isHovered ? 16 : 8,
+              offset: _isHovered ? const Offset(0, 6) : const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: InkWell(
+            onTap: widget.onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isCompact = constraints.maxWidth < 750;
+
+                  final avatar = CircleAvatar(
+                    radius: 22,
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                    child: Text(
+                      initial,
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  );
+
+                  final bookingHeader = Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        booking.studentName,
+                        name,
                         style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary,
+                          letterSpacing: -0.2,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Booking ID: #${booking.bookingId.substring(0, 5).toUpperCase()}',
+                        'Booking ID: #${widget.booking.bookingId.substring(0, 5).toUpperCase()}',
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 12,
                           color: Colors.grey[500],
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
-                  ),
-                ),
-                // Property Info
-                Expanded(
-                  flex: 4,
-                  child: Row(
-                    children: [
-                      Icon(Icons.home_outlined, size: 20, color: Colors.grey[400]),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  );
+
+                  final propertyBlock = _InfoBlock(
+                    label: 'Property',
+                    title: widget.booking.propertyName,
+                    subTitle: 'Owner: ${widget.booking.ownerName ?? 'Unknown'}',
+                    icon: Icons.home_work_outlined,
+                  );
+
+                  final dateBlock = _InfoBlock(
+                    label: 'Booking Date',
+                    title: dateFormat.format(widget.booking.requestedAt),
+                    icon: Icons.calendar_today_outlined,
+                  );
+
+                  final rateBlock = _InfoBlock(
+                    label: 'Monthly Rate',
+                    title: currencyFormat.format(widget.booking.monthlyRate),
+                    icon: Icons.payments_outlined,
+                    titleColor: AppColors.primary,
+                  );
+
+                  final statusChip = _StatusChip(status: widget.booking.status);
+
+                  if (isCompact) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            Text(
-                              'Property',
-                              style: TextStyle(fontSize: 11, color: Colors.grey[500]),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              booking.propertyName,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              'Owner: ${booking.ownerName ?? 'Unknown'}',
-                              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                            ),
+                            avatar,
+                            const SizedBox(width: 14),
+                            Expanded(child: bookingHeader),
+                            statusChip,
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Date Info
-                Expanded(
-                  flex: 3,
-                  child: Row(
+                        const SizedBox(height: 16),
+                        const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(child: propertyBlock),
+                            Expanded(child: rateBlock),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            Expanded(child: dateBlock),
+                            const Spacer(),
+                          ],
+                        ),
+                      ],
+                    );
+                  }
+
+                  return Row(
                     children: [
-                      Icon(Icons.calendar_today_outlined, size: 20, color: Colors.grey[400]),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Booking Date',
-                            style: TextStyle(fontSize: 11, color: Colors.grey[500]),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            dateFormat.format(booking.requestedAt),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
+                      avatar,
+                      const SizedBox(width: 16),
+                      Expanded(flex: 3, child: bookingHeader),
+                      const SizedBox(width: 16),
+                      Expanded(flex: 4, child: propertyBlock),
+                      const SizedBox(width: 16),
+                      Expanded(flex: 3, child: dateBlock),
+                      const SizedBox(width: 16),
+                      Expanded(flex: 3, child: rateBlock),
+                      const SizedBox(width: 16),
+                      statusChip,
                     ],
-                  ),
-                ),
-                // Rate Info
-                Expanded(
-                  flex: 3,
-                  child: Row(
-                    children: [
-                      Icon(Icons.payments_outlined, size: 20, color: Colors.grey[400]),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Monthly Rate',
-                            style: TextStyle(fontSize: 11, color: Colors.grey[500]),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            currencyFormat.format(booking.monthlyRate),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                // Status Chip
-                _StatusChip(status: booking.status),
-              ],
+                  );
+                },
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _InfoBlock extends StatelessWidget {
+  final String label;
+  final String title;
+  final String? subTitle;
+  final IconData icon;
+  final Color? titleColor;
+
+  const _InfoBlock({
+    required this.label,
+    required this.title,
+    required this.icon,
+    this.subTitle,
+    this.titleColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: Colors.grey[400]),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey[500],
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.3,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: titleColor ?? AppColors.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (subTitle != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  subTitle!,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[500],
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -186,54 +251,52 @@ class _StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color bgColor;
-    Color textColor;
-    IconData icon;
+    Color color;
     String label;
 
     switch (status) {
       case BookingStatus.pending:
-        bgColor = AppColors.warning.withValues(alpha: 0.1);
-        textColor = AppColors.warning;
-        icon = Icons.access_time_filled;
+        color = AppColors.warning;
         label = 'Pending';
         break;
       case BookingStatus.approved:
-        bgColor = AppColors.success.withValues(alpha: 0.1);
-        textColor = AppColors.success;
-        icon = Icons.check_circle;
+        color = AppColors.success;
         label = 'Approved';
         break;
       case BookingStatus.rejected:
-        bgColor = AppColors.error.withValues(alpha: 0.1);
-        textColor = AppColors.error;
-        icon = Icons.cancel;
+        color = AppColors.error;
         label = 'Rejected';
         break;
       default:
-        bgColor = Colors.grey[200]!;
-        textColor = Colors.grey[600]!;
-        icon = Icons.help;
+        color = Colors.grey;
         label = status.name.toUpperCase();
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20),
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: textColor, size: 16),
-          const SizedBox(width: 8),
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 6),
           Text(
             label,
             style: TextStyle(
-              color: textColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
+              color: color,
+              fontWeight: FontWeight.w800,
+              fontSize: 11,
             ),
           ),
         ],
@@ -241,3 +304,4 @@ class _StatusChip extends StatelessWidget {
     );
   }
 }
+
