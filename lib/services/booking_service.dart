@@ -44,6 +44,7 @@ class BookingService {
     required String studentEmail,
     String? studentPhone,
     required String studentGender,
+    required String propertyGenderOrientation,
     String? studentNotes,
     DateTime? moveInDate,
     int durationMonths = 1,
@@ -60,14 +61,10 @@ class BookingService {
       }
 
       // 2. Gender Enforcement
-      final propertyData = await _supabase.from('properties').select('gender_orientation').eq('id', propertyId).single();
-      
-      final propertyOrientation = propertyData['gender_orientation'] as String;
-
-      if (propertyOrientation != 'mixed' && studentGender.isNotEmpty) {
-        if (propertyOrientation != studentGender) {
+      if (propertyGenderOrientation != 'mixed' && studentGender.isNotEmpty) {
+        if (propertyGenderOrientation != studentGender) {
           throw BookingException(
-            'This property is for ${propertyOrientation}s only. Your profile gender ($studentGender) does not match.',
+            'This property is for ${propertyGenderOrientation}s only. Your profile gender ($studentGender) does not match.',
           );
         }
       }
@@ -92,10 +89,27 @@ class BookingService {
       final data = await _supabase
           .from('bookings')
           .insert(bookingJson)
-          .select('*, properties(name), rooms(description)')
+          .select('id')
           .single();
 
-      return BookingModel.fromJson(data);
+      final now = DateTime.now();
+      return BookingModel(
+        bookingId: data['id'] as String,
+        studentId: studentId,
+        propertyId: propertyId,
+        roomId: roomId ?? '',
+        propertyName: propertyName,
+        roomDescription: roomDescription,
+        studentName: studentName,
+        studentEmail: studentEmail,
+        studentPhone: studentPhone,
+        status: BookingStatus.pending,
+        requestedAt: now,
+        expiresAt: now.add(const Duration(hours: 48)),
+        studentNotes: studentNotes,
+        moveInDate: moveInDate,
+        durationMonths: durationMonths,
+      );
     } on BookingException {
       rethrow;
     } catch (e) {

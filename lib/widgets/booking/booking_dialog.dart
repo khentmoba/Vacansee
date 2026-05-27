@@ -60,6 +60,7 @@ class _BookingDialogState extends State<BookingDialog> {
         studentEmail: student.email,
         studentPhone: student.phoneNumber,
         studentGender: student.gender ?? '',
+        propertyGenderOrientation: widget.property.genderOrientation.name,
         studentNotes: _notesController.text.trim(),
       );
 
