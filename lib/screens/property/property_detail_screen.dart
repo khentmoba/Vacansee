@@ -98,8 +98,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   Widget build(BuildContext context) {
     final propertyProvider = context.watch<PropertyProvider>();
     final rooms = propertyProvider.rooms;
-    final vacantRooms = rooms.where((r) => r.status == RoomStatus.vacant).length;
-    final totalRooms = rooms.length;
+    final hasLoadedRooms = rooms.isNotEmpty;
+    final vacantRooms = hasLoadedRooms
+        ? rooms.where((r) => r.status == RoomStatus.vacant).length
+        : widget.property.availableRooms;
+    final totalRooms = hasLoadedRooms ? rooms.length : widget.property.totalRooms;
     final isDesktop = MediaQuery.of(context).size.width >= 1000;
 
     return Scaffold(

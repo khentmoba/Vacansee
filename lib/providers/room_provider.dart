@@ -56,7 +56,9 @@ class RoomProvider extends ChangeNotifier {
 
   /// Check if a specific property has any live vacancies
   bool hasVacancyForProperty(String propertyId) {
-    return _vacantRooms.any((room) => room.propertyId == propertyId);
+    return _vacantRooms.any(
+      (room) => room.propertyId == propertyId && room.status == RoomStatus.vacant,
+    );
   }
 
   /// Update vacancy status for a room (Owner action)

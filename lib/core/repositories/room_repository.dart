@@ -16,11 +16,11 @@ class RoomRepository {
   RoomRepository({SupabaseClient? supabase})
     : _supabase = supabase ?? Supabase.instance.client;
 
-  /// Stream of rooms with vacancy status, joined with property data
-  /// Uses the public.room_vacancies view for real-time relational streaming
+  /// Stream of all rooms for real-time vacancy tracking
+  /// Streams from the `rooms` table (added to supabase_realtime publication)
   Stream<List<RoomModel>> getVacancyStream() {
     return _supabase
-        .from('room_vacancies')
+        .from('rooms')
         .stream(primaryKey: ['id'])
         .order('last_updated', ascending: false)
         .map((data) {
