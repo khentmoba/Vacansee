@@ -1231,7 +1231,7 @@ class _PermissionItem extends StatelessWidget {
           color: AppColors.textPrimary,
         ),
       ),
-      activeColor: AppColors.primary,
+      activeTrackColor: AppColors.primary,
       dense: true,
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
     );

@@ -47,7 +47,7 @@ class _AdminStatCardState extends State<AdminStatCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutCubic,
-        transform: _isHovered ? (Matrix4.identity()..translate(0, -6, 0)) : Matrix4.identity(),
+        transform: _isHovered ? Matrix4.translationValues(0, -6, 0) : Matrix4.identity(),
         padding: EdgeInsets.all(isSmall ? 16 : 24),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -216,7 +216,7 @@ class _AdminSolidStatCardState extends State<AdminSolidStatCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutCubic,
-        transform: _isHovered ? (Matrix4.identity()..translate(0, -6, 0)) : Matrix4.identity(),
+        transform: _isHovered ? Matrix4.translationValues(0, -6, 0) : Matrix4.identity(),
         padding: EdgeInsets.all(isSmall ? 16 : 24),
         decoration: BoxDecoration(
           color: widget.backgroundColor,

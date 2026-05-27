@@ -33,7 +33,7 @@ class _QuickActionCardState extends State<QuickActionCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
-        transform: _isHovered ? (Matrix4.identity()..translate(4, 0, 0)) : Matrix4.identity(),
+        transform: _isHovered ? Matrix4.translationValues(4, 0, 0) : Matrix4.identity(),
         child: InkWell(
           onTap: widget.onTap,
           borderRadius: BorderRadius.circular(16),

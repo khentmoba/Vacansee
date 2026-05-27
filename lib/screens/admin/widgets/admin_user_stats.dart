@@ -87,7 +87,7 @@ class _UserStatCardState extends State<_UserStatCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
-        transform: _isHovered ? (Matrix4.identity()..translate(0, -4, 0)) : Matrix4.identity(),
+        transform: _isHovered ? Matrix4.translationValues(0, -4, 0) : Matrix4.identity(),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,

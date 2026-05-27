@@ -34,7 +34,7 @@ class _AdminBookingCardState extends State<AdminBookingCard> {
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
         margin: const EdgeInsets.only(bottom: 16),
-        transform: _isHovered ? (Matrix4.identity()..translate(0, -3, 0)) : Matrix4.identity(),
+        transform: _isHovered ? Matrix4.translationValues(0, -3, 0) : Matrix4.identity(),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
