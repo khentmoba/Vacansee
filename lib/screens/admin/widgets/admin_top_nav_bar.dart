@@ -200,12 +200,7 @@ class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    size: 16,
-                    color: AppColors.textMuted,
-                  ),
+
                 ],
               ],
             ),

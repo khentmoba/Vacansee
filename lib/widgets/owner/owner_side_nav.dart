@@ -22,7 +22,6 @@ class OwnerSideNav extends StatelessWidget {
     _NavItem('Dashboard', Icons.dashboard_rounded),
     _NavItem('My Listings', Icons.home_work_rounded),
     _NavItem('Booking Requests', Icons.book_online_rounded),
-    _NavItem('Messages', Icons.mail_rounded),
     _NavItem('Performance', Icons.analytics_rounded),
     _NavItem('Payments', Icons.payments_rounded),
     _NavItem('Profile/Settings', Icons.person_rounded),

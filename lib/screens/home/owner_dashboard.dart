@@ -314,12 +314,10 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
       case 2:
         return const OwnerBookingsScreen(showAppBar: false);
       case 3:
-        return _buildComingSoonScreen('Direct Messages');
-      case 4:
         return const OwnerPerformanceScreen();
-      case 5:
+      case 4:
         return const OwnerPaymentsScreen();
-      case 6:
+      case 5:
         return const OwnerProfileScreen(showAppBar: false);
       default:
         return _buildComingSoonScreen('Screen');

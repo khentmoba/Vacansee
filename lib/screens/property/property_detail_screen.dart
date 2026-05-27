@@ -1084,7 +1084,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   }
 
   Widget _buildSidebarCard(int vacantRooms, int totalRooms, List<RoomModel> rooms) {
-    final isVacant = vacantRooms > 0;
+    final firstVacantRoom = rooms.cast<RoomModel?>().firstWhere(
+      (r) => r!.status == RoomStatus.vacant,
+      orElse: () => null,
+    );
+    final isVacant = firstVacantRoom != null;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -1188,9 +1192,13 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             child: ElevatedButton(
               onPressed: isVacant
                   ? () {
-                      final firstVacantRoom = rooms.firstWhere(
-                        (r) => r.status == RoomStatus.vacant,
-                      );
+                      final authProvider = context.read<AuthProvider>();
+                      if (authProvider.user == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Please sign in to reserve a room')),
+                        );
+                        return;
+                      }
                       Navigator.push(
                         context,
                         SharedAxisPageRoute(
@@ -1508,22 +1516,6 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Message host implementation
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.textPrimary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: const Text('Message Host', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ),
             ],
           ),
         ),
@@ -1635,7 +1627,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   }
 
   Widget _buildMobileStickyBottomBar(int vacantRooms, int totalRooms, List<RoomModel> rooms) {
-    final isVacant = vacantRooms > 0;
+    final firstVacantRoom = rooms.cast<RoomModel?>().firstWhere(
+      (r) => r!.status == RoomStatus.vacant,
+      orElse: () => null,
+    );
+    final isVacant = firstVacantRoom != null;
 
     return Positioned(
       bottom: 0,
@@ -1692,9 +1688,13 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
               child: ElevatedButton(
                 onPressed: isVacant
                     ? () {
-                        final firstVacantRoom = rooms.firstWhere(
-                          (r) => r.status == RoomStatus.vacant,
-                        );
+                        final authProvider = context.read<AuthProvider>();
+                        if (authProvider.user == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Please sign in to book a room')),
+                          );
+                          return;
+                        }
                         Navigator.push(
                           context,
                           SharedAxisPageRoute(
