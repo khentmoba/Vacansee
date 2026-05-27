@@ -1,13 +1,16 @@
 # Flutter
 .dart_tool/
 .flutter-plugins*
-build/
 android/
 ios/
 linux/
 macos/
 windows/
 web/.dart_tool/
+
+# Keep build/web/ for deployment — only exclude intermediate build artifacts
+build/*/
+!build/web/
 
 # Node
 landing/node_modules/

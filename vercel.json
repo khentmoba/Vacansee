@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node scripts/build-landing.js",
+  "buildCommand": "cd landing && npm install && npm run build",
   "outputDirectory": "landing/dist",
   "cleanUrls": true,
   "trailingSlash": false,
