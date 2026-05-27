@@ -11,18 +11,33 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+DECLARE
+  service_role_key TEXT;
 BEGIN
-  -- We use net.http_post to call the Edge Function asynchronously
-  -- The URL should be updated to the production URL if different from the project reference
+  -- Try to retrieve the service role key from the Supabase Vault securely
+  BEGIN
+    SELECT decrypted_secret INTO service_role_key 
+    FROM vault.decrypted_secrets 
+    WHERE name = 'service_role_key' 
+    LIMIT 1;
+  EXCEPTION WHEN OTHERS THEN
+    service_role_key := NULL;
+  END;
+
+  -- Fallback to current_setting or default anon key if vault query fails/is empty
+  IF service_role_key IS NULL THEN
+    service_role_key := COALESCE(
+      current_setting('vault.service_role_key', true), 
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6ZWx5eHZlY2dnd29ybXNvZXNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMTk0NzIsImV4cCI6MjA5MTg5NTQ3Mn0.GInyDYoBe3Tu8aJQ0nOmEVS1mmRNIAYSGW_VmClc2o0'
+    );
+  END IF;
+
   PERFORM
     net.http_post(
       url := 'https://hzelyxvecggwormsoesa.supabase.co/functions/v1/send-notification-email',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer ' || COALESCE(
-          current_setting('vault.service_role_key', true), 
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6ZWx5eHZlY2dnd29ybXNvZXNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMTk0NzIsImV4cCI6MjA5MTg5NTQ3Mn0.GInyDYoBe3Tu8aJQ0nOmEVS1mmRNIAYSGW_VmClc2o0'
-        )
+        'Authorization', 'Bearer ' || service_role_key
       ),
       body := jsonb_build_object('record', row_to_json(NEW))
     );

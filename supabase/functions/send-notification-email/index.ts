@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
-
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
+const TEST_RECIPIENT_EMAIL = Deno.env.get('TEST_RECIPIENT_EMAIL')
 
 serve(async (req) => {
   try {
@@ -202,6 +202,10 @@ serve(async (req) => {
 
     // 4. Send Email via Resend
     // Note: 'from' address must be verified in Resend. 'onboarding@resend.dev' works for testing.
+    // If TEST_RECIPIENT_EMAIL is configured, send to that email instead of user.email for testing purposes.
+    const recipientEmail = TEST_RECIPIENT_EMAIL || user.email;
+    console.log(`Sending email to: ${recipientEmail} (Original owner email: ${user.email}) for notification: ${record.title}`);
+
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -210,7 +214,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         from: 'VacanSee <onboarding@resend.dev>',
-        to: [user.email],
+        to: [recipientEmail],
         subject: `[VacanSee] ${record.title}`,
         html: emailHtml,
       }),
