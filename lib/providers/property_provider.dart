@@ -542,20 +542,30 @@ class PropertyProvider extends ChangeNotifier {
         reason: reason,
       );
 
-      // Update local state if present
-      final index = _properties.indexWhere((p) => p.propertyId == propertyId);
-      if (index != -1) {
-        _properties[index] = _properties[index].copyWith(
-          status: status,
-          rejectionReason: reason,
-        );
-      }
-      if (_selectedProperty?.propertyId == propertyId) {
-        _selectedProperty = _selectedProperty?.copyWith(
-          status: status,
-          rejectionReason: reason,
-        );
-      }
+    // Update local state if present
+    final index = _properties.indexWhere((p) => p.propertyId == propertyId);
+    if (index != -1) {
+      _properties[index] = _properties[index].copyWith(
+        status: status,
+        rejectionReason: reason,
+      );
+    }
+
+    // Also update _allAdminProperties for admin dashboard consistency
+    final adminIndex = _allAdminProperties.indexWhere((p) => p.propertyId == propertyId);
+    if (adminIndex != -1) {
+      _allAdminProperties[adminIndex] = _allAdminProperties[adminIndex].copyWith(
+        status: status,
+        rejectionReason: reason,
+      );
+    }
+
+    if (_selectedProperty?.propertyId == propertyId) {
+      _selectedProperty = _selectedProperty?.copyWith(
+        status: status,
+        rejectionReason: reason,
+      );
+    }
 
       _isLoading = false;
       notifyListeners();

@@ -31,9 +31,7 @@ class PropertyService {
     sanitized.remove('has_vacancy');
     sanitized.remove('average_rating');
     sanitized.remove('reviews_count');
-    sanitized.remove('total_rooms');
-    sanitized.remove('available_rooms');
-    sanitized.remove('monthly_price');
+    // Keep editable fields: total_rooms, available_rooms, monthly_price
     return sanitized;
   }
 

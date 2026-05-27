@@ -49,9 +49,7 @@ class ListingService {
       propertyJson.remove('has_vacancy');
       propertyJson.remove('average_rating');
       propertyJson.remove('reviews_count');
-      propertyJson.remove('total_rooms');
-      propertyJson.remove('available_rooms');
-      propertyJson.remove('monthly_price');
+      // Keep editable fields: total_rooms, available_rooms, monthly_price
 
       await _supabase
           .from('properties')
