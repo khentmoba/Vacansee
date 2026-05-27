@@ -157,66 +157,88 @@ class OwnerSideNav extends StatelessWidget {
   }) {
     final isSelected = selectedIndex == index;
     final activeColor = const Color(0xFF5287B2);
+    bool isHovered = false;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: InkWell(
-        onTap: () => onIndexChanged(index),
-        borderRadius: BorderRadius.circular(12),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? activeColor.withValues(alpha: 0.15)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            border: isSelected
-                ? Border(
-                    left: BorderSide(color: activeColor, width: 4),
-                  )
-                : const Border(
-                    left: BorderSide(color: Colors.transparent, width: 4),
-                  ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                color: isSelected ? activeColor : const Color(0xFF94A3B8),
-                size: 20,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : const Color(0xFF94A3B8),
-                    fontSize: 15,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  ),
+    return StatefulBuilder(
+      builder: (context, setStateBuilder) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: MouseRegion(
+            onEnter: (_) => setStateBuilder(() => isHovered = true),
+            onExit: (_) => setStateBuilder(() => isHovered = false),
+            child: InkWell(
+              onTap: () => onIndexChanged(index),
+              borderRadius: BorderRadius.circular(12),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? activeColor.withValues(alpha: 0.15)
+                      : isHovered 
+                          ? Colors.white.withValues(alpha: 0.05)
+                          : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  border: isSelected
+                      ? Border(
+                          left: BorderSide(color: activeColor, width: 4),
+                        )
+                      : Border(
+                          left: BorderSide(
+                            color: isHovered ? activeColor.withValues(alpha: 0.5) : Colors.transparent, 
+                            width: 4,
+                          ),
+                        ),
                 ),
-              ),
-              if (badgeCount > 0)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.orangeAccent,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '$badgeCount',
-                    style: const TextStyle(
-                      color: Colors.black87,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
+                child: Row(
+                  children: [
+                    Icon(
+                      icon,
+                      color: isSelected 
+                          ? activeColor 
+                          : isHovered 
+                              ? Colors.white 
+                              : const Color(0xFF94A3B8),
+                      size: 20,
                     ),
-                  ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                          color: isSelected 
+                              ? Colors.white 
+                              : isHovered 
+                                  ? Colors.white.withValues(alpha: 0.9) 
+                                  : const Color(0xFF94A3B8),
+                          fontSize: 15,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    if (badgeCount > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.orangeAccent,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '$badgeCount',
+                          style: const TextStyle(
+                            color: Colors.black87,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-            ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

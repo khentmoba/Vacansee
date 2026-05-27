@@ -77,7 +77,7 @@ class OwnerPerformanceScreen extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
-                  childAspectRatio: isWide ? 1.6 : 1.3,
+                  childAspectRatio: isWide ? 2.4 : 1.6,
                   children: [
                     _buildKpiCard(
                       'Occupancy Rate',
@@ -164,73 +164,131 @@ class OwnerPerformanceScreen extends StatelessWidget {
   }
 
   Widget _buildKpiCard(String label, String value, IconData icon, Color color) {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFE2E8F0)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF64748B),
-                  ),
+    bool isHovered = false;
+    return StatefulBuilder(
+      builder: (context, setStateBuilder) {
+        return MouseRegion(
+          onEnter: (_) => setStateBuilder(() => isHovered = true),
+          onExit: (_) => setStateBuilder(() => isHovered = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isHovered ? color.withValues(alpha: 0.5) : const Color(0xFFE2E8F0),
+                width: isHovered ? 1.5 : 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: isHovered 
+                      ? color.withValues(alpha: 0.08) 
+                      : Colors.black.withValues(alpha: 0.02),
+                  blurRadius: isHovered ? 12 : 6,
+                  offset: Offset(0, isHovered ? 4 : 2),
                 ),
-                Icon(icon, color: color, size: 20),
               ],
             ),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
-              ),
+            transform: Matrix4.translationValues(0.0, isHovered ? -2.0 : 0.0, 0.0),
+            child: Row(
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: isHovered 
+                        ? color.withValues(alpha: 0.15) 
+                        : color.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: color, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF64748B),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        value,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0F172A),
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildBreakdownCard({required String title, required List<Widget> children}) {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFE2E8F0)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+    bool isHovered = false;
+    return StatefulBuilder(
+      builder: (context, setStateBuilder) {
+        return MouseRegion(
+          onEnter: (_) => setStateBuilder(() => isHovered = true),
+          onExit: (_) => setStateBuilder(() => isHovered = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isHovered ? const Color(0xFF5287B2).withValues(alpha: 0.3) : const Color(0xFFE2E8F0),
+                width: isHovered ? 1.5 : 1.0,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: isHovered 
+                      ? const Color(0xFF5287B2).withValues(alpha: 0.05) 
+                      : Colors.black.withValues(alpha: 0.02),
+                  blurRadius: isHovered ? 16 : 8,
+                  offset: Offset(0, isHovered ? 6 : 4),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            ...children,
-          ],
-        ),
-      ),
+            transform: Matrix4.translationValues(0.0, isHovered ? -2.0 : 0.0, 0.0),
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ...children,
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

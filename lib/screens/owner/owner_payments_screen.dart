@@ -14,6 +14,7 @@ class OwnerPaymentsScreen extends StatefulWidget {
 
 class _OwnerPaymentsScreenState extends State<OwnerPaymentsScreen> {
   String _searchQuery = '';
+  bool _isSummaryHovered = false;
 
   @override
   Widget build(BuildContext context) {
@@ -89,14 +90,30 @@ class _OwnerPaymentsScreenState extends State<OwnerPaymentsScreen> {
             const SizedBox(height: 24),
 
             // Summary Card
-            Card(
-              elevation: 0,
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: const BorderSide(color: Color(0xFFE2E8F0)),
-              ),
-              child: Padding(
+            MouseRegion(
+              onEnter: (_) => setState(() => _isSummaryHovered = true),
+              onExit: (_) => setState(() => _isSummaryHovered = false),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: _isSummaryHovered ? const Color(0xFF5287B2).withValues(alpha: 0.5) : const Color(0xFFE2E8F0),
+                    width: _isSummaryHovered ? 1.5 : 1.0,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _isSummaryHovered 
+                          ? const Color(0xFF5287B2).withValues(alpha: 0.05) 
+                          : Colors.black.withValues(alpha: 0.02),
+                      blurRadius: _isSummaryHovered ? 16 : 8,
+                      offset: Offset(0, _isSummaryHovered ? 6 : 4),
+                    ),
+                  ],
+                ),
+                transform: Matrix4.translationValues(0.0, _isSummaryHovered ? -2.0 : 0.0, 0.0),
                 padding: const EdgeInsets.all(24.0),
                 child: Row(
                   children: [

@@ -258,302 +258,218 @@ class _OwnerBookingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
     if (!isPending) return _buildProcessedCard(context);
+    bool isHovered = false;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(24),
+    return StatefulBuilder(
+      builder: (context, setStateBuilder) {
+        return MouseRegion(
+          onEnter: (_) => setStateBuilder(() => isHovered = true),
+          onExit: (_) => setStateBuilder(() => isHovered = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            margin: const EdgeInsets.only(bottom: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isHovered ? const Color(0xFF5287B2).withValues(alpha: 0.5) : const Color(0xFFF1F5F9),
+                width: isHovered ? 1.5 : 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: isHovered 
+                      ? const Color(0xFF5287B2).withValues(alpha: 0.08) 
+                      : Colors.black.withValues(alpha: 0.03),
+                  blurRadius: isHovered ? 20 : 12,
+                  offset: Offset(0, isHovered ? 8 : 4),
+                ),
+              ],
+            ),
+            transform: Matrix4.translationValues(0.0, isHovered ? -3.0 : 0.0, 0.0),
             child: Column(
               children: [
-                // Top Info Row
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: const Color(
-                        0xFF5287B2,
-                      ).withValues(alpha: 0.1),
-                      child: const Icon(
-                        Icons.person_outline,
-                        color: Color(0xFF5287B2),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            booking.studentName,
-                            style: TextStyle(
-                              fontSize: isMobile ? 16 : 18,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF1D1B16),
-                            ),
-                          ),
-                          Text(
-                            'Booking Request #${booking.bookingId.substring(0, 5).toUpperCase()}',
-                            style: TextStyle(
-                              fontSize: isMobile ? 12 : 13,
-                              color: Colors.grey[500],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (!isMobile)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFFBEB),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Text(
-                          'Pending Review',
-                          style: TextStyle(
-                            color: Color(0xFFD97706),
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                if (isMobile) ...[
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFFBEB),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Text(
-                      'Pending Review',
-                      style: TextStyle(
-                        color: Color(0xFFD97706),
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-                // Info Grid/Row
-                if (isMobile)
-                  Column(
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Top Info Row
                       Row(
                         children: [
-                          _buildInfoItem(
-                            Icons.home_outlined,
-                            'Property',
-                            booking.propertyName,
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundColor: const Color(0xFF5287B2).withValues(alpha: 0.1),
+                            child: const Icon(
+                              Icons.person_outline,
+                              color: Color(0xFF5287B2),
+                            ),
                           ),
-                          _buildInfoItem(
-                            Icons.calendar_today_outlined,
-                            'Requested',
-                            DateFormat(
-                              'MMM d, yyyy',
-                            ).format(booking.requestedAt),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  booking.studentName,
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 16 : 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFF1D1B16),
+                                  ),
+                                ),
+                                Text(
+                                  'Booking Request #${booking.bookingId.substring(0, 5).toUpperCase()}',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 12 : 13,
+                                    color: Colors.grey[500],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFFBEB),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Text(
+                              'Pending Review',
+                              style: TextStyle(
+                                color: Color(0xFFD97706),
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          _buildInfoItem(
-                            Icons.payments_outlined,
-                            'Monthly Rate',
-                            '₱${NumberFormat('#,###').format(12345)}',
-                          ),
-                          _buildInfoItem(
-                            Icons.person_search_outlined,
-                            'Tenant Info',
-                            'View Details',
-                            isLink: true,
-                            onTap: () => _showTenantDetails(context),
-                          ),
-                        ],
-                      ),
+                      const SizedBox(height: 24),
+                      const Divider(color: Color(0xFFF1F5F9), height: 1),
+                      const SizedBox(height: 20),
+                      // Info Grid/Row
+                      if (isMobile)
+                        Column(
+                          children: [
+                            Row(
+                              children: [
+                                _buildInfoItem(
+                                  Icons.home_outlined,
+                                  'Property',
+                                  booking.propertyName,
+                                ),
+                                _buildInfoItem(
+                                  Icons.calendar_today_outlined,
+                                  'Requested',
+                                  DateFormat('MMM d, yyyy').format(booking.requestedAt),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                _buildInfoItem(
+                                  Icons.payments_outlined,
+                                  'Monthly Rate',
+                                  '₱${NumberFormat('#,###').format(booking.monthlyRate != 0 ? booking.monthlyRate : 5500)}',
+                                ),
+                                _buildInfoItem(
+                                  Icons.person_search_outlined,
+                                  'Tenant Info',
+                                  'View Details',
+                                  isLink: true,
+                                  onTap: () => _showTenantDetails(context),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      else
+                        Row(
+                          children: [
+                            _buildInfoItem(
+                              Icons.home_outlined,
+                              'Property',
+                              booking.propertyName,
+                            ),
+                            _buildInfoItem(
+                              Icons.calendar_today_outlined,
+                              'Request Date',
+                              DateFormat('MMM d, yyyy').format(booking.requestedAt),
+                            ),
+                            _buildInfoItem(
+                              Icons.payments_outlined,
+                              'Monthly Rate',
+                              '₱${NumberFormat('#,###').format(booking.monthlyRate != 0 ? booking.monthlyRate : 5500)}',
+                            ),
+                            _buildInfoItem(
+                              Icons.person_search_outlined,
+                              'Tenant Info',
+                              'View Details',
+                              isLink: true,
+                              onTap: () => _showTenantDetails(context),
+                            ),
+                          ],
+                        ),
                     ],
-                  )
-                else
-                  Row(
+                  ),
+                ),
+                // Premium rounded buttons side-by-side inside card padding
+                Padding(
+                  padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
+                  child: Row(
                     children: [
-                      _buildInfoItem(
-                        Icons.home_outlined,
-                        'Property',
-                        booking.propertyName,
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _handleAction(context, false),
+                          icon: const Icon(Icons.close, size: 18),
+                          label: const Text('Reject Request'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFFEF4444),
+                            side: const BorderSide(color: Color(0xFFEF4444)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
                       ),
-                      _buildInfoItem(
-                        Icons.calendar_today_outlined,
-                        'Request Date',
-                        DateFormat('MMM d, yyyy').format(booking.requestedAt),
-                      ),
-                      _buildInfoItem(
-                        Icons.payments_outlined,
-                        'Monthly Rate',
-                        '₱${NumberFormat('#,###').format(12345)}',
-                      ),
-                      _buildInfoItem(
-                        Icons.person_search_outlined,
-                        'Tenant Info',
-                        'View Details',
-                        isLink: true,
-                        onTap: () => _showTenantDetails(context),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _handleAction(context, true),
+                          icon: const Icon(Icons.check, size: 18),
+                          label: const Text('Approve Booking'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF10B981),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
-                  ),
-              ],
-            ),
-          ),
-          // Action Buttons
-          if (isMobile)
-            Column(
-              children: [
-                GestureDetector(
-                  onTap: () => _handleAction(context, true),
-                  child: Container(
-                    height: 52,
-                    width: double.infinity,
-                    color: const Color(0xFF10B981),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.check, color: Colors.white, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Approve Booking',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => _handleAction(context, false),
-                  child: Container(
-                    height: 52,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFEF4444),
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.close, color: Colors.white, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Reject Request',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            )
-          else
-            Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _handleAction(context, true),
-                    child: Container(
-                      height: 56,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF10B981),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.check, color: Colors.white, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            'Approve Booking',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _handleAction(context, false),
-                    child: Container(
-                      height: 56,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFEF4444),
-                        borderRadius: BorderRadius.only(
-                          bottomRight: Radius.circular(20),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.close, color: Colors.white, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            'Reject Request',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                 ),
               ],
             ),
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildProcessedCard(BuildContext context) {
     final status = booking.status;
+    bool isHovered = false;
 
     IconData statusIcon;
     Color badgeBgColor;
@@ -594,145 +510,168 @@ class _OwnerBookingCard extends StatelessWidget {
     final propertyProvider = context.watch<PropertyProvider>();
     final roomStatus = propertyProvider.getRoomStatusFromCache(booking.roomId);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: badgeBgColor,
-                child: Icon(statusIcon, color: badgeTextColor, size: 20),
+    return StatefulBuilder(
+      builder: (context, setStateBuilder) {
+        return MouseRegion(
+          onEnter: (_) => setStateBuilder(() => isHovered = true),
+          onExit: (_) => setStateBuilder(() => isHovered = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isHovered ? const Color(0xFF5287B2).withValues(alpha: 0.5) : const Color(0xFFF1F5F9),
+                width: isHovered ? 1.5 : 1.0,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      booking.studentName,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1D1B16),
-                      ),
-                    ),
-                    Text(
-                      booking.propertyName,
-                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_today_outlined,
-                          size: 12,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          DateFormat('MMM d, yyyy').format(booking.requestedAt),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Icon(
-                          Icons.payments_outlined,
-                          size: 12,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '₱${NumberFormat('#,###').format(booking.monthlyRate != 0 ? booking.monthlyRate : 5500)}/month',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: badgeBgColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  booking.statusLabel,
-                  style: TextStyle(
-                    color: badgeTextColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (status == BookingStatus.approved) ...[
-            const SizedBox(height: 16),
-            const Divider(),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                if (roomStatus != RoomStatus.occupied)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: OutlinedButton.icon(
-                      onPressed: () => _handleCheckIn(context),
-                      icon: const Icon(Icons.login_rounded, size: 16),
-                      label: const Text('Check-In Student'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF10B981),
-                        side: const BorderSide(color: Color(0xFF10B981)),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ),
-                ElevatedButton.icon(
-                  onPressed: () => _handleCheckOut(context),
-                  icon: const Icon(Icons.logout_rounded, size: 16),
-                  label: const Text('Complete Stay (Check-Out)'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3B82F6),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
+              boxShadow: [
+                BoxShadow(
+                  color: isHovered 
+                      ? const Color(0xFF5287B2).withValues(alpha: 0.06) 
+                      : Colors.black.withValues(alpha: 0.02),
+                  blurRadius: isHovered ? 16 : 8,
+                  offset: Offset(0, isHovered ? 6 : 4),
                 ),
               ],
             ),
-          ],
-        ],
-      ),
+            transform: Matrix4.translationValues(0.0, isHovered ? -2.0 : 0.0, 0.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: badgeBgColor,
+                      child: Icon(statusIcon, color: badgeTextColor, size: 20),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            booking.studentName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1D1B16),
+                            ),
+                          ),
+                          Text(
+                            booking.propertyName,
+                            style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today_outlined,
+                                size: 12,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                DateFormat('MMM d, yyyy').format(booking.requestedAt),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Icon(
+                                Icons.payments_outlined,
+                                size: 12,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '₱${NumberFormat('#,###').format(booking.monthlyRate != 0 ? booking.monthlyRate : 5500)}/month',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: badgeBgColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        booking.statusLabel,
+                        style: TextStyle(
+                          color: badgeTextColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (status == BookingStatus.approved) ...[
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (roomStatus != RoomStatus.occupied)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: OutlinedButton.icon(
+                            onPressed: () => _handleCheckIn(context),
+                            icon: const Icon(Icons.login_rounded, size: 16),
+                            label: const Text('Check-In Student'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF10B981),
+                              side: const BorderSide(color: Color(0xFF10B981)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ElevatedButton.icon(
+                        onPressed: () => _handleCheckOut(context),
+                        icon: const Icon(Icons.logout_rounded, size: 16),
+                        label: const Text('Complete Stay (Check-Out)'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF3B82F6),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -280,194 +280,223 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
 
   Widget _buildOwnerInfoSection(bool isDesktop) {
     final isMobile = MediaQuery.of(context).size.width < 600;
-    return Container(
-      padding: EdgeInsets.all(isMobile ? 20 : 32),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Owner Information',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    bool isHovered = false;
+    return StatefulBuilder(
+      builder: (context, setStateBuilder) {
+        return MouseRegion(
+          onEnter: (_) => setStateBuilder(() => isHovered = true),
+          onExit: (_) => setStateBuilder(() => isHovered = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            padding: EdgeInsets.all(isMobile ? 20 : 32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isHovered ? const Color(0xFF5287B2).withValues(alpha: 0.3) : const Color(0xFFE2E8F0),
+                width: isHovered ? 1.5 : 1.0,
               ),
-              ElevatedButton(
-                onPressed: _isSaving ? null : _handleSave,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF5287B2),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+              boxShadow: [
+                BoxShadow(
+                  color: isHovered 
+                      ? const Color(0xFF5287B2).withValues(alpha: 0.05) 
+                      : Colors.black.withValues(alpha: 0.04),
+                  blurRadius: isHovered ? 28 : 24,
+                  offset: const Offset(0, 8),
                 ),
-                child: _isSaving
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Text('Edit Profile'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          if (isMobile) ...[
-            PremiumTextField(
-              controller: _firstNameController,
-              label: 'First Name',
-              hintText: 'Enter first name',
+              ],
             ),
-            const SizedBox(height: 20),
-            PremiumTextField(
-              controller: _lastNameController,
-              label: 'Last Name',
-              hintText: 'Enter last name',
-            ),
-          ] else
-            Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: PremiumTextField(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Owner Information',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: _isSaving ? null : _handleSave,
+                      icon: const Icon(Icons.save_rounded, size: 16),
+                      label: _isSaving
+                          ? const Text('Saving...')
+                          : const Text('Save Changes'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF5287B2),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                if (isMobile) ...[
+                  PremiumTextField(
                     controller: _firstNameController,
                     label: 'First Name',
                     hintText: 'Enter first name',
                   ),
-                ),
-                const SizedBox(width: 24),
-                Expanded(
-                  child: PremiumTextField(
+                  const SizedBox(height: 20),
+                  PremiumTextField(
                     controller: _lastNameController,
                     label: 'Last Name',
                     hintText: 'Enter last name',
                   ),
-                ),
-              ],
-            ),
-          const SizedBox(height: 24),
-          if (isMobile) ...[
-            PremiumTextField(
-              controller: _emailController,
-              label: 'Email Address',
-              hintText: 'email@example.com',
-              readOnly: true,
-              icon: Icons.email_outlined,
-            ),
-            const SizedBox(height: 20),
-            PremiumTextField(
-              controller: _phoneController,
-              label: 'Phone Number',
-              hintText: '09123456789',
-              icon: Icons.phone_outlined,
-            ),
-          ] else
-            Row(
-              children: [
-                Expanded(
-                  child: PremiumTextField(
+                ] else
+                  Row(
+                    children: [
+                      Expanded(
+                        child: PremiumTextField(
+                          controller: _firstNameController,
+                          label: 'First Name',
+                          hintText: 'Enter first name',
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        child: PremiumTextField(
+                          controller: _lastNameController,
+                          label: 'Last Name',
+                          hintText: 'Enter last name',
+                        ),
+                      ),
+                    ],
+                  ),
+                const SizedBox(height: 24),
+                if (isMobile) ...[
+                  PremiumTextField(
                     controller: _emailController,
                     label: 'Email Address',
                     hintText: 'email@example.com',
                     readOnly: true,
                     icon: Icons.email_outlined,
                   ),
-                ),
-                const SizedBox(width: 24),
-                Expanded(
-                  child: PremiumTextField(
+                  const SizedBox(height: 20),
+                  PremiumTextField(
                     controller: _phoneController,
                     label: 'Phone Number',
                     hintText: '09123456789',
                     icon: Icons.phone_outlined,
                   ),
+                ] else
+                  Row(
+                    children: [
+                      Expanded(
+                        child: PremiumTextField(
+                          controller: _emailController,
+                          label: 'Email Address',
+                          hintText: 'email@example.com',
+                          readOnly: true,
+                          icon: Icons.email_outlined,
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        child: PremiumTextField(
+                          controller: _phoneController,
+                          label: 'Phone Number',
+                          hintText: '09123456789',
+                          icon: Icons.phone_outlined,
+                        ),
+                      ),
+                    ],
+                  ),
+                const SizedBox(height: 24),
+                PremiumTextField(
+                  controller: _addressController,
+                  label: 'Address',
+                  hintText: 'Enter your business address',
                 ),
               ],
             ),
-          const SizedBox(height: 24),
-          PremiumTextField(
-            controller: _addressController,
-            label: 'Address',
-            hintText: 'Enter your business address',
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildBusinessInfoSection(bool isDesktop) {
     final isMobile = MediaQuery.of(context).size.width < 600;
-    return Container(
-      padding: EdgeInsets.all(isMobile ? 20 : 32),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Business Information',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 24),
-          if (isMobile) ...[
-            PremiumTextField(
-              controller: _businessNameController,
-              label: 'Business Name',
-              hintText: 'Enter business name',
-              icon: Icons.business_outlined,
+    bool isHovered = false;
+    return StatefulBuilder(
+      builder: (context, setStateBuilder) {
+        return MouseRegion(
+          onEnter: (_) => setStateBuilder(() => isHovered = true),
+          onExit: (_) => setStateBuilder(() => isHovered = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            padding: EdgeInsets.all(isMobile ? 20 : 32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isHovered ? const Color(0xFF5287B2).withValues(alpha: 0.3) : const Color(0xFFE2E8F0),
+                width: isHovered ? 1.5 : 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: isHovered 
+                      ? const Color(0xFF5287B2).withValues(alpha: 0.05) 
+                      : Colors.black.withValues(alpha: 0.04),
+                  blurRadius: isHovered ? 28 : 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            PremiumTextField(
-              controller: _businessPermitController,
-              label: 'Business Permit No.',
-              hintText: 'BP-202X-XXXXX',
-            ),
-          ] else
-            Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: PremiumTextField(
+                const Text(
+                  'Business Information',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 24),
+                if (isMobile) ...[
+                  PremiumTextField(
                     controller: _businessNameController,
                     label: 'Business Name',
                     hintText: 'Enter business name',
                     icon: Icons.business_outlined,
                   ),
-                ),
-                const SizedBox(width: 24),
-                Expanded(
-                  child: PremiumTextField(
+                  const SizedBox(height: 20),
+                  PremiumTextField(
                     controller: _businessPermitController,
                     label: 'Business Permit No.',
                     hintText: 'BP-202X-XXXXX',
                   ),
-                ),
+                ] else
+                  Row(
+                    children: [
+                      Expanded(
+                        child: PremiumTextField(
+                          controller: _businessNameController,
+                          label: 'Business Name',
+                          hintText: 'Enter business name',
+                          icon: Icons.business_outlined,
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        child: PremiumTextField(
+                          controller: _businessPermitController,
+                          label: 'Business Permit No.',
+                          hintText: 'BP-202X-XXXXX',
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
 }

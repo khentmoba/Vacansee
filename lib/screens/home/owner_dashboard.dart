@@ -394,7 +394,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
             crossAxisCount: 4,
             crossAxisSpacing: 20,
             mainAxisSpacing: 20,
-            childAspectRatio: 1.6,
+            childAspectRatio: 2.3,
             children: [
               _buildStatCard(
                 Icons.home_work_rounded,
@@ -402,6 +402,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 'Active Listings',
                 const Color(0xFF5287B2),
                 true,
+                onTap: () => setState(() => _currentIndex = 1),
               ),
               _buildStatCard(
                 Icons.pending_actions_rounded,
@@ -409,6 +410,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 'Pending Requests',
                 Colors.orangeAccent,
                 true,
+                onTap: () => setState(() => _currentIndex = 2),
               ),
               _buildStatCard(
                 Icons.check_circle_rounded,
@@ -416,6 +418,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 'Occupied Rooms',
                 const Color(0xFF10B981),
                 true,
+                onTap: () => setState(() => _currentIndex = 4),
               ),
               _buildStatCard(
                 Icons.home_outlined,
@@ -423,6 +426,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 'Available Rooms',
                 Colors.indigo,
                 true,
+                onTap: () => setState(() => _currentIndex = 4),
               ),
             ],
           ),
@@ -667,7 +671,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
       crossAxisCount: 2,
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
-      childAspectRatio: 1.1,
+      childAspectRatio: 1.8,
       children: [
         _buildStatCard(
           Icons.home_rounded,
@@ -675,6 +679,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
           'Total Listings',
           const Color(0xFF3B82F6),
           false,
+          onTap: () => setState(() => _currentIndex = 1),
         ),
         _buildStatCard(
           Icons.check_circle_rounded,
@@ -682,6 +687,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
           'Occupied Rooms',
           const Color(0xFF10B981),
           false,
+          onTap: () {},
         ),
         _buildStatCard(
           Icons.home_outlined,
@@ -689,6 +695,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
           'Available Rooms',
           const Color(0xFF8B5CF6),
           false,
+          onTap: () {},
         ),
         _buildStatCard(
           Icons.calendar_today_rounded,
@@ -696,6 +703,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
           'Pending Requests',
           const Color(0xFFF59E0B),
           false,
+          onTap: () => setState(() => _currentIndex = 1),
         ),
       ],
     );
@@ -767,229 +775,298 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     String value,
     String label,
     Color color,
-    bool isDesktop,
-  ) {
-    return Container(
-      alignment: Alignment.topLeft,
-      padding: EdgeInsets.all(isDesktop ? 24 : 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: isDesktop ? 12 : 11,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF64748B),
-                ),
+    bool isDesktop, {
+    VoidCallback? onTap,
+  }) {
+    bool isHovered = false;
+    return StatefulBuilder(
+      builder: (context, setStateBuilder) {
+        return MouseRegion(
+          onEnter: (_) => setStateBuilder(() => isHovered = true),
+          onExit: (_) => setStateBuilder(() => isHovered = false),
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: onTap,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.symmetric(
+                horizontal: isDesktop ? 20 : 14,
+                vertical: isDesktop ? 16 : 10,
               ),
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isHovered ? color.withValues(alpha: 0.5) : const Color(0xFFE2E8F0),
+                  width: isHovered ? 1.5 : 1.0,
                 ),
-                child: Icon(icon, color: color, size: 18),
+                boxShadow: [
+                  BoxShadow(
+                    color: isHovered 
+                        ? color.withValues(alpha: 0.1) 
+                        : Colors.black.withValues(alpha: 0.02),
+                    blurRadius: isHovered ? 12 : 6,
+                    offset: Offset(0, isHovered ? 4 : 2),
+                  ),
+                ],
               ),
-            ],
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF0F172A),
-              letterSpacing: -0.5,
+              transform: Matrix4.translationValues(0.0, isHovered ? -2.0 : 0.0, 0.0),
+              child: Row(
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: EdgeInsets.all(isDesktop ? 12 : 10),
+                    decoration: BoxDecoration(
+                      color: isHovered 
+                          ? color.withValues(alpha: 0.15) 
+                          : color.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      icon, 
+                      color: color, 
+                      size: isDesktop ? 22 : 18,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: isDesktop ? 13 : 11,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF64748B),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          value,
+                          style: TextStyle(
+                            fontSize: isDesktop ? 22 : 18,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF0F172A),
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildPropertyCard(PropertyModel property) {
     final isDesktop = MediaQuery.of(context).size.width >= 900;
     final occupiedRooms = property.totalRooms - property.availableRooms;
+    bool isHovered = false;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image
-          Expanded(
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  child: property.coverImageUrl != null
-                      ? Image.network(
-                          property.coverImageUrl!,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                        )
-                      : Container(
-                          color: const Color(0xFFF8FAFC),
-                          child: Center(
-                            child: Icon(
-                              Icons.home_work_rounded,
-                              size: 40,
-                              color: const Color(0xFF5287B2).withValues(alpha: 0.3),
-                            ),
-                          ),
-                        ),
+    return StatefulBuilder(
+      builder: (context, setStateBuilder) {
+        return MouseRegion(
+          onEnter: (_) => setStateBuilder(() => isHovered = true),
+          onExit: (_) => setStateBuilder(() => isHovered = false),
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                FadePageRoute(
+                  child: EditPropertyScreen(property: property),
                 ),
-                // Edit Button Overlay
-                Positioned(
-                  top: 12,
-                  left: 12,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        FadePageRoute(
-                          child: EditPropertyScreen(property: property),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.edit_rounded, size: 12, color: Color(0xFF0F172A)),
-                          SizedBox(width: 4),
-                          Text(
-                            'Edit',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF0F172A),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+              );
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isHovered ? const Color(0xFF5287B2).withValues(alpha: 0.5) : const Color(0xFFE2E8F0),
+                  width: isHovered ? 1.5 : 1.0,
                 ),
-                // Available Badge Overlay
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: property.hasVacancy ? const Color(0xFF10B981) : Colors.redAccent,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      property.hasVacancy ? 'Available' : 'Full',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Info Section
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  property.name,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_on_rounded,
-                      size: 14,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        property.address,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w400,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                if (isDesktop) ...[
-                  const SizedBox(height: 12),
-                  const Divider(color: Color(0xFFF1F5F9), height: 1),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Occupancy: $occupiedRooms/${property.totalRooms} Rooms',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF64748B),
-                        ),
-                      ),
-                      Text(
-                        '₱${property.monthlyPrice}/mo',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF5287B2),
-                        ),
-                      ),
-                    ],
+                boxShadow: [
+                  BoxShadow(
+                    color: isHovered 
+                        ? const Color(0xFF5287B2).withValues(alpha: 0.1) 
+                        : Colors.black.withValues(alpha: 0.03),
+                    blurRadius: isHovered ? 16 : 8,
+                    offset: Offset(0, isHovered ? 6 : 4),
                   ),
                 ],
-              ],
+              ),
+              transform: Matrix4.translationValues(0.0, isHovered ? -4.0 : 0.0, 0.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Image
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                          child: property.coverImageUrl != null
+                              ? Image.network(
+                                  property.coverImageUrl!,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                )
+                              : Container(
+                                  color: const Color(0xFFF8FAFC),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.home_work_rounded,
+                                      size: 40,
+                                      color: const Color(0xFF5287B2).withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                ),
+                        ),
+                        // Edit Button Overlay
+                        Positioned(
+                          top: 12,
+                          left: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.edit_rounded, size: 12, color: Color(0xFF0F172A)),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Edit',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF0F172A),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Available Badge Overlay
+                        Positioned(
+                          top: 12,
+                          right: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: property.hasVacancy ? const Color(0xFF10B981) : Colors.redAccent,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              property.hasVacancy ? 'Available' : 'Full',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Info Section
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          property.name,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF0F172A),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on_rounded,
+                              size: 14,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                property.address,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (isDesktop) ...[
+                          const SizedBox(height: 12),
+                          const Divider(color: Color(0xFFF1F5F9), height: 1),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Occupancy: $occupiedRooms/${property.totalRooms} Rooms',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF64748B),
+                                ),
+                              ),
+                              Text(
+                                '₱${property.monthlyPrice}/mo',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF5287B2),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
