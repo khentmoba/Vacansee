@@ -71,6 +71,7 @@ class NotificationService {
         'type': type,
         'is_read': false,
         'created_at': DateTime.now().toIso8601String(),
+        // ignore: use_null_aware_elements
         if (metadata != null) 'metadata': metadata,
       });
     } catch (e) {

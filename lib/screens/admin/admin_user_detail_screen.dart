@@ -384,7 +384,7 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
           Text('Role', style: GoogleFonts.workSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
           const SizedBox(height: 8),
           DropdownButtonFormField<UserRole>(
-            value: _selectedRole,
+            initialValue: _selectedRole,
             items: UserRole.values.map((r) => DropdownMenuItem(value: r, child: Text(r.name.toUpperCase()))).toList(),
             onChanged: (v) {
               if (v != null) setState(() => _selectedRole = v);
