@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/booking_model.dart';
@@ -25,159 +26,135 @@ class _AdminBookingCardState extends State<AdminBookingCard> {
     final currencyFormat = NumberFormat.currency(symbol: '₱', decimalDigits: 0);
     final dateFormat = DateFormat('MMM d, yyyy');
     final name = widget.booking.studentName;
-    final initial = name.isNotEmpty ? name[0].toUpperCase() : 'B';
+    final initials = name.isNotEmpty
+        ? name.trim().split(' ').map((l) => l.isNotEmpty ? l[0] : '').take(2).join().toUpperCase()
+        : 'B';
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: AppDurations.medium,
         curve: Curves.easeOutCubic,
         margin: const EdgeInsets.only(bottom: 16),
-        transform: _isHovered
-            ? Matrix4.translationValues(0, -3, 0)
-            : Matrix4.identity(),
+        transform: _isHovered ? Matrix4.translationValues(0, -3, 0) : Matrix4.identity(),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: _isHovered
-                ? AppColors.primary.withValues(alpha: 0.15)
-                : Colors.black.withValues(alpha: 0.05),
+            color: _isHovered ? AppColors.primary.withValues(alpha: 0.15) : AppColors.border,
             width: 1.5,
           ),
           boxShadow: [
-            BoxShadow(
-              color: _isHovered
-                  ? Colors.black.withValues(alpha: 0.06)
-                  : Colors.black.withValues(alpha: 0.02),
-              blurRadius: _isHovered ? 16 : 8,
-              offset: _isHovered ? const Offset(0, 6) : const Offset(0, 3),
-            ),
+            _isHovered ? AppShadows.lg : AppShadows.md,
           ],
         ),
-        child: ClipRRect(
+        child: InkWell(
+          onTap: widget.onTap,
           borderRadius: BorderRadius.circular(20),
-          child: InkWell(
-            onTap: widget.onTap,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final isCompact = constraints.maxWidth < 750;
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 750;
 
-                  final avatar = CircleAvatar(
-                    radius: 22,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                    child: Text(
-                      initial,
-                      style: const TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
+                final avatar = CircleAvatar(
+                  radius: 22,
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  child: Text(
+                    initials,
+                    style: GoogleFonts.outfit(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                );
+
+                final bookingHeader = Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: GoogleFonts.outfit(
                         fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.2,
                       ),
                     ),
-                  );
+                    const SizedBox(height: 4),
+                    Text(
+                      'Booking #${widget.booking.bookingId.substring(0, 5).toUpperCase()}',
+                      style: GoogleFonts.workSans(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                );
 
-                  final bookingHeader = Column(
+                final propertyBlock = _InfoBlock(
+                  label: 'Property',
+                  title: widget.booking.propertyName,
+                  subTitle: 'Owner: ${widget.booking.ownerName ?? 'Unknown'}',
+                  icon: Icons.home_work_outlined,
+                );
+
+                final dateBlock = _InfoBlock(
+                  label: 'Booking Date',
+                  title: dateFormat.format(widget.booking.requestedAt),
+                  icon: Icons.calendar_today_outlined,
+                );
+
+                final rateBlock = _InfoBlock(
+                  label: 'Monthly Rate',
+                  title: currencyFormat.format(widget.booking.monthlyRate),
+                  icon: Icons.payments_outlined,
+                  titleColor: AppColors.primary,
+                );
+
+                final statusChip = _StatusChip(status: widget.booking.status);
+
+                if (isCompact) {
+                  return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
-                          letterSpacing: -0.2,
-                        ),
+                      Row(
+                        children: [
+                          avatar,
+                          const SizedBox(width: 14),
+                          Expanded(child: bookingHeader),
+                          statusChip,
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Booking ID: #${widget.booking.bookingId.substring(0, 5).toUpperCase()}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[500],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                      const SizedBox(height: 16),
+                      const Divider(height: 1, color: AppColors.divider),
+                      const SizedBox(height: 16),
+                      Row(children: [Expanded(child: propertyBlock), Expanded(child: rateBlock)]),
+                      const SizedBox(height: 14),
+                      Row(children: [Expanded(child: dateBlock), const Spacer()]),
                     ],
                   );
+                }
 
-                  final propertyBlock = _InfoBlock(
-                    label: 'Property',
-                    title: widget.booking.propertyName,
-                    subTitle: 'Owner: ${widget.booking.ownerName ?? 'Unknown'}',
-                    icon: Icons.home_work_outlined,
-                  );
-
-                  final dateBlock = _InfoBlock(
-                    label: 'Booking Date',
-                    title: dateFormat.format(widget.booking.requestedAt),
-                    icon: Icons.calendar_today_outlined,
-                  );
-
-                  final rateBlock = _InfoBlock(
-                    label: 'Monthly Rate',
-                    title: currencyFormat.format(widget.booking.monthlyRate),
-                    icon: Icons.payments_outlined,
-                    titleColor: AppColors.primary,
-                  );
-
-                  final statusChip = _StatusChip(status: widget.booking.status);
-
-                  if (isCompact) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            avatar,
-                            const SizedBox(width: 14),
-                            Expanded(child: bookingHeader),
-                            statusChip,
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        const Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Color(0xFFF1F5F9),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(child: propertyBlock),
-                            Expanded(child: rateBlock),
-                          ],
-                        ),
-                        const SizedBox(height: 14),
-                        Row(
-                          children: [
-                            Expanded(child: dateBlock),
-                            const Spacer(),
-                          ],
-                        ),
-                      ],
-                    );
-                  }
-
-                  return Row(
-                    children: [
-                      avatar,
-                      const SizedBox(width: 16),
-                      Expanded(flex: 3, child: bookingHeader),
-                      const SizedBox(width: 16),
-                      Expanded(flex: 4, child: propertyBlock),
-                      const SizedBox(width: 16),
-                      Expanded(flex: 3, child: dateBlock),
-                      const SizedBox(width: 16),
-                      Expanded(flex: 3, child: rateBlock),
-                      const SizedBox(width: 16),
-                      statusChip,
-                    ],
-                  );
-                },
-              ),
+                return Row(
+                  children: [
+                    avatar,
+                    const SizedBox(width: 16),
+                    Expanded(flex: 3, child: bookingHeader),
+                    const SizedBox(width: 16),
+                    Expanded(flex: 4, child: propertyBlock),
+                    const SizedBox(width: 16),
+                    Expanded(flex: 3, child: dateBlock),
+                    const SizedBox(width: 16),
+                    Expanded(flex: 3, child: rateBlock),
+                    const SizedBox(width: 16),
+                    statusChip,
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -207,17 +184,17 @@ class _InfoBlock extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: Colors.grey[400]),
-        const SizedBox(width: 10),
+        Icon(icon, size: 16, color: AppColors.textMuted),
+        const SizedBox(width: 8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: GoogleFonts.workSans(
                   fontSize: 10,
-                  color: Colors.grey[500],
+                  color: AppColors.textMuted,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.3,
                 ),
@@ -225,7 +202,7 @@ class _InfoBlock extends StatelessWidget {
               const SizedBox(height: 3),
               Text(
                 title,
-                style: TextStyle(
+                style: GoogleFonts.outfit(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: titleColor ?? AppColors.textPrimary,
@@ -237,9 +214,9 @@ class _InfoBlock extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   subTitle!,
-                  style: TextStyle(
+                  style: GoogleFonts.workSans(
                     fontSize: 11,
-                    color: Colors.grey[500],
+                    color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
                   ),
                   maxLines: 1,
@@ -278,7 +255,7 @@ class _StatusChip extends StatelessWidget {
         label = 'Rejected';
         break;
       default:
-        color = Colors.grey;
+        color = AppColors.textMuted;
         label = status.name.toUpperCase();
     }
 
@@ -300,7 +277,7 @@ class _StatusChip extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               color: color,
               fontWeight: FontWeight.w800,
               fontSize: 11,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_theme.dart';
 
 class QuickActionCard extends StatefulWidget {
@@ -31,11 +32,9 @@ class _QuickActionCardState extends State<QuickActionCard> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: AppDurations.medium,
         curve: Curves.easeOutCubic,
-        transform: _isHovered
-            ? Matrix4.translationValues(4, 0, 0)
-            : Matrix4.identity(),
+        transform: _isHovered ? Matrix4.translationValues(4, 0, 0) : Matrix4.identity(),
         child: InkWell(
           onTap: widget.onTap,
           borderRadius: BorderRadius.circular(16),
@@ -45,33 +44,36 @@ class _QuickActionCardState extends State<QuickActionCard> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: _isHovered
-                    ? themeColor.withValues(alpha: 0.3)
-                    : Colors.black.withValues(alpha: 0.05),
+                color: _isHovered ? themeColor.withValues(alpha: 0.3) : AppColors.border,
                 width: 1.5,
               ),
               boxShadow: [
-                BoxShadow(
-                  color: _isHovered
-                      ? themeColor.withValues(alpha: 0.06)
-                      : Colors.black.withValues(alpha: 0.01),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
+                _isHovered
+                    ? AppShadows.lg.copyWith(color: themeColor.withValues(alpha: 0.06))
+                    : AppShadows.sm,
               ],
             ),
             child: Row(
               children: [
                 AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
+                  duration: AppDurations.medium,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: _isHovered
-                        ? themeColor.withValues(alpha: 0.15)
-                        : themeColor.withValues(alpha: 0.08),
+                    gradient: _isHovered
+                        ? LinearGradient(
+                            colors: [themeColor, themeColor.withValues(alpha: 0.8)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          )
+                        : null,
+                    color: _isHovered ? null : themeColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(widget.icon, size: 24, color: themeColor),
+                  child: Icon(
+                    widget.icon,
+                    size: 24,
+                    color: _isHovered ? Colors.white : themeColor,
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -81,7 +83,7 @@ class _QuickActionCardState extends State<QuickActionCard> {
                     children: [
                       Text(
                         widget.label,
-                        style: const TextStyle(
+                        style: GoogleFonts.outfit(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
                           color: AppColors.textPrimary,
@@ -92,9 +94,9 @@ class _QuickActionCardState extends State<QuickActionCard> {
                         const SizedBox(height: 4),
                         Text(
                           widget.subLabel!,
-                          style: TextStyle(
+                          style: GoogleFonts.workSans(
                             fontSize: 12,
-                            color: Colors.grey[500],
+                            color: AppColors.textMuted,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -105,7 +107,7 @@ class _QuickActionCardState extends State<QuickActionCard> {
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 14,
-                  color: _isHovered ? themeColor : Colors.grey[300],
+                  color: _isHovered ? themeColor : AppColors.border,
                 ),
               ],
             ),

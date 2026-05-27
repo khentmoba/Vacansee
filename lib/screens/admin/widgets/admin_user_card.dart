@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/user_model.dart';
 
@@ -24,34 +25,26 @@ class _AdminUserCardState extends State<AdminUserCard> {
   @override
   Widget build(BuildContext context) {
     final name = widget.user.displayName;
-    final initial = name.isNotEmpty ? name[0].toUpperCase() : 'U';
+    final initials = name.isNotEmpty
+        ? name.trim().split(' ').map((l) => l.isNotEmpty ? l[0] : '').take(2).join().toUpperCase()
+        : 'U';
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: AppDurations.medium,
         curve: Curves.easeOutCubic,
-        transform: _isHovered
-            ? Matrix4.translationValues(0, -4, 0)
-            : Matrix4.identity(),
+        transform: _isHovered ? Matrix4.translationValues(0, -4, 0) : Matrix4.identity(),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: _isHovered
-                ? AppColors.primary.withValues(alpha: 0.15)
-                : Colors.black.withValues(alpha: 0.05),
+            color: _isHovered ? AppColors.primary.withValues(alpha: 0.15) : AppColors.border,
             width: 1.5,
           ),
           boxShadow: [
-            BoxShadow(
-              color: _isHovered
-                  ? Colors.black.withValues(alpha: 0.06)
-                  : Colors.black.withValues(alpha: 0.02),
-              blurRadius: _isHovered ? 16 : 8,
-              offset: _isHovered ? const Offset(0, 6) : const Offset(0, 3),
-            ),
+            _isHovered ? AppShadows.lg : AppShadows.md,
           ],
         ),
         padding: const EdgeInsets.all(20),
@@ -64,8 +57,8 @@ class _AdminUserCardState extends State<AdminUserCard> {
                   radius: 20,
                   backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                   child: Text(
-                    initial,
-                    style: const TextStyle(
+                    initials,
+                    style: GoogleFonts.outfit(
                       color: AppColors.primary,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -79,7 +72,7 @@ class _AdminUserCardState extends State<AdminUserCard> {
                     children: [
                       Text(
                         name,
-                        style: const TextStyle(
+                        style: GoogleFonts.outfit(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary,
@@ -96,18 +89,18 @@ class _AdminUserCardState extends State<AdminUserCard> {
               ],
             ),
             const SizedBox(height: 18),
-            const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
+            const Divider(height: 1, color: AppColors.divider),
             const SizedBox(height: 16),
             Row(
               children: [
-                Icon(Icons.email_outlined, size: 14, color: Colors.grey[400]),
+                Icon(Icons.email_outlined, size: 14, color: AppColors.textMuted),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     widget.user.email,
-                    style: TextStyle(
+                    style: GoogleFonts.workSans(
                       fontSize: 12,
-                      color: Colors.grey[600],
+                      color: AppColors.textMuted,
                       fontWeight: FontWeight.w500,
                     ),
                     maxLines: 1,
@@ -119,14 +112,14 @@ class _AdminUserCardState extends State<AdminUserCard> {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.phone_outlined, size: 14, color: Colors.grey[400]),
+                Icon(Icons.phone_outlined, size: 14, color: AppColors.textMuted),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     widget.user.phoneNumber ?? 'No phone number',
-                    style: TextStyle(
+                    style: GoogleFonts.workSans(
                       fontSize: 12,
-                      color: Colors.grey[600],
+                      color: AppColors.textMuted,
                       fontWeight: FontWeight.w500,
                     ),
                     maxLines: 1,
@@ -146,13 +139,11 @@ class _AdminUserCardState extends State<AdminUserCard> {
                       foregroundColor: Colors.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    child: const Text(
+                    child: Text(
                       'View Details',
-                      style: TextStyle(
+                      style: GoogleFonts.outfit(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -163,17 +154,11 @@ class _AdminUserCardState extends State<AdminUserCard> {
                 IconButton(
                   onPressed: widget.onEdit,
                   style: IconButton.styleFrom(
-                    backgroundColor: Colors.grey[100],
+                    backgroundColor: AppColors.divider,
                     padding: const EdgeInsets.all(12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  icon: Icon(
-                    Icons.edit_outlined,
-                    size: 16,
-                    color: Colors.grey[700],
-                  ),
+                  icon: Icon(Icons.edit_outlined, size: 16, color: AppColors.textMuted),
                 ),
               ],
             ),
@@ -208,7 +193,7 @@ class _RoleBadge extends StatelessWidget {
         label = 'Admin';
         break;
       default:
-        color = Colors.grey;
+        color = AppColors.textMuted;
         label = 'Unknown';
     }
 
@@ -217,6 +202,7 @@ class _RoleBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -229,7 +215,7 @@ class _RoleBadge extends StatelessWidget {
           const SizedBox(width: 5),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               color: color,
               fontWeight: FontWeight.w800,
               fontSize: 10,

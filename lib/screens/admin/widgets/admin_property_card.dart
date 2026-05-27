@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/property_model.dart';
@@ -23,37 +24,28 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(symbol: '₱', decimalDigits: 0);
-    final statusColor = widget.property.hasVacancy
-        ? AppColors.success
-        : AppColors.error;
+    final statusColor = widget.property.hasVacancy ? AppColors.success : AppColors.error;
     final statusText = widget.property.hasVacancy ? 'Available' : 'Full';
+    final occupancyPercent = widget.property.totalRooms > 0
+        ? (widget.property.totalRooms - widget.property.availableRooms) / widget.property.totalRooms
+        : 0.0;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
+        duration: AppDurations.medium,
         curve: Curves.easeOutCubic,
-        transform: _isHovered
-            ? Matrix4.translationValues(0, -6, 0)
-            : Matrix4.identity(),
+        transform: _isHovered ? Matrix4.translationValues(0, -6, 0) : Matrix4.identity(),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: _isHovered
-                ? AppColors.primary.withValues(alpha: 0.15)
-                : Colors.black.withValues(alpha: 0.05),
+            color: _isHovered ? AppColors.primary.withValues(alpha: 0.15) : AppColors.border,
             width: 1.5,
           ),
           boxShadow: [
-            BoxShadow(
-              color: _isHovered
-                  ? Colors.black.withValues(alpha: 0.08)
-                  : Colors.black.withValues(alpha: 0.03),
-              blurRadius: _isHovered ? 24 : 12,
-              offset: _isHovered ? const Offset(0, 10) : const Offset(0, 4),
-            ),
+            _isHovered ? AppShadows.lg : AppShadows.md,
           ],
         ),
         clipBehavior: Clip.antiAlias,
@@ -63,7 +55,7 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image with Overlays
+              // Image
               Stack(
                 children: [
                   AnimatedScale(
@@ -76,28 +68,25 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: NetworkImage(
-                            widget.property.coverImageUrl ??
-                                'https://via.placeholder.com/400x200?text=No+Image',
+                            widget.property.coverImageUrl ?? 'https://via.placeholder.com/400x200?text=No+Image',
                           ),
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
+                  // Gradient scrim
                   Container(
                     height: 180,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withValues(alpha: 0.5),
-                        ],
+                        colors: [Colors.transparent, Colors.black.withValues(alpha: 0.5)],
                       ),
                     ),
                   ),
-                  // Owner Overlay (Frosted glass effect badge)
+                  // Owner badge
                   Positioned(
                     top: 14,
                     left: 14,
@@ -105,14 +94,11 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         color: Colors.white.withValues(alpha: 0.9),
                         child: Text(
                           'Owner: ${widget.property.ownerName ?? 'Unknown'}',
-                          style: const TextStyle(
+                          style: GoogleFonts.outfit(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
@@ -123,15 +109,12 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                       ),
                     ),
                   ),
-                  // Status Overlay with Dot Indicator
+                  // Status badge
                   Positioned(
                     top: 14,
                     right: 14,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(100),
@@ -143,15 +126,12 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                           Container(
                             width: 6,
                             height: 6,
-                            decoration: BoxDecoration(
-                              color: statusColor,
-                              shape: BoxShape.circle,
-                            ),
+                            decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
                           ),
                           const SizedBox(width: 6),
                           Text(
                             statusText,
-                            style: TextStyle(
+                            style: GoogleFonts.outfit(
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
                               color: statusColor,
@@ -163,6 +143,7 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                   ),
                 ],
               ),
+              // Content
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -170,7 +151,7 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                   children: [
                     Text(
                       widget.property.name,
-                      style: const TextStyle(
+                      style: GoogleFonts.outfit(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary,
@@ -182,18 +163,14 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(
-                          Icons.location_on_outlined,
-                          size: 14,
-                          color: Colors.grey[500],
-                        ),
+                        Icon(Icons.location_on_outlined, size: 14, color: AppColors.textMuted),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             widget.property.address,
-                            style: TextStyle(
+                            style: GoogleFonts.workSans(
                               fontSize: 12,
-                              color: Colors.grey[500],
+                              color: AppColors.textMuted,
                               fontWeight: FontWeight.w500,
                             ),
                             maxLines: 1,
@@ -202,12 +179,21 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    const Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: Color(0xFFF1F5F9),
+                    const SizedBox(height: 10),
+                    // Occupancy bar
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: occupancyPercent,
+                        backgroundColor: AppColors.divider,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          occupancyPercent > 0.8 ? AppColors.error : AppColors.success,
+                        ),
+                        minHeight: 4,
+                      ),
                     ),
+                    const SizedBox(height: 10),
+                    const Divider(height: 1, color: AppColors.divider),
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -216,10 +202,8 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                           text: TextSpan(
                             children: [
                               TextSpan(
-                                text: currencyFormat.format(
-                                  widget.property.priceRange.min,
-                                ),
-                                style: const TextStyle(
+                                text: currencyFormat.format(widget.property.priceRange.min),
+                                style: GoogleFonts.outfit(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w900,
                                   color: AppColors.primary,
@@ -227,9 +211,9 @@ class _AdminPropertyCardState extends State<AdminPropertyCard> {
                               ),
                               TextSpan(
                                 text: '/mo',
-                                style: TextStyle(
+                                style: GoogleFonts.workSans(
                                   fontSize: 12,
-                                  color: Colors.grey[500],
+                                  color: AppColors.textMuted,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),

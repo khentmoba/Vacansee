@@ -17,7 +17,8 @@ class RegisterScreen extends StatefulWidget {
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends State<RegisterScreen>
+    with SingleTickerProviderStateMixin {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _contactController = TextEditingController();
@@ -26,6 +27,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePassword = true;
   bool _agreedToTerms = false;
   UserRole? _selectedRole;
+  late final AnimationController _animationController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
 
   final Map<String, String?> _errors = {
     'firstName': null,
@@ -38,34 +42,55 @@ class _RegisterScreenState extends State<RegisterScreen> {
   };
 
   @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.04), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutQuad,
+          ),
+        );
+    _animationController.forward();
+  }
+
+  @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _contactController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
   void _validateAndSubmit() {
     setState(() {
-      _errors['firstName'] =
-          _firstNameController.text.isEmpty ? 'Required' : null;
-      _errors['lastName'] =
-          _lastNameController.text.isEmpty ? 'Required' : null;
-      _errors['contact'] =
-          _contactController.text.isEmpty ? 'Required' : null;
+      _errors['firstName'] = _firstNameController.text.isEmpty
+          ? 'Required'
+          : null;
+      _errors['lastName'] = _lastNameController.text.isEmpty
+          ? 'Required'
+          : null;
+      _errors['contact'] = _contactController.text.isEmpty ? 'Required' : null;
       _errors['email'] =
           _emailController.text.isEmpty || !_emailController.text.contains('@')
-              ? 'Please enter a valid email'
-              : null;
+          ? 'Please enter a valid email'
+          : null;
       _errors['password'] = _passwordController.text.length < 6
           ? 'Password must be at least 6 characters'
           : null;
-      _errors['role'] =
-          _selectedRole == null ? 'Please select a role' : null;
-      _errors['terms'] =
-          !_agreedToTerms ? 'You must agree to the terms' : null;
+      _errors['role'] = _selectedRole == null ? 'Please select a role' : null;
+      _errors['terms'] = !_agreedToTerms ? 'You must agree to the terms' : null;
     });
 
     if (_errors.values.every((e) => e == null)) {
@@ -108,160 +133,98 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 900;
 
     return Scaffold(
       body: AuthBackground(
-        child: isMobile
-            ? _buildMobileLayout(authProvider)
-            : _buildDesktopLayout(authProvider),
-      ),
-    );
-  }
-
-  Widget _buildDesktopLayout(AuthProvider authProvider) {
-    return Row(
-      children: [
-        Expanded(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 60),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.25),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  child: GlassCard(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 32,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      AppColors.primary,
+                                      AppColors.secondary,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(14),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.primary.withValues(
+                                        alpha: 0.25,
+                                      ),
+                                      blurRadius: 16,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ],
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.home_work_rounded,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              const Text(
+                                'VacanSee',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        const SizedBox(height: 24),
+                        const Text(
+                          'Create Account',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Fill in your details to get started with VacanSee',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        _buildForm(authProvider),
                       ],
                     ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.home_work_rounded,
-                        color: Colors.white,
-                        size: 34,
-                      ),
-                    ),
                   ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Join VacanSee',
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Create your account and start\nfinding your perfect space',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.textSecondary,
-                      height: 1.6,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 48),
-              child: GlassCard(
-                padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 460),
-                  child: _buildForm(authProvider),
                 ),
               ),
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMobileLayout(AuthProvider authProvider) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          children: [
-            const SizedBox(height: 16),
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.25),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.home_work_rounded,
-                  color: Colors.white,
-                  size: 30,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'VacanSee',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 24),
-            GlassCard(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Create Account',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Fill in your details to get started',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  _buildForm(authProvider),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -294,7 +257,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 18, color: AppColors.error),
+                  icon: const Icon(
+                    Icons.close,
+                    size: 18,
+                    color: AppColors.error,
+                  ),
                   onPressed: authProvider.clearError,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -377,108 +344,128 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SizedBox(height: 24),
 
         _buildLabel('I am a:'),
-        Container(
-          height: 50,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25),
-            border: Border.all(
-              color: _errors['role'] != null
-                  ? AppColors.error
-                  : AppColors.border,
-              width: 1.5,
-            ),
-          ),
-          padding: const EdgeInsets.all(4),
-          child: Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedRole = UserRole.student;
-                      _clearError('role');
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    decoration: BoxDecoration(
+        Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedRole = UserRole.student;
+                    _clearError('role');
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: _selectedRole == UserRole.student
+                        ? AppColors.primaryContainer.withValues(alpha: 0.5)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
                       color: _selectedRole == UserRole.student
                           ? AppColors.primary
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(21),
+                          : _errors['role'] != null
+                          ? AppColors.error
+                          : AppColors.border,
+                      width: _selectedRole == UserRole.student ? 2 : 1.5,
                     ),
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.school_rounded,
-                          size: 18,
+                    boxShadow: _selectedRole == UserRole.student
+                        ? [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.08),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.school_rounded,
+                        size: 26,
+                        color: _selectedRole == UserRole.student
+                            ? AppColors.primary
+                            : const Color(0xFF7A7A7A),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Tenant',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                           color: _selectedRole == UserRole.student
-                              ? Colors.white
+                              ? AppColors.primary
                               : const Color(0xFF7A7A7A),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Tenant',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: _selectedRole == UserRole.student
-                                ? Colors.white
-                                : const Color(0xFF7A7A7A),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedRole = UserRole.owner;
-                      _clearError('role');
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    decoration: BoxDecoration(
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedRole = UserRole.owner;
+                    _clearError('role');
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: _selectedRole == UserRole.owner
+                        ? AppColors.primaryContainer.withValues(alpha: 0.5)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
                       color: _selectedRole == UserRole.owner
                           ? AppColors.primary
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(21),
+                          : _errors['role'] != null
+                          ? AppColors.error
+                          : AppColors.border,
+                      width: _selectedRole == UserRole.owner ? 2 : 1.5,
                     ),
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.business_rounded,
-                          size: 18,
+                    boxShadow: _selectedRole == UserRole.owner
+                        ? [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.08),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.business_rounded,
+                        size: 26,
+                        color: _selectedRole == UserRole.owner
+                            ? AppColors.primary
+                            : const Color(0xFF7A7A7A),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Owner',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                           color: _selectedRole == UserRole.owner
-                              ? Colors.white
+                              ? AppColors.primary
                               : const Color(0xFF7A7A7A),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Owner',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: _selectedRole == UserRole.owner
-                                ? Colors.white
-                                : const Color(0xFF7A7A7A),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         if (_errors['role'] != null)
           Padding(
@@ -653,10 +640,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               const Text(
                 "Already have an account? ",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                ),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
               ),
               GestureDetector(
                 onTap: () => Navigator.pushReplacement(

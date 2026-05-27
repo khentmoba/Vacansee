@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/booking_model.dart';
@@ -8,33 +9,55 @@ class RecentBookingRow extends StatelessWidget {
 
   const RecentBookingRow({super.key, required this.booking});
 
+  static const _avatarColors = [
+    AppColors.primary,
+    AppColors.secondary,
+    Color(0xFF8B5CF6),
+    Color(0xFFEC4899),
+    Color(0xFF14B8A6),
+  ];
+
   @override
   Widget build(BuildContext context) {
     final name = booking.studentName;
-    final initial = name.isNotEmpty ? name[0].toUpperCase() : 'B';
+    final initials = name.isNotEmpty
+        ? name.trim().split(' ').map((l) => l.isNotEmpty ? l[0] : '').take(2).join().toUpperCase()
+        : 'B';
     final dateStr = DateFormat('MMM d, h:mm a').format(booking.requestedAt);
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-            color: Colors.black.withValues(alpha: 0.03),
-            width: 1,
-          ),
+          bottom: BorderSide(color: Colors.black.withValues(alpha: 0.03), width: 1),
         ),
       ),
       child: Row(
         children: [
+          // Gradient avatar
           CircleAvatar(
             radius: 18,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-            child: Text(
-              initial,
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    _avatarColors[booking.requestedAt.day % _avatarColors.length],
+                    _avatarColors[booking.requestedAt.day % _avatarColors.length].withValues(alpha: 0.7),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  initials,
+                  style: GoogleFonts.outfit(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11,
+                  ),
+                ),
               ),
             ),
           ),
@@ -45,7 +68,7 @@ class RecentBookingRow extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
+                  style: GoogleFonts.outfit(
                     fontWeight: FontWeight.w700,
                     fontSize: 14,
                     color: AppColors.textPrimary,
@@ -54,9 +77,9 @@ class RecentBookingRow extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   '${booking.propertyName} • $dateStr',
-                  style: TextStyle(
+                  style: GoogleFonts.workSans(
                     fontSize: 12,
-                    color: Colors.grey[500],
+                    color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -64,29 +87,33 @@ class RecentBookingRow extends StatelessWidget {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: _getStatusBgColor(booking.status),
+              color: _getStatusColor(booking.status).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(100),
+              border: Border.all(
+                color: _getStatusColor(booking.status).withValues(alpha: 0.2),
+                width: 1,
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 6,
-                  height: 6,
+                  width: 5,
+                  height: 5,
                   decoration: BoxDecoration(
-                    color: _getStatusTextColor(booking.status),
+                    color: _getStatusColor(booking.status),
                     shape: BoxShape.circle,
                   ),
                 ),
                 const SizedBox(width: 6),
                 Text(
                   booking.statusLabel,
-                  style: TextStyle(
-                    fontSize: 11,
+                  style: GoogleFonts.outfit(
+                    fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: _getStatusTextColor(booking.status),
+                    color: _getStatusColor(booking.status),
                   ),
                 ),
               ],
@@ -97,29 +124,16 @@ class RecentBookingRow extends StatelessWidget {
     );
   }
 
-  Color _getStatusBgColor(BookingStatus status) {
+  Color _getStatusColor(BookingStatus status) {
     switch (status) {
       case BookingStatus.pending:
-        return const Color(0xFFFEF3C7);
+        return AppColors.warning;
       case BookingStatus.approved:
-        return const Color(0xFFD1FAE5);
+        return AppColors.success;
       case BookingStatus.rejected:
-        return const Color(0xFFFEE2E2);
+        return AppColors.error;
       default:
-        return Colors.grey[100]!;
-    }
-  }
-
-  Color _getStatusTextColor(BookingStatus status) {
-    switch (status) {
-      case BookingStatus.pending:
-        return const Color(0xFFD97706);
-      case BookingStatus.approved:
-        return const Color(0xFF059669);
-      case BookingStatus.rejected:
-        return const Color(0xFFDC2626);
-      default:
-        return Colors.grey[600]!;
+        return AppColors.textMuted;
     }
   }
 }

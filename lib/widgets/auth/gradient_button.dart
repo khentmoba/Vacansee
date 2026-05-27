@@ -38,21 +38,18 @@ class GradientButton extends StatelessWidget {
           gradient: disabled
               ? null
               : const LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    AppColors.primary,
-                    Color(0xFF1D4ED8),
-                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppColors.primary, AppColors.secondary],
                 ),
           color: disabled ? Colors.grey[300] : null,
           boxShadow: disabled
               ? null
               : [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.30),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+                    color: AppColors.primary.withValues(alpha: 0.25),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
                   ),
                 ],
         ),
@@ -75,19 +72,14 @@ class GradientButton extends StatelessWidget {
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (icon != null) ...[
-                          icon!,
-                          const SizedBox(width: 10),
-                        ],
+                        if (icon != null) ...[icon!, const SizedBox(width: 10)],
                         Text(
                           label,
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.5,
-                            color: disabled
-                                ? Colors.grey[500]
-                                : Colors.white,
+                            color: disabled ? Colors.grey[500] : Colors.white,
                           ),
                         ),
                       ],

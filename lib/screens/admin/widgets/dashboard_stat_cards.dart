@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_theme.dart';
 
 class AdminStatCard extends StatefulWidget {
@@ -32,14 +33,10 @@ class _AdminStatCardState extends State<AdminStatCard> {
   Widget build(BuildContext context) {
     final isSmall = MediaQuery.of(context).size.width < 500;
 
-    // Parse numeric value for animation if possible
     final numericOnly = widget.value.replaceAll(RegExp(r'[^0-9.]'), '');
     final double? endValue = double.tryParse(numericOnly);
     final isPercent = widget.value.contains('%');
-    final prefix =
-        widget.value.startsWith(RegExp(r'[^0-9]')) &&
-            !isPercent &&
-            widget.value.isNotEmpty
+    final prefix = widget.value.startsWith(RegExp(r'[^0-9]')) && !isPercent && widget.value.isNotEmpty
         ? widget.value.substring(0, 1)
         : '';
     final suffix = isPercent ? '%' : '';
@@ -48,30 +45,20 @@ class _AdminStatCardState extends State<AdminStatCard> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
+        duration: AppDurations.medium,
         curve: Curves.easeOutCubic,
-        transform: _isHovered
-            ? Matrix4.translationValues(0, -6, 0)
-            : Matrix4.identity(),
+        transform: _isHovered ? Matrix4.translationValues(0, -6, 0) : Matrix4.identity(),
         padding: EdgeInsets.all(isSmall ? 16 : 24),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: _isHovered
-                ? widget.iconColor.withValues(alpha: 0.3)
-                : Colors.black.withValues(alpha: 0.05),
+            color: _isHovered ? widget.iconColor.withValues(alpha: 0.3) : AppColors.border,
             width: 1.5,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: _isHovered
-                  ? widget.iconColor.withValues(alpha: 0.08)
-                  : Colors.black.withValues(alpha: 0.03),
-              blurRadius: _isHovered ? 24 : 12,
-              offset: _isHovered ? const Offset(0, 12) : const Offset(0, 6),
-            ),
-          ],
+          boxShadow: _isHovered
+              ? [AppShadows.lg.copyWith(color: widget.iconColor.withValues(alpha: 0.08))]
+              : [AppShadows.md],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,22 +68,28 @@ class _AdminStatCardState extends State<AdminStatCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
+                  duration: AppDurations.medium,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: _isHovered
-                        ? widget.iconColor.withValues(alpha: 0.15)
-                        : widget.iconBgColor,
+                    gradient: _isHovered
+                        ? LinearGradient(
+                            colors: [widget.iconColor, widget.iconColor.withValues(alpha: 0.8)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          )
+                        : null,
+                    color: _isHovered ? null : widget.iconBgColor,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Icon(widget.icon, color: widget.iconColor, size: 22),
+                  child: Icon(
+                    widget.icon,
+                    color: _isHovered ? Colors.white : widget.iconColor,
+                    size: 22,
+                  ),
                 ),
                 if (widget.trendPercent != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: (widget.isPositiveTrend ?? true)
                           ? const Color(0xFFECFDF5)
@@ -118,7 +111,7 @@ class _AdminStatCardState extends State<AdminStatCard> {
                         const SizedBox(width: 4),
                         Text(
                           '${widget.trendPercent!.toStringAsFixed(1)}%',
-                          style: TextStyle(
+                          style: GoogleFonts.workSans(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             color: (widget.isPositiveTrend ?? true)
@@ -149,7 +142,7 @@ class _AdminStatCardState extends State<AdminStatCard> {
                           }
                           return Text(
                             '$prefix$formattedVal$suffix',
-                            style: TextStyle(
+                            style: GoogleFonts.outfit(
                               fontSize: isSmall ? 24 : 32,
                               fontWeight: FontWeight.w800,
                               letterSpacing: -0.5,
@@ -160,7 +153,7 @@ class _AdminStatCardState extends State<AdminStatCard> {
                       )
                     : Text(
                         widget.value,
-                        style: TextStyle(
+                        style: GoogleFonts.outfit(
                           fontSize: isSmall ? 24 : 32,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.5,
@@ -170,9 +163,9 @@ class _AdminStatCardState extends State<AdminStatCard> {
                 const SizedBox(height: 6),
                 Text(
                   widget.title,
-                  style: TextStyle(
+                  style: GoogleFonts.workSans(
                     fontSize: 13,
-                    color: Colors.grey[500],
+                    color: AppColors.textMuted,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.1,
                   ),
@@ -211,14 +204,10 @@ class _AdminSolidStatCardState extends State<AdminSolidStatCard> {
   Widget build(BuildContext context) {
     final isSmall = MediaQuery.of(context).size.width < 500;
 
-    // Parse numeric value for animation if possible
     final numericOnly = widget.value.replaceAll(RegExp(r'[^0-9.]'), '');
     final double? endValue = double.tryParse(numericOnly);
     final isPercent = widget.value.contains('%');
-    final prefix =
-        widget.value.startsWith(RegExp(r'[^0-9]')) &&
-            !isPercent &&
-            widget.value.isNotEmpty
+    final prefix = widget.value.startsWith(RegExp(r'[^0-9]')) && !isPercent && widget.value.isNotEmpty
         ? widget.value.substring(0, 1)
         : '';
     final suffix = isPercent ? '%' : '';
@@ -227,20 +216,20 @@ class _AdminSolidStatCardState extends State<AdminSolidStatCard> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
+        duration: AppDurations.medium,
         curve: Curves.easeOutCubic,
-        transform: _isHovered
-            ? Matrix4.translationValues(0, -6, 0)
-            : Matrix4.identity(),
+        transform: _isHovered ? Matrix4.translationValues(0, -6, 0) : Matrix4.identity(),
         padding: EdgeInsets.all(isSmall ? 16 : 24),
         decoration: BoxDecoration(
-          color: widget.backgroundColor,
+          gradient: LinearGradient(
+            colors: [widget.backgroundColor, widget.backgroundColor.withValues(alpha: 0.85)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: widget.backgroundColor.withValues(
-                alpha: _isHovered ? 0.35 : 0.25,
-              ),
+              color: widget.backgroundColor.withValues(alpha: _isHovered ? 0.35 : 0.25),
               blurRadius: _isHovered ? 24 : 12,
               offset: _isHovered ? const Offset(0, 12) : const Offset(0, 6),
             ),
@@ -250,7 +239,6 @@ class _AdminSolidStatCardState extends State<AdminSolidStatCard> {
           borderRadius: BorderRadius.circular(20),
           child: Stack(
             children: [
-              // Decorative circle
               Positioned(
                 right: -20,
                 bottom: -20,
@@ -298,7 +286,7 @@ class _AdminSolidStatCardState extends State<AdminSolidStatCard> {
                                 }
                                 return Text(
                                   '$prefix$formattedVal$suffix',
-                                  style: TextStyle(
+                                  style: GoogleFonts.outfit(
                                     fontSize: isSmall ? 28 : 36,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: -0.5,
@@ -309,7 +297,7 @@ class _AdminSolidStatCardState extends State<AdminSolidStatCard> {
                             )
                           : Text(
                               widget.value,
-                              style: TextStyle(
+                              style: GoogleFonts.outfit(
                                 fontSize: isSmall ? 28 : 36,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: -0.5,
@@ -319,7 +307,7 @@ class _AdminSolidStatCardState extends State<AdminSolidStatCard> {
                       const SizedBox(height: 6),
                       Text(
                         widget.title,
-                        style: TextStyle(
+                        style: GoogleFonts.workSans(
                           fontSize: 13,
                           color: Colors.white.withValues(alpha: 0.85),
                           fontWeight: FontWeight.w600,

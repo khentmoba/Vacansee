@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/auth_provider.dart';
@@ -42,12 +43,13 @@ class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.black.withValues(alpha: 0.05),
-            width: 1.5,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
           ),
-        ),
+        ],
       ),
       child: Row(
         children: [
@@ -60,9 +62,9 @@ class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: () => Scaffold.of(context).openDrawer(),
             ),
             const SizedBox(width: 8),
-            const Text(
+            Text(
               'VacanSee',
-              style: TextStyle(
+              style: GoogleFonts.outfit(
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
                 color: AppColors.textPrimary,
@@ -78,24 +80,25 @@ class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     Text(
                       'Admin',
-                      style: TextStyle(
+                      style: GoogleFonts.workSans(
                         fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[400],
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textMuted,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Text(
-                      '/',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 14,
+                      color: AppColors.textMuted,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       _getViewTitle(currentView),
-                      style: TextStyle(
+                      style: GoogleFonts.workSans(
                         fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
                       ),
                     ),
                   ],
@@ -103,7 +106,7 @@ class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
                 const SizedBox(height: 2),
                 Text(
                   _getViewTitle(currentView),
-                  style: const TextStyle(
+                  style: GoogleFonts.outfit(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -113,24 +116,57 @@ class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ],
           const Spacer(),
+          // Global search (desktop only)
+          if (!isMobile)
+            Container(
+              width: 240,
+              height: 38,
+              margin: const EdgeInsets.only(right: 16),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: TextField(
+                style: GoogleFonts.workSans(
+                  fontSize: 13,
+                  color: AppColors.textPrimary,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Search anything...',
+                  hintStyle: GoogleFonts.workSans(
+                    color: AppColors.textMuted,
+                    fontSize: 13,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    size: 18,
+                    color: AppColors.textMuted,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  isDense: true,
+                ),
+              ),
+            ),
           // Notifications
           IconButton(
-            hoverColor: Colors.grey[100],
+            hoverColor: AppColors.primary.withValues(alpha: 0.05),
             icon: Stack(
               children: [
                 const Icon(
                   Icons.notifications_none_rounded,
-                  color: Colors.grey,
-                  size: 24,
+                  color: AppColors.textMuted,
+                  size: 22,
                 ),
                 Positioned(
-                  right: 3,
-                  top: 3,
+                  right: 2,
+                  top: 2,
                   child: Container(
                     width: 8,
                     height: 8,
                     decoration: const BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.error,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -139,54 +175,50 @@ class AdminTopNavBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             onPressed: () {},
           ),
-          const SizedBox(width: 16),
-          // User Avatar / Badge Info
-          if (!isMobile)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 14,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                    child: Text(
-                      initial,
-                      style: const TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
+          const SizedBox(width: 8),
+          // User avatar pill
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.border),
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(
+                  radius: 12,
+                  backgroundImage: null,
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  child: Text(
+                    initial,
+                    style: GoogleFonts.outfit(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
                     ),
                   ),
+                ),
+                if (!isMobile) ...[
                   const SizedBox(width: 8),
                   Text(
                     email.split('@')[0],
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: GoogleFonts.workSans(
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    size: 16,
+                    color: AppColors.textMuted,
+                  ),
                 ],
-              ),
-            )
-          else
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-              child: Text(
-                initial,
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
+              ],
             ),
+          ),
         ],
       ),
     );

@@ -1,5 +1,7 @@
-import 'dart:math';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_theme.dart';
 import '../../models/booking_model.dart';
 
 class OwnerRevenueChart extends StatefulWidget {
@@ -16,10 +18,10 @@ class OwnerRevenueChart extends StatefulWidget {
 
 class _OwnerRevenueChartState extends State<OwnerRevenueChart> {
   int _selectedYear = DateTime.now().year;
+  int? _hoveredIndex;
 
   @override
   Widget build(BuildContext context) {
-    // Get unique years from bookings to populate dropdown
     final years = widget.bookings
         .map((b) => b.requestedAt.year)
         .toSet()
@@ -29,7 +31,6 @@ class _OwnerRevenueChartState extends State<OwnerRevenueChart> {
     }
     years.sort((a, b) => b.compareTo(a));
 
-    // Calculate revenue map for the selected year
     final Map<int, double> monthlyRevenue = {};
     for (int i = 1; i <= 12; i++) {
       monthlyRevenue[i] = 0.0;
@@ -40,56 +41,64 @@ class _OwnerRevenueChartState extends State<OwnerRevenueChart> {
           (booking.status == BookingStatus.approved ||
               booking.status == BookingStatus.completed)) {
         final month = booking.requestedAt.month;
-        monthlyRevenue[month] = (monthlyRevenue[month] ?? 0.0) + booking.monthlyRate;
+        monthlyRevenue[month] =
+            (monthlyRevenue[month] ?? 0.0) + booking.monthlyRate;
       }
     }
 
-    final totalRevenue = monthlyRevenue.values.fold(0.0, (sum, item) => sum + item);
+    final totalRevenue =
+        monthlyRevenue.values.fold(0.0, (sum, item) => sum + item);
+    final maxVal = monthlyRevenue.values.fold(0.0, (a, b) => a > b ? a : b);
+    final ceiling = maxVal == 0 ? 10000.0 : (maxVal * 1.2);
+
+    final barData = monthlyRevenue.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
 
     return Card(
       elevation: 0,
       color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFE2E8F0)),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Row
+            // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Revenue Analytics',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Total Earned: ₱${totalRevenue.toStringAsFixed(0)}',
-                      style: const TextStyle(
+                      'Total Earned: ₱${_formatNumber(totalRevenue)}',
+                      style: GoogleFonts.openSans(
                         fontSize: 14,
-                        color: Color(0xFF64748B),
+                        color: AppColors.textMuted,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
-                // Dropdown Selector
+                // Year Selector
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<int>(
@@ -99,24 +108,22 @@ class _OwnerRevenueChartState extends State<OwnerRevenueChart> {
                                 value: y,
                                 child: Text(
                                   '$y',
-                                  style: const TextStyle(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF0F172A),
+                                    color: AppColors.textPrimary,
                                   ),
                                 ),
                               ))
                           .toList(),
                       onChanged: (val) {
                         if (val != null) {
-                          setState(() {
-                            _selectedYear = val;
-                          });
+                          setState(() => _selectedYear = val);
                         }
                       },
                       icon: const Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        color: Color(0xFF64748B),
+                        color: AppColors.textMuted,
                       ),
                     ),
                   ),
@@ -124,17 +131,148 @@ class _OwnerRevenueChartState extends State<OwnerRevenueChart> {
               ],
             ),
             const SizedBox(height: 32),
-            // Custom Painted Chart Area
+            // Chart
             Expanded(
-              child: monthlyRevenue.values.every((v) => v == 0)
+              child: totalRevenue == 0
                   ? _buildEmptyState()
                   : LayoutBuilder(
                       builder: (context, constraints) {
-                        return CustomPaint(
-                          size: Size(constraints.maxWidth, constraints.maxHeight),
-                          painter: _BarChartPainter(
-                            monthlyRevenue: monthlyRevenue,
-                          ),
+                        return Column(
+                          children: [
+                            Expanded(
+                              child: BarChart(
+                                BarChartData(
+                                  alignment: BarChartAlignment.spaceAround,
+                                  maxY: ceiling,
+                                  minY: 0,
+                                  barTouchData: BarTouchData(
+                                    enabled: true,
+                                    touchTooltipData: BarTouchTooltipData(
+                                      tooltipRoundedRadius: 8,
+                                      getTooltipItem:
+                                          (group, groupIndex, rod, rodIndex) {
+                                        final monthIndex = group.x.toInt() - 1;
+                                        final months = [
+                                          'Jan', 'Feb', 'Mar', 'Apr', 'May',
+                                          'Jun',
+                                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov',
+                                          'Dec'
+                                        ];
+                                        return BarTooltipItem(
+                                          '${months[monthIndex]}\n₱${_formatNumber(rod.toY)}',
+                                          TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            fontFamily: 'Poppins',
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    touchCallback: (event, response) {
+                                      setState(() {
+                                        _hoveredIndex =
+                                            response?.spot?.touchedBarGroupIndex;
+                                      });
+                                    },
+                                  ),
+                                  titlesData: FlTitlesData(
+                                    topTitles: const AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                    rightTitles: const AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                    leftTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        reservedSize: 50,
+                                        getTitlesWidget: (value, meta) {
+                                          return Text(
+                                            _formatCompact(value),
+                                            style: GoogleFonts.openSans(
+                                              fontSize: 10,
+                                              color: AppColors.textMuted,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        reservedSize: 28,
+                                        getTitlesWidget: (value, meta) {
+                                          final months = [
+                                            'J', 'F', 'M', 'A', 'M', 'J',
+                                            'J', 'A', 'S', 'O', 'N', 'D'
+                                          ];
+                                          final idx = value.toInt() - 1;
+                                          if (idx < 0 || idx >= 12) {
+                                            return const SizedBox.shrink();
+                                          }
+                                          return Padding(
+                                            padding: const EdgeInsets.only(top: 8),
+                                            child: Text(
+                                              months[idx],
+                                              style: GoogleFonts.openSans(
+                                                fontSize: 10,
+                                                color: AppColors.textMuted,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  gridData: FlGridData(
+                                    show: true,
+                                    drawVerticalLine: false,
+                                    horizontalInterval: ceiling / 4,
+                                    getDrawingHorizontalLine: (value) {
+                                      return FlLine(
+                                        color: AppColors.divider,
+                                        strokeWidth: 1,
+                                      );
+                                    },
+                                  ),
+                                  borderData: FlBorderData(show: false),
+                                  barGroups: barData
+                                      .map((entry) => BarChartGroupData(
+                                            x: entry.key,
+                                            barRods: [
+                                              BarChartRodData(
+                                                toY: entry.value,
+                                                color: _hoveredIndex != null &&
+                                                        _hoveredIndex ==
+                                                            entry.key - 1
+                                                    ? AppColors.primary
+                                                    : AppColors.primary
+                                                        .withValues(alpha: 0.7),
+                                                width: 16,
+                                                borderRadius:
+                                                    const BorderRadius.vertical(
+                                                  top: Radius.circular(6),
+                                                ),
+                                                backDrawRodData:
+                                                    BackgroundBarChartRodData(
+                                                  show: true,
+                                                  toY: ceiling,
+                                                  color: AppColors.primary
+                                                      .withValues(alpha: 0.05),
+                                                ),
+                                              ),
+                                            ],
+                                          ))
+                                      .toList(),
+                                ),
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              ),
+                            ),
+                          ],
                         );
                       },
                     ),
@@ -153,14 +291,14 @@ class _OwnerRevenueChartState extends State<OwnerRevenueChart> {
           Icon(
             Icons.bar_chart_rounded,
             size: 48,
-            color: const Color(0xFF5287B2).withValues(alpha: 0.3),
+            color: AppColors.primary.withValues(alpha: 0.2),
           ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'No booking revenue in this period',
-            style: TextStyle(
+            style: GoogleFonts.openSans(
               fontSize: 14,
-              color: Color(0xFF64748B),
+              color: AppColors.textMuted,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -168,130 +306,22 @@ class _OwnerRevenueChartState extends State<OwnerRevenueChart> {
       ),
     );
   }
-}
 
-class _BarChartPainter extends CustomPainter {
-  final Map<int, double> monthlyRevenue;
-
-  _BarChartPainter({required this.monthlyRevenue});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const double bottomPadding = 30;
-    const double leftPadding = 50;
-    const double topPadding = 10;
-    const double rightPadding = 10;
-
-    final chartWidth = size.width - leftPadding - rightPadding;
-    final chartHeight = size.height - bottomPadding - topPadding;
-
-    final double maxVal = monthlyRevenue.values.fold(0.0, max);
-    final double limitVal = maxVal == 0 ? 1000 : maxVal * 1.15; // Give headroom
-
-    // Paints
-    final gridPaint = Paint()
-      ..color = const Color(0xFFF1F5F9)
-      ..strokeWidth = 1.0;
-
-    final barPaint = Paint()
-      ..shader = LinearGradient(
-        colors: [
-          const Color(0xFF5287B2), // Brand Blue
-          const Color(0xFF3B82F6), // Accent Blue
-        ],
-        begin: Alignment.bottomCenter,
-        end: Alignment.topCenter,
-      ).createShader(
-        Rect.fromLTWH(0, topPadding, size.width, chartHeight),
-      );
-
-    // Text Style for Axis Labels
-    const textStyle = TextStyle(
-      color: Color(0xFF64748B),
-      fontSize: 10,
-      fontWeight: FontWeight.w500,
-    );
-
-    // Draw Y gridlines and labels
-    const int gridLines = 4;
-    for (int i = 0; i <= gridLines; i++) {
-      final double val = (limitVal / gridLines) * i;
-      final double y = size.height - bottomPadding - (chartHeight / gridLines) * i;
-
-      // Draw grid line (skip the baseline at 0 to avoid overlapping)
-      if (i > 0) {
-        canvas.drawLine(
-          Offset(leftPadding, y),
-          Offset(size.width - rightPadding, y),
-          gridPaint,
-        );
-      }
-
-      // Draw Y label
-      final String label = _formatPeso(val);
-      final textPainter = TextPainter(
-        text: TextSpan(text: label, style: textStyle),
-        textDirection: TextDirection.ltr,
-      )..layout();
-
-      textPainter.paint(
-        canvas,
-        Offset(leftPadding - textPainter.width - 10, y - textPainter.height / 2),
-      );
+  String _formatNumber(double val) {
+    if (val >= 1000000) {
+      return '${(val / 1000000).toStringAsFixed(1)}M';
+    } else if (val >= 1000) {
+      return '${(val / 1000).toStringAsFixed(0)}K';
     }
-
-    // Draw X labels and Bars
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    final double barWidth = (chartWidth / 12) * 0.55;
-    final double spaceBetween = (chartWidth / 12);
-
-    for (int i = 0; i < 12; i++) {
-      final monthIndex = i + 1;
-      final double val = monthlyRevenue[monthIndex] ?? 0.0;
-      final double barHeight = (val / limitVal) * chartHeight;
-
-      final double centerX = leftPadding + (spaceBetween * i) + (spaceBetween / 2);
-      final double xLeft = centerX - barWidth / 2;
-      final double yTop = size.height - bottomPadding - barHeight;
-
-      // Draw bar if height > 0
-      if (barHeight > 0) {
-        final RRect rrect = RRect.fromRectAndCorners(
-          Rect.fromLTWH(xLeft, yTop, barWidth, barHeight),
-          topLeft: const Radius.circular(6),
-          topRight: const Radius.circular(6),
-        );
-        canvas.drawRRect(rrect, barPaint);
-      }
-
-      // Draw X axis label
-      final String label = months[i];
-      final textPainter = TextPainter(
-        text: TextSpan(text: label, style: textStyle),
-        textDirection: TextDirection.ltr,
-      )..layout();
-
-      textPainter.paint(
-        canvas,
-        Offset(centerX - textPainter.width / 2, size.height - bottomPadding + 8),
-      );
-    }
+    return val.toStringAsFixed(0);
   }
 
-  String _formatPeso(double val) {
+  String _formatCompact(double val) {
     if (val >= 1000000) {
       return '₱${(val / 1000000).toStringAsFixed(1)}M';
     } else if (val >= 1000) {
       return '₱${(val / 1000).toStringAsFixed(0)}K';
     }
     return '₱${val.toStringAsFixed(0)}';
-  }
-
-  @override
-  bool shouldRepaint(covariant _BarChartPainter oldDelegate) {
-    return oldDelegate.monthlyRevenue != monthlyRevenue;
   }
 }

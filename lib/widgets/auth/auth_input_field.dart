@@ -67,8 +67,8 @@ class _AuthInputFieldState extends State<AuthInputField> {
               color: _isFocused
                   ? AppColors.primary
                   : hasError
-                      ? AppColors.error
-                      : AppColors.textPrimary,
+                  ? AppColors.error
+                  : AppColors.textPrimary,
             ),
           ),
         ),
@@ -80,8 +80,8 @@ class _AuthInputFieldState extends State<AuthInputField> {
               color: _isFocused
                   ? AppColors.primary
                   : hasError
-                      ? AppColors.error
-                      : AppColors.border,
+                  ? AppColors.error
+                  : AppColors.border,
               width: _isFocused ? 2 : 1.5,
             ),
             boxShadow: _isFocused
@@ -103,13 +103,13 @@ class _AuthInputFieldState extends State<AuthInputField> {
             onChanged: (v) {
               widget.onChanged?.call(v);
             },
-            style: const TextStyle(
-              fontSize: 15,
-              color: AppColors.textPrimary,
-            ),
+            style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
             decoration: InputDecoration(
               hintText: widget.hintText,
-              hintStyle: const TextStyle(color: Color(0xFF999999), fontSize: 15),
+              hintStyle: const TextStyle(
+                color: Color(0xFF999999),
+                fontSize: 15,
+              ),
               prefixIcon: widget.prefixIcon != null
                   ? Container(
                       padding: const EdgeInsets.only(right: 12),
@@ -119,15 +119,17 @@ class _AuthInputFieldState extends State<AuthInputField> {
                         color: _isFocused
                             ? AppColors.primary
                             : hasError
-                                ? AppColors.error
-                                : const Color(0xFF999999),
+                            ? AppColors.error
+                            : const Color(0xFF999999),
                       ),
                     )
                   : null,
               suffixIcon: widget.suffixIcon,
               filled: true,
               fillColor: hasError
-                  ? AppColors.error.withValues(alpha: 0.05)
+                  ? AppColors.error.withValues(alpha: 0.03)
+                  : _isFocused
+                  ? AppColors.primary.withValues(alpha: 0.02)
                   : Colors.white,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),

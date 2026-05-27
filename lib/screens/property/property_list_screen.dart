@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/property_model.dart';
 import '../../providers/providers.dart';
@@ -571,7 +572,7 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
 
   Widget _buildCategoriesBar(PropertyProvider provider) {
     return SizedBox(
-      height: 50,
+      height: 44,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -579,36 +580,42 @@ class _PropertyListScreenState extends State<PropertyListScreen> {
         itemBuilder: (context, index) {
           final cat = _categories[index];
           final isSelected = _selectedCategoryIndex == index;
-          return InkWell(
-            onTap: () => _onCategorySelected(index, provider),
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              margin: const EdgeInsets.only(right: 32),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    cat['icon'],
-                    size: 22,
-                    color: isSelected ? AppColors.primary : AppColors.textSecondary,
+          return Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: InkWell(
+              onTap: () => _onCategorySelected(index, provider),
+              borderRadius: BorderRadius.circular(20),
+              child: AnimatedContainer(
+                duration: AppDurations.fast,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  gradient: isSelected ? AppGradients.primaryHorizontal : null,
+                  color: isSelected ? null : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected ? Colors.transparent : AppColors.border,
+                    width: 1,
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    cat['label'],
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                      color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      cat['icon'],
+                      size: 18,
+                      color: isSelected ? Colors.white : AppColors.textSecondary,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    height: 2,
-                    width: 24,
-                    color: isSelected ? AppColors.primary : Colors.transparent,
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    Text(
+                      cat['label'],
+                      style: GoogleFonts.workSans(
+                        fontSize: 13,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                        color: isSelected ? Colors.white : AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -846,8 +853,29 @@ class _PropertyCard extends StatefulWidget {
   State<_PropertyCard> createState() => _PropertyCardState();
 }
 
-class _PropertyCardState extends State<_PropertyCard> {
+class _PropertyCardState extends State<_PropertyCard> with SingleTickerProviderStateMixin {
   bool _isHovered = false;
+  late AnimationController _favoriteController;
+  late Animation<double> _favoriteScale;
+
+  @override
+  void initState() {
+    super.initState();
+    _favoriteController = AnimationController(
+      vsync: this,
+      duration: AppDurations.fast,
+    );
+    _favoriteScale = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
+    ]).animate(_favoriteController);
+  }
+
+  @override
+  void dispose() {
+    _favoriteController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -866,137 +894,191 @@ class _PropertyCardState extends State<_PropertyCard> {
             ),
           );
         },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image with Overlays
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: AnimatedScale(
-                        scale: _isHovered ? 1.05 : 1.0,
-                        duration: const Duration(milliseconds: 350),
-                        curve: Curves.easeOutCubic,
-                        child: widget.property.coverImageUrl != null
-                            ? CachedNetworkImage(
-                                imageUrl: widget.property.coverImageUrl!,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => Container(color: Colors.grey[200]),
-                                errorWidget: (context, url, error) => _buildPlaceholder(),
-                              )
-                            : _buildPlaceholder(),
+        child: AnimatedContainer(
+          duration: AppDurations.fast,
+          transform: _isHovered ? (Matrix4.identity()..translateByDouble(0, -6, 0, 0)) : Matrix4.identity(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image with Overlays
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: AnimatedScale(
+                          scale: _isHovered ? 1.06 : 1.0,
+                          duration: AppDurations.slow,
+                          curve: Curves.easeOutCubic,
+                          child: widget.property.coverImageUrl != null
+                              ? CachedNetworkImage(
+                                  imageUrl: widget.property.coverImageUrl!,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => Container(color: Colors.grey[100]),
+                                  errorWidget: (context, url, error) => _buildPlaceholder(),
+                                )
+                              : _buildPlaceholder(),
+                        ),
                       ),
-                    ),
-                    // "Student Favorite" Pill
-                    if (hasFavoriteBadge)
+                      // Ambient Vignette Glow
+                      Positioned.fill(
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.transparent, Color(0x66000000)],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // "Student Favorite" Pill
+                      if (hasFavoriteBadge)
+                        Positioned(
+                          top: 12,
+                          left: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.95),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: const [AppShadows.sm],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.stars_rounded, size: 13, color: AppColors.cta),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Guest favorite',
+                                  style: GoogleFonts.workSans(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      // Heart Icon
                       Positioned(
                         top: 12,
-                        left: 12,
+                        right: 12,
+                        child: GestureDetector(
+                          onTap: () {
+                            _favoriteController.forward(from: 0);
+                            widget.onFavoriteToggle();
+                          },
+                          child: ScaleTransition(
+                            scale: _favoriteScale,
+                            child: Icon(
+                              widget.isFavorited ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                              color: widget.isFavorited ? Colors.red : Colors.white,
+                              size: 24,
+                              shadows: const [
+                                Shadow(color: Colors.black45, blurRadius: 4, offset: Offset(0, 1)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Availability Pill
+                      Positioned(
+                        bottom: 12,
+                        right: 12,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.95),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                            gradient: widget.liveVacancy ? AppGradients.successGradient : AppGradients.dangerGradient,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: const [AppShadows.sm],
                           ),
-                          child: const Text(
-                            'Guest favorite',
-                            style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                          child: Text(
+                            widget.liveVacancy ? 'VACANT' : 'FULL',
+                            style: GoogleFonts.workSans(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
                       ),
-                    // Heart Icon
-                    Positioned(
-                      top: 12,
-                      right: 12,
-                      child: GestureDetector(
-                        onTap: widget.onFavoriteToggle,
-                        child: Icon(
-                          widget.isFavorited ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                          color: widget.isFavorited ? Colors.red : Colors.white,
-                          size: 24,
-                          shadows: const [
-                            Shadow(color: Colors.black45, blurRadius: 4, offset: Offset(0, 1)),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Availability Pill
-                    Positioned(
-                      bottom: 12,
-                      right: 12,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: widget.liveVacancy ? AppColors.success : AppColors.error,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          widget.liveVacancy ? 'VACANT' : 'FULL',
-                          style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            // Title & Stars Row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    widget.property.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textPrimary),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Row(
-                  children: [
-                    Icon(Icons.star_rounded, size: 16, color: Colors.amber[700]),
-                    const SizedBox(width: 2),
-                    Text(
-                      widget.property.averageRating > 0
-                          ? widget.property.averageRating.toStringAsFixed(1)
-                          : 'New',
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 3),
-            // Address details
-            Text(
-              widget.property.address,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 2),
-            // Price Tag
-            RichText(
-              text: TextSpan(
+              const SizedBox(height: 12),
+              // Title & Stars Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextSpan(
-                    text: '₱${widget.property.monthlyPrice > 0 ? widget.property.monthlyPrice : widget.property.priceRange.min}',
-                    style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.textPrimary, fontSize: 14.5),
+                  Expanded(
+                    child: Text(
+                      widget.property.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
                   ),
-                  const TextSpan(
-                    text: ' /month',
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                  const SizedBox(width: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.star_rounded, size: 16, color: Colors.amber),
+                      const SizedBox(width: 2),
+                      Text(
+                        widget.property.averageRating > 0
+                            ? widget.property.averageRating.toStringAsFixed(1)
+                            : 'New',
+                        style: GoogleFonts.workSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ),
-          ],
+              const SizedBox(height: 3),
+              // Address details
+              Text(
+                widget.property.address,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.workSans(fontSize: 13, color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 4),
+              // Price Tag
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '₱${widget.property.monthlyPrice > 0 ? widget.property.monthlyPrice : widget.property.priceRange.min}',
+                      style: GoogleFonts.workSans(
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                        fontSize: 15,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' /month',
+                      style: GoogleFonts.workSans(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1004,7 +1086,7 @@ class _PropertyCardState extends State<_PropertyCard> {
 
   Widget _buildPlaceholder() {
     return Container(
-      color: Colors.grey[200],
+      color: Colors.grey[100],
       child: const Center(
         child: Icon(Icons.home_work_outlined, size: 40, color: Colors.grey),
       ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../core/theme/app_theme.dart';
 import '../../models/booking_model.dart';
 
 class OwnerRecentBookingRequests extends StatelessWidget {
@@ -12,9 +14,16 @@ class OwnerRecentBookingRequests extends StatelessWidget {
     required this.onViewAll,
   });
 
+  static const _avatarColors = [
+    AppColors.primary,
+    AppColors.secondary,
+    Color(0xFF8B5CF6),
+    Color(0xFFEC4899),
+    Color(0xFF14B8A6),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    // Sort and take top 5 recent requests
     final sortedBookings = List<BookingModel>.from(bookings)
       ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
     final recentBookings = sortedBookings.take(5).toList();
@@ -24,7 +33,7 @@ class OwnerRecentBookingRequests extends StatelessWidget {
       color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFE2E8F0)),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -35,27 +44,35 @@ class OwnerRecentBookingRequests extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Recent Booking Requests',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: AppColors.textPrimary,
                   ),
                 ),
-                TextButton(
+                OutlinedButton(
                   onPressed: onViewAll,
-                  style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF5287B2),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: Row(
-                    children: const [
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                       Text(
                         'View All',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600, fontSize: 12),
                       ),
-                      SizedBox(width: 4),
-                      Icon(Icons.arrow_forward_rounded, size: 16),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.arrow_forward_rounded, size: 14),
                     ],
                   ),
                 ),
@@ -63,7 +80,6 @@ class OwnerRecentBookingRequests extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Content List
             if (recentBookings.isEmpty)
               Expanded(
                 child: Center(
@@ -73,14 +89,14 @@ class OwnerRecentBookingRequests extends StatelessWidget {
                       Icon(
                         Icons.book_online_rounded,
                         size: 40,
-                        color: const Color(0xFF5287B2).withValues(alpha: 0.3),
+                        color: AppColors.primary.withValues(alpha: 0.2),
                       ),
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         'No booking requests yet',
-                        style: TextStyle(
+                        style: GoogleFonts.openSans(
                           fontSize: 14,
-                          color: Color(0xFF64748B),
+                          color: AppColors.textMuted,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -93,7 +109,7 @@ class OwnerRecentBookingRequests extends StatelessWidget {
                 child: ListView.separated(
                   itemCount: recentBookings.length,
                   separatorBuilder: (context, index) => const Divider(
-                    color: Color(0xFFF1F5F9),
+                    color: AppColors.divider,
                     height: 24,
                   ),
                   itemBuilder: (context, index) {
@@ -109,36 +125,52 @@ class OwnerRecentBookingRequests extends StatelessWidget {
                             .toUpperCase()
                         : '?';
 
-                    final dateStr = DateFormat('MMM dd, yyyy').format(booking.requestedAt);
+                    final avatarColor =
+                        _avatarColors[index % _avatarColors.length];
+                    final dateStr =
+                        DateFormat('MMM dd, yyyy').format(booking.requestedAt);
 
                     return Row(
                       children: [
-                        // Avatar
+                        // Gradient Avatar
                         CircleAvatar(
                           radius: 20,
-                          backgroundColor: const Color(0xFF5287B2).withValues(alpha: 0.1),
-                          child: Text(
-                            initials,
-                            style: const TextStyle(
-                              color: Color(0xFF5287B2),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  avatarColor,
+                                  avatarColor.withValues(alpha: 0.7),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                initials,
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 12),
-
-                        // Middle details
+                        // Details
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 studentName,
-                                style: const TextStyle(
+                                style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF0F172A),
+                                  color: AppColors.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -146,37 +178,42 @@ class OwnerRecentBookingRequests extends StatelessWidget {
                                 '${booking.propertyName} • ${booking.roomDescription}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: GoogleFonts.openSans(
                                   fontSize: 12,
-                                  color: Color(0xFF64748B),
+                                  color: AppColors.textMuted,
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Rate: ₱${booking.monthlyRate}/mo • $dateStr',
-                                style: const TextStyle(
+                                '₱${booking.monthlyRate}/mo • $dateStr',
+                                style: GoogleFonts.openSans(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF5287B2),
+                                  color: AppColors.primary,
                                 ),
                               ),
                             ],
                           ),
                         ),
-
                         // Status Badge
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: booking.statusColor.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: booking.statusColor
+                                  .withValues(alpha: 0.2),
+                              width: 1,
+                            ),
                           ),
                           child: Text(
                             booking.statusLabel,
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: booking.statusColor,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),

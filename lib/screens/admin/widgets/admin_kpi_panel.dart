@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_theme.dart';
 
 class KpiItem {
@@ -35,9 +36,7 @@ class AdminKpiPanel extends StatelessWidget {
           childAspectRatio: 1.5,
         ),
         itemCount: items.length,
-        itemBuilder: (context, index) {
-          return _buildKpiCard(items[index]);
-        },
+        itemBuilder: (context, index) => _buildKpiCard(items[index]),
       );
     }
 
@@ -45,17 +44,8 @@ class AdminKpiPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.black.withValues(alpha: 0.05),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: AppColors.border),
+        boxShadow: [AppShadows.md],
       ),
       child: IntrinsicHeight(
         child: Row(
@@ -66,10 +56,7 @@ class AdminKpiPanel extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 20,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -88,16 +75,16 @@ class AdminKpiPanel extends StatelessWidget {
                               children: [
                                 Text(
                                   item.label,
-                                  style: TextStyle(
+                                  style: GoogleFonts.workSans(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.grey[500],
+                                    color: AppColors.textMuted,
                                   ),
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
                                   item.value,
-                                  style: const TextStyle(
+                                  style: GoogleFonts.outfit(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.textPrimary,
@@ -120,8 +107,8 @@ class AdminKpiPanel extends StatelessWidget {
                   ),
                   if (index < items.length - 1)
                     VerticalDivider(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      thickness: 1.5,
+                      color: AppColors.border,
+                      thickness: 1,
                       width: 1,
                       indent: 16,
                       endIndent: 16,
@@ -141,17 +128,8 @@ class AdminKpiPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.black.withValues(alpha: 0.05),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.01),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: AppColors.border),
+        boxShadow: [AppShadows.sm],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,10 +150,10 @@ class AdminKpiPanel extends StatelessWidget {
               children: [
                 Text(
                   item.label,
-                  style: TextStyle(
+                  style: GoogleFonts.workSans(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Colors.grey[500],
+                    color: AppColors.textMuted,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -183,7 +161,7 @@ class AdminKpiPanel extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   item.value,
-                  style: const TextStyle(
+                  style: GoogleFonts.outfit(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -191,6 +169,14 @@ class AdminKpiPanel extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: item.color.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(item.icon, color: item.color, size: 16),
           ),
         ],
       ),

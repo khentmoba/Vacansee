@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -75,33 +77,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
         : 'U';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FBFD),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF5287B2),
+        foregroundColor: AppColors.textPrimary,
         elevation: 0,
         centerTitle: false,
-        title: const Text(
-          'Profile settings',
-          style: TextStyle(
-            color: Color(0xFF1D1B16),
+        title: Text(
+          'Profile Settings',
+          style: GoogleFonts.outfit(
+            color: AppColors.textPrimary,
             fontWeight: FontWeight.w800,
             fontSize: 20,
           ),
         ),
         actions: [
           if (_isSaved)
-            const Center(
+            Center(
               child: Padding(
-                padding: EdgeInsets.only(right: 16),
+                padding: const EdgeInsets.only(right: 16),
                 child: Row(
                   children: [
-                    Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18),
-                    SizedBox(width: 8),
+                    const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 18),
+                    const SizedBox(width: 8),
                     Text(
                       'Saved',
-                      style: TextStyle(
-                        color: Color(0xFF10B981),
+                      style: GoogleFonts.workSans(
+                        color: AppColors.success,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -123,11 +125,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     : const Icon(Icons.save_rounded, size: 18),
                 label: const Text('Save'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF5287B2),
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               ),
@@ -158,14 +160,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.02),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                    border: Border.all(color: const Color(0xFFF3F4F6)),
+                    boxShadow: const [AppShadows.sm],
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: Column(
                     children: [
@@ -173,19 +169,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         padding: const EdgeInsets.all(4),
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [Color(0xFF5287B2), Color(0xFF3B82F6)],
-                          ),
+                          gradient: AppGradients.avatarRing,
                         ),
                         child: CircleAvatar(
                           radius: 40,
                           backgroundColor: Colors.white,
                           child: Text(
                             initials,
-                            style: const TextStyle(
+                            style: GoogleFonts.outfit(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF5287B2),
+                              color: AppColors.primary,
                             ),
                           ),
                         ),
@@ -193,18 +187,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 12),
                       Text(
                         user?.displayName ?? 'Valued Tenant',
-                        style: const TextStyle(
+                        style: GoogleFonts.outfit(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F2937),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         user?.email ?? 'tenant@vacansee.com',
-                        style: TextStyle(
+                        style: GoogleFonts.workSans(
                           fontSize: 14,
-                          color: Colors.grey[500],
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -217,7 +211,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,9 +221,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       if (isDesktop) ...[
                         Row(
                           children: [
-                            Expanded(child: _buildTextField('First Name', _firstNameController, Icons.person_outline)),
+                            Expanded(child: _buildTextField('First Name', _firstNameController, Icons.person_outline_rounded)),
                             const SizedBox(width: 16),
-                            Expanded(child: _buildTextField('Last Name', _lastNameController, Icons.person_outline)),
+                            Expanded(child: _buildTextField('Last Name', _lastNameController, Icons.person_outline_rounded)),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -241,9 +235,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                       ] else ...[
-                        _buildTextField('First Name', _firstNameController, Icons.person_outline),
+                        _buildTextField('First Name', _firstNameController, Icons.person_outline_rounded),
                         const SizedBox(height: 16),
-                        _buildTextField('Last Name', _lastNameController, Icons.person_outline),
+                        _buildTextField('Last Name', _lastNameController, Icons.person_outline_rounded),
                         const SizedBox(height: 16),
                         _buildGenderDropdown(),
                         const SizedBox(height: 16),
@@ -263,7 +257,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,19 +287,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.01),
+                    color: AppColors.error.withValues(alpha: 0.01),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.red.withValues(alpha: 0.15)),
+                    border: Border.all(color: AppColors.error.withValues(alpha: 0.15)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Account Actions',
-                        style: TextStyle(
+                        style: GoogleFonts.outfit(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.red,
+                          color: AppColors.error,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -322,11 +316,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           icon: const Icon(Icons.logout_rounded, size: 18),
                           label: const Text('Sign Out of VacanSee'),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.red,
-                            side: const BorderSide(color: Colors.red),
+                            foregroundColor: AppColors.error,
+                            side: const BorderSide(color: AppColors.error),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
                         ),
@@ -349,17 +343,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           width: 4,
           height: 16,
           decoration: BoxDecoration(
-            color: const Color(0xFF5287B2),
+            gradient: AppGradients.primaryGradient,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: GoogleFonts.outfit(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1F2937),
+            color: AppColors.textPrimary,
           ),
         ),
       ],
@@ -378,10 +372,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: GoogleFonts.workSans(
             fontSize: 12.5,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF4B5563),
+            color: AppColors.textSecondary,
           ),
         ),
         const SizedBox(height: 6),
@@ -389,26 +383,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
           controller: controller,
           enabled: enabled,
           keyboardType: keyboardType,
-          style: const TextStyle(fontSize: 14.5),
+          style: GoogleFonts.workSans(fontSize: 14.5, color: AppColors.textPrimary),
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, size: 18, color: const Color(0xFF5287B2)),
+            prefixIcon: Icon(icon, size: 18, color: AppColors.primary),
             filled: true,
-            fillColor: enabled ? const Color(0xFFF9FAFB) : Colors.grey[50],
+            fillColor: enabled ? Colors.white : Colors.grey[50],
             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: AppColors.border, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
             ),
             disabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFF3F4F6), width: 1),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: AppColors.border, width: 1),
             ),
             hintText: 'Enter $label',
-            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13.5),
+            hintStyle: GoogleFonts.workSans(color: Colors.grey[400], fontSize: 13.5),
           ),
         ),
       ],
@@ -419,36 +413,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Gender',
-          style: TextStyle(
+          style: GoogleFonts.workSans(
             fontSize: 12.5,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF4B5563),
+            color: AppColors.textSecondary,
           ),
         ),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
           initialValue: _gender,
+          dropdownColor: Colors.white,
           items: const [
             DropdownMenuItem(value: 'male', child: Text('Male')),
             DropdownMenuItem(value: 'female', child: Text('Female')),
             DropdownMenuItem(value: 'other', child: Text('Other')),
           ],
           onChanged: (val) => setState(() => _gender = val),
-          style: const TextStyle(fontSize: 14.5, color: Colors.black),
+          style: GoogleFonts.workSans(fontSize: 14.5, color: AppColors.textPrimary),
           decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.people_outline, size: 18, color: Color(0xFF5287B2)),
+            prefixIcon: const Icon(Icons.people_outline_rounded, size: 18, color: AppColors.primary),
             filled: true,
-            fillColor: const Color(0xFFF9FAFB),
+            fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: AppColors.border, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF5287B2), width: 1.5),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
             ),
           ),
         ),
@@ -461,18 +456,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       margin: const EdgeInsets.only(bottom: 24),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.red[50],
+        color: AppColors.error.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red[100]!),
+        border: Border.all(color: AppColors.error),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: Colors.red, size: 20),
+          const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(color: Colors.red, fontSize: 14),
+              style: GoogleFonts.workSans(color: AppColors.error, fontSize: 14),
             ),
           ),
         ],

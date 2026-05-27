@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/booking_model.dart';
 
@@ -27,17 +28,8 @@ class AdminBookingFilterBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.black.withValues(alpha: 0.05),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: AppColors.border),
+        boxShadow: [AppShadows.md],
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -46,20 +38,16 @@ class AdminBookingFilterBar extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: AppColors.divider,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(
-                Icons.filter_list_rounded,
-                color: Colors.grey[700],
-                size: 18,
-              ),
+              child: Icon(Icons.filter_list_rounded, color: AppColors.textMuted, size: 18),
             ),
             const SizedBox(width: 12),
             Text(
               'Status:',
-              style: TextStyle(
-                color: Colors.grey[800],
+              style: GoogleFonts.outfit(
+                color: AppColors.textPrimary,
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
                 letterSpacing: -0.1,
@@ -133,28 +121,20 @@ class _FilterChipState extends State<_FilterChip> {
 
   @override
   Widget build(BuildContext context) {
-    final activeBg = widget.activeColor.withValues(alpha: 0.1);
-    final activeBorder = widget.activeColor;
-    final activeText = widget.activeColor;
-
-    final inactiveBg = Colors.white;
-    final inactiveBorder = Colors.black.withValues(alpha: 0.06);
-    final inactiveText = Colors.grey[700]!;
-
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
+        duration: AppDurations.fast,
         decoration: BoxDecoration(
           color: widget.isSelected
-              ? activeBg
-              : (_isHovered ? Colors.grey[50] : inactiveBg),
+              ? widget.activeColor.withValues(alpha: 0.1)
+              : (_isHovered ? AppColors.divider : Colors.white),
           borderRadius: BorderRadius.circular(100),
           border: Border.all(
             color: widget.isSelected
-                ? activeBorder
-                : (_isHovered ? Colors.grey[300]! : inactiveBorder),
+                ? widget.activeColor
+                : (_isHovered ? AppColors.border : Colors.black.withValues(alpha: 0.06)),
             width: 1.5,
           ),
         ),
@@ -170,41 +150,33 @@ class _FilterChipState extends State<_FilterChip> {
                   Container(
                     width: 6,
                     height: 6,
-                    decoration: BoxDecoration(
-                      color: widget.dotColor,
-                      shape: BoxShape.circle,
-                    ),
+                    decoration: BoxDecoration(color: widget.dotColor, shape: BoxShape.circle),
                   ),
                   const SizedBox(width: 8),
                 ],
                 Text(
                   widget.label,
-                  style: TextStyle(
-                    color: widget.isSelected ? activeText : inactiveText,
-                    fontWeight: widget.isSelected
-                        ? FontWeight.w800
-                        : FontWeight.w600,
+                  style: GoogleFonts.outfit(
+                    color: widget.isSelected ? widget.activeColor : AppColors.textMuted,
+                    fontWeight: widget.isSelected ? FontWeight.w800 : FontWeight.w600,
                     fontSize: 13,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: widget.isSelected
                         ? widget.activeColor.withValues(alpha: 0.2)
-                        : Colors.grey[100],
+                        : AppColors.divider,
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(
                     widget.count.toString(),
-                    style: TextStyle(
+                    style: GoogleFonts.workSans(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: widget.isSelected ? activeText : Colors.grey[600],
+                      color: widget.isSelected ? widget.activeColor : AppColors.textMuted,
                     ),
                   ),
                 ),

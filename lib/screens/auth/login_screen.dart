@@ -16,16 +16,42 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   final Map<String, String?> _errors = {'email': null, 'password': null};
+  late final AnimationController _animationController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.04), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutQuad,
+          ),
+        );
+    _animationController.forward();
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -33,8 +59,8 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _errors['email'] =
           _emailController.text.isEmpty || !_emailController.text.contains('@')
-              ? 'Please enter a valid email'
-              : null;
+          ? 'Please enter a valid email'
+          : null;
       _errors['password'] = _passwordController.text.length < 6
           ? 'Password must be at least 6 characters'
           : null;
@@ -66,160 +92,108 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 900;
 
     return Scaffold(
       body: AuthBackground(
-        child: isMobile
-            ? _buildMobileLayout(authProvider)
-            : _buildDesktopLayout(authProvider),
-      ),
-    );
-  }
-
-  Widget _buildDesktopLayout(AuthProvider authProvider) {
-    return Row(
-      children: [
-        Expanded(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 60),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.25),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 460),
+                  child: GlassCard(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 28,
+                      vertical: 36,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      AppColors.primary,
+                                      AppColors.secondary,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.primary.withValues(
+                                        alpha: 0.25,
+                                      ),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 8),
+                                    ),
+                                  ],
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.home_work_rounded,
+                                    color: Colors.white,
+                                    size: 32,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              const Text(
+                                'VacanSee',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              const Text(
+                                'Find your perfect space in Cagayan de Oro',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        const SizedBox(height: 32),
+                        const Text(
+                          'Welcome Back',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Sign in to continue tracking vacancies in real-time',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        _buildForm(authProvider),
                       ],
                     ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.home_work_rounded,
-                        color: Colors.white,
-                        size: 34,
-                      ),
-                    ),
                   ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'VacanSee',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Find your perfect boarding house\nin Cagayan de Oro',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.textSecondary,
-                      height: 1.6,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 48),
-              child: GlassCard(
-                padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 44),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: _buildForm(authProvider),
                 ),
               ),
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMobileLayout(AuthProvider authProvider) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.25),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.home_work_rounded,
-                  color: Colors.white,
-                  size: 30,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'VacanSee',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 32),
-            GlassCard(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Welcome Back',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Login to continue finding your space',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  _buildForm(authProvider),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -252,7 +226,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 18, color: AppColors.error),
+                  icon: const Icon(
+                    Icons.close,
+                    size: 18,
+                    color: AppColors.error,
+                  ),
                   onPressed: authProvider.clearError,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -311,10 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             child: const Text(
               'Forgot Password?',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -389,10 +364,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const Text(
                 "Don't have an account? ",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                ),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
               ),
               GestureDetector(
                 onTap: () => Navigator.pushReplacement(
@@ -416,10 +388,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Center(
           child: Text.rich(
             TextSpan(
-              style: const TextStyle(
-                fontSize: 11,
-                color: Color(0xFF999999),
-              ),
+              style: const TextStyle(fontSize: 11, color: Color(0xFF999999)),
               children: [
                 const TextSpan(text: 'By logging in, you agree to our '),
                 TextSpan(

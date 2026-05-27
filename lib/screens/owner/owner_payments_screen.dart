@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
@@ -14,26 +15,29 @@ class OwnerPaymentsScreen extends StatefulWidget {
 
 class _OwnerPaymentsScreenState extends State<OwnerPaymentsScreen> {
   String _searchQuery = '';
-  bool _isSummaryHovered = false;
 
   @override
   Widget build(BuildContext context) {
     final bookingProvider = context.watch<BookingProvider>();
+    final revenueBookings = bookingProvider.bookings
+        .where((b) =>
+            b.status == BookingStatus.approved ||
+            b.status == BookingStatus.completed)
+        .toList();
 
-    // Get all approved and completed bookings as revenue lines
-    final revenueBookings = bookingProvider.bookings.where((b) =>
-        b.status == BookingStatus.approved ||
-        b.status == BookingStatus.completed).toList();
-
-    // Filter by student or property name search query
     final filteredBookings = revenueBookings.where((b) {
       final query = _searchQuery.toLowerCase();
       return b.studentName.toLowerCase().contains(query) ||
           b.propertyName.toLowerCase().contains(query);
     }).toList();
 
-    // Total monthly earnings from approved bookings
-    final totalMonthlyEarnings = filteredBookings.fold(0.0, (sum, b) => sum + b.monthlyRate);
+    final totalMonthlyEarnings =
+        filteredBookings.fold(0.0, (sum, b) => sum + b.monthlyRate);
+    final approvedCount =
+        revenueBookings.where((b) => b.status == BookingStatus.approved).length;
+    final completedCount = revenueBookings
+        .where((b) => b.status == BookingStatus.completed)
+        .length;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -42,32 +46,32 @@ class _OwnerPaymentsScreenState extends State<OwnerPaymentsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title & Actions Row
+            // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       'Payments & Revenue',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppColors.textPrimary,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Text(
                       'Manage, search and track monthly rates and booking payments.',
-                      style: TextStyle(
+                      style: GoogleFonts.openSans(
                         fontSize: 14,
-                        color: Color(0xFF64748B),
+                        color: AppColors.textMuted,
                       ),
                     ),
                   ],
                 ),
-                ElevatedButton.icon(
+                OutlinedButton.icon(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -76,12 +80,18 @@ class _OwnerPaymentsScreenState extends State<OwnerPaymentsScreen> {
                     );
                   },
                   icon: const Icon(Icons.download_rounded, size: 16),
-                  label: const Text('Export PDF'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5287B2),
-                    foregroundColor: Colors.white,
+                  label: Text(
+                    'Export PDF',
+                    style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 11),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
@@ -89,207 +99,333 @@ class _OwnerPaymentsScreenState extends State<OwnerPaymentsScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Summary Card
-            MouseRegion(
-              onEnter: (_) => setState(() => _isSummaryHovered = true),
-              onExit: (_) => setState(() => _isSummaryHovered = false),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: _isSummaryHovered ? const Color(0xFF5287B2).withValues(alpha: 0.5) : const Color(0xFFE2E8F0),
-                    width: _isSummaryHovered ? 1.5 : 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _isSummaryHovered 
-                          ? const Color(0xFF5287B2).withValues(alpha: 0.05) 
-                          : Colors.black.withValues(alpha: 0.02),
-                      blurRadius: _isSummaryHovered ? 16 : 8,
-                      offset: Offset(0, _isSummaryHovered ? 6 : 4),
-                    ),
-                  ],
-                ),
-                transform: Matrix4.translationValues(0.0, _isSummaryHovered ? -2.0 : 0.0, 0.0),
-                padding: const EdgeInsets.all(24.0),
-                child: Row(
+            // Summary KPI Cards
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth > 700;
+                return GridView.count(
+                  crossAxisCount: isWide ? 3 : 1,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: isWide ? 3.5 : 4.5,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF5287B2).withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.account_balance_wallet_rounded,
-                        color: Color(0xFF5287B2),
-                        size: 32,
-                      ),
+                    _buildSummaryCard(
+                      Icons.account_balance_wallet_rounded,
+                      'Estimated Monthly Revenue',
+                      '₱${_formatNumber(totalMonthlyEarnings)}',
+                      AppColors.primary,
                     ),
-                    const SizedBox(width: 24),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Estimated Monthly Revenue',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF64748B),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '₱${totalMonthlyEarnings.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F172A),
-                          ),
-                        ),
-                      ],
+                    _buildSummaryCard(
+                      Icons.check_circle_rounded,
+                      'Approved Bookings',
+                      '$approvedCount',
+                      AppColors.success,
+                    ),
+                    _buildSummaryCard(
+                      Icons.done_all_rounded,
+                      'Completed Bookings',
+                      '$completedCount',
+                      AppColors.secondary,
                     ),
                   ],
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+
+            // Search
+            TextField(
+              onChanged: (val) => setState(() => _searchQuery = val),
+              decoration: InputDecoration(
+                hintText: 'Search by student name or property name...',
+                prefixIcon:
+                    const Icon(Icons.search_rounded, color: AppColors.textMuted),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear_rounded,
+                            color: AppColors.textMuted),
+                        onPressed: () => setState(() => _searchQuery = ''),
+                      )
+                    : null,
+                fillColor: Colors.white,
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide:
+                      const BorderSide(color: AppColors.primary, width: 1.5),
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-
-            // Search Bar & Filter Row
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    onChanged: (val) {
-                      setState(() {
-                        _searchQuery = val;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Search by student name or property name...',
-                      prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF64748B)),
-                      fillColor: Colors.white,
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
             const SizedBox(height: 16),
 
-            // Revenue Listings Table/Card
+            // Revenue Table
             Card(
               elevation: 0,
               color: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: const BorderSide(color: Color(0xFFE2E8F0)),
+                side: const BorderSide(color: AppColors.border),
               ),
               child: filteredBookings.isEmpty
                   ? _buildEmptyState()
-                  : Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: DataTable(
-                        columnSpacing: 24,
-                        columns: const [
-                          DataColumn(
-                            label: Text(
-                              'Tenant',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Property / Room',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Start Date',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Rate',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Status',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-                            ),
-                          ),
-                        ],
-                        rows: filteredBookings.map((booking) {
-                          final dateStr = DateFormat('MMM dd, yyyy').format(booking.requestedAt);
-
-                          return DataRow(
-                            cells: [
-                              DataCell(
-                                Text(
-                                  booking.studentName,
-                                  style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  '${booking.propertyName} (${booking.roomDescription})',
-                                  style: const TextStyle(color: Color(0xFF475569)),
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  dateStr,
-                                  style: const TextStyle(color: Color(0xFF64748B)),
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  '₱${booking.monthlyRate}/mo',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF5287B2)),
-                                ),
-                              ),
-                              DataCell(
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: booking.statusColor.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    booking.statusLabel,
-                                    style: TextStyle(
-                                      color: booking.statusColor,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                      ),
+                  : LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (constraints.maxWidth < 600) {
+                          return _buildMobileListView(filteredBookings);
+                        }
+                        return _buildDesktopTable(filteredBookings);
+                      },
                     ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSummaryCard(
+      IconData icon, String label, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.openSans(
+                    fontSize: 12,
+                    color: AppColors.textMuted,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: GoogleFonts.poppins(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopTable(List<BookingModel> bookings) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: DataTable(
+        columnSpacing: 24,
+        headingRowHeight: 48,
+        columns: [
+          DataColumn(
+            label: Text(
+              'Tenant',
+              style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                  fontSize: 13),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Property / Room',
+              style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                  fontSize: 13),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Start Date',
+              style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                  fontSize: 13),
+            ),
+          ),
+          DataColumn(
+            numeric: true,
+            label: Text(
+              'Rate',
+              style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                  fontSize: 13),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Status',
+              style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                  fontSize: 13),
+            ),
+          ),
+        ],
+        rows: bookings.map((booking) {
+          final dateStr =
+              DateFormat('MMM dd, yyyy').format(booking.requestedAt);
+          return DataRow(
+            cells: [
+              DataCell(Text(
+                booking.studentName,
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                    fontSize: 13),
+              )),
+              DataCell(Text(
+                '${booking.propertyName} (${booking.roomDescription})',
+                style: GoogleFonts.openSans(
+                    color: AppColors.textSecondary, fontSize: 13),
+              )),
+              DataCell(Text(
+                dateStr,
+                style: GoogleFonts.openSans(
+                    color: AppColors.textMuted, fontSize: 13),
+              )),
+              DataCell(Text(
+                '₱${NumberFormat('#,###').format(booking.monthlyRate)}',
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                    fontSize: 13),
+              )),
+              DataCell(Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: booking.statusColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: booking.statusColor.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Text(
+                  booking.statusLabel,
+                  style: GoogleFonts.poppins(
+                    color: booking.statusColor,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              )),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildMobileListView(List<BookingModel> bookings) {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(16),
+      itemCount: bookings.length,
+      separatorBuilder: (_, _) => const Divider(
+        color: AppColors.divider,
+        height: 24,
+      ),
+      itemBuilder: (context, index) {
+        final booking = bookings[index];
+        final dateStr =
+            DateFormat('MMM dd, yyyy').format(booking.requestedAt);
+        return Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    booking.studentName,
+                    style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                        fontSize: 14),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${booking.propertyName} • $dateStr',
+                    style: GoogleFonts.openSans(
+                        color: AppColors.textMuted, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '₱${NumberFormat('#,###').format(booking.monthlyRate)}',
+                  style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                      fontSize: 14),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: booking.statusColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: booking.statusColor.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Text(
+                    booking.statusLabel,
+                    style: GoogleFonts.poppins(
+                      color: booking.statusColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -302,14 +438,14 @@ class _OwnerPaymentsScreenState extends State<OwnerPaymentsScreen> {
             Icon(
               Icons.receipt_long_rounded,
               size: 48,
-              color: const Color(0xFF5287B2).withValues(alpha: 0.3),
+              color: AppColors.primary.withValues(alpha: 0.2),
             ),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'No matching payment records found',
-              style: TextStyle(
+              style: GoogleFonts.openSans(
                 fontSize: 14,
-                color: Color(0xFF64748B),
+                color: AppColors.textMuted,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -317,5 +453,14 @@ class _OwnerPaymentsScreenState extends State<OwnerPaymentsScreen> {
         ),
       ),
     );
+  }
+
+  String _formatNumber(double val) {
+    if (val >= 1000000) {
+      return '${(val / 1000000).toStringAsFixed(1)}M';
+    } else if (val >= 1000) {
+      return '${(val / 1000).toStringAsFixed(0)}K';
+    }
+    return val.toStringAsFixed(0);
   }
 }

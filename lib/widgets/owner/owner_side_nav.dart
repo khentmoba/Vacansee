@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../core/theme/app_theme.dart';
+import '../../providers/auth_provider.dart';
 
 class OwnerSideNav extends StatelessWidget {
   final int selectedIndex;
@@ -14,131 +18,180 @@ class OwnerSideNav extends StatelessWidget {
     this.pendingBookingsCount = 0,
   });
 
+  static const _navItems = [
+    _NavItem('Dashboard', Icons.dashboard_rounded),
+    _NavItem('My Listings', Icons.home_work_rounded),
+    _NavItem('Booking Requests', Icons.book_online_rounded),
+    _NavItem('Messages', Icons.mail_rounded),
+    _NavItem('Performance', Icons.analytics_rounded),
+    _NavItem('Payments', Icons.payments_rounded),
+    _NavItem('Profile/Settings', Icons.person_rounded),
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthProvider>().user;
+    final initials = _getInitials(user?.displayName ?? 'Owner');
+
     return Container(
       width: 260,
       decoration: const BoxDecoration(
-        color: Color(0xFF1A2B4B), // Deep navy from guidelines
+        gradient: LinearGradient(
+          colors: [AppColors.navyDark, AppColors.navyMedium],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(2, 0),
+            color: Color(0x1A000000),
+            blurRadius: 20,
+            offset: Offset(4, 0),
           ),
         ],
       ),
       child: Column(
         children: [
-          // Header/Logo
+          // Brand + User Section
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: Color(0x1AFFFFFF)),
+              ),
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Logo row
                 Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF5287B2).withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
+                        gradient: const LinearGradient(
+                          colors: [AppColors.primary, AppColors.secondary],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(
                         Icons.holiday_village_rounded,
-                        color: Color(0xFF5287B2),
-                        size: 28,
+                        color: Colors.white,
+                        size: 22,
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
+                    Text(
                       'VacanSee',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         color: Colors.white,
-                        fontSize: 22,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(width: 12),
-                Padding(
-                  padding: const EdgeInsets.only(left: 48, top: 4),
-                  child: Text(
-                    'OWNER PORTAL',
-                    style: TextStyle(
-                      color: const Color(0xFF5287B2).withValues(alpha: 0.8),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.0,
+                const SizedBox(height: 20),
+                // User avatar + name
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                      child: Text(
+                        initials,
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user?.displayName ?? 'Property Owner',
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            'Owner Portal',
+                            style: GoogleFonts.openSans(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
 
-          const Divider(color: Color(0xFF2C3E60), height: 1),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // Nav Items
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                _buildNavItem(0, 'Dashboard', Icons.dashboard_rounded),
-                _buildNavItem(1, 'My Listings', Icons.home_work_rounded),
-                _buildNavItem(
-                  2,
-                  'Booking Requests',
-                  Icons.book_online_rounded,
-                  badgeCount: pendingBookingsCount,
-                ),
-                _buildNavItem(3, 'Messages', Icons.mail_rounded),
-                _buildNavItem(4, 'Performance', Icons.analytics_rounded),
-                _buildNavItem(5, 'Payments', Icons.payments_rounded),
-                _buildNavItem(6, 'Profile/Settings', Icons.person_rounded),
-              ],
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              children: _navItems.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
+                final isSelected = selectedIndex == index;
+                final showBadge = index == 2 && pendingBookingsCount > 0;
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: _SideNavItem(
+                    icon: item.icon,
+                    label: item.label,
+                    isSelected: isSelected,
+                    badgeCount: showBadge ? pendingBookingsCount : 0,
+                    onTap: () => onIndexChanged(index),
+                  ),
+                );
+              }).toList(),
             ),
           ),
 
           // Footer
-          const Divider(color: Color(0xFF2C3E60), height: 1),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              border: Border(
+                top: BorderSide(color: Color(0x1AFFFFFF)),
+              ),
+            ),
             child: Column(
               children: [
-                _buildNavItem(7, 'Help & Support', Icons.help_outline_rounded, isUtility: true),
-                const SizedBox(height: 8),
-                InkWell(
+                _SideNavItem(
+                  icon: Icons.help_outline_rounded,
+                  label: 'Help & Support',
+                  isSelected: false,
+                  utility: true,
+                  onTap: () {},
+                ),
+                const SizedBox(height: 6),
+                _SideNavItem(
+                  icon: Icons.logout_rounded,
+                  label: 'Logout',
+                  isSelected: false,
+                  utility: true,
+                  isLogout: true,
                   onTap: onLogout,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: const [
-                        Icon(
-                          Icons.logout_rounded,
-                          color: Colors.redAccent,
-                          size: 20,
-                        ),
-                        SizedBox(width: 16),
-                        Text(
-                          'Logout',
-                          style: TextStyle(
-                            color: Colors.redAccent,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -148,97 +201,120 @@ class OwnerSideNav extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(
-    int index,
-    String title,
-    IconData icon, {
-    int badgeCount = 0,
-    bool isUtility = false,
-  }) {
-    final isSelected = selectedIndex == index;
-    final activeColor = const Color(0xFF5287B2);
-    bool isHovered = false;
+  String _getInitials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return name.isNotEmpty ? name[0].toUpperCase() : 'O';
+  }
+}
 
-    return StatefulBuilder(
-      builder: (context, setStateBuilder) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0),
-          child: MouseRegion(
-            onEnter: (_) => setStateBuilder(() => isHovered = true),
-            onExit: (_) => setStateBuilder(() => isHovered = false),
-            child: InkWell(
-              onTap: () => onIndexChanged(index),
-              borderRadius: BorderRadius.circular(12),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? activeColor.withValues(alpha: 0.15)
-                      : isHovered 
-                          ? Colors.white.withValues(alpha: 0.05)
-                          : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
-                  border: isSelected
-                      ? Border(
-                          left: BorderSide(color: activeColor, width: 4),
-                        )
-                      : Border(
-                          left: BorderSide(
-                            color: isHovered ? activeColor.withValues(alpha: 0.5) : Colors.transparent, 
-                            width: 4,
-                          ),
-                        ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      icon,
-                      color: isSelected 
-                          ? activeColor 
-                          : isHovered 
-                              ? Colors.white 
-                              : const Color(0xFF94A3B8),
-                      size: 20,
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                          color: isSelected 
-                              ? Colors.white 
-                              : isHovered 
-                                  ? Colors.white.withValues(alpha: 0.9) 
-                                  : const Color(0xFF94A3B8),
-                          fontSize: 15,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    if (badgeCount > 0)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.orangeAccent,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          '$badgeCount',
-                          style: const TextStyle(
-                            color: Colors.black87,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                  ],
+class _NavItem {
+  final String label;
+  final IconData icon;
+  const _NavItem(this.label, this.icon);
+}
+
+class _SideNavItem extends StatefulWidget {
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final int badgeCount;
+  final VoidCallback onTap;
+  final bool utility;
+  final bool isLogout;
+
+  const _SideNavItem({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+    this.badgeCount = 0,
+    this.utility = false,
+    this.isLogout = false,
+  });
+
+  @override
+  State<_SideNavItem> createState() => _SideNavItemState();
+}
+
+class _SideNavItemState extends State<_SideNavItem> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: widget.isSelected
+                ? AppColors.primary.withValues(alpha: 0.15)
+                : _isHovered
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            border: widget.isSelected
+                ? const Border(
+                    left: BorderSide(color: AppColors.primary, width: 3),
+                  )
+                : null,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                widget.icon,
+                size: 20,
+                color: widget.isSelected
+                    ? AppColors.primary
+                    : _isHovered
+                        ? Colors.white
+                        : Colors.white.withValues(alpha: 0.55),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  widget.label,
+                  style: GoogleFonts.poppins(
+                    color: widget.isSelected
+                        ? Colors.white
+                        : _isHovered
+                            ? Colors.white.withValues(alpha: 0.9)
+                            : Colors.white.withValues(alpha: 0.55),
+                    fontSize: 14,
+                    fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w400,
+                  ),
                 ),
               ),
-            ),
+              if (widget.badgeCount > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.secondary],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${widget.badgeCount}',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_theme.dart';
 import '../../models/booking_model.dart';
 import '../../models/rating_model.dart';
 import '../../models/property_model.dart';
@@ -85,7 +87,7 @@ class _RatingsScreenState extends State<RatingsScreen> {
     final isDesktop = MediaQuery.of(context).size.width >= 1000;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FBFD),
+      backgroundColor: AppColors.background,
       body: SingleChildScrollView(
         padding: EdgeInsets.only(
           left: isDesktop ? 60 : 24,
@@ -97,20 +99,20 @@ class _RatingsScreenState extends State<RatingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Page Header
-            const Text(
+            Text(
               'Rate Your Experience',
-              style: TextStyle(
+              style: GoogleFonts.outfit(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1D1B16),
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Share your feedback to help other tenants make informed decisions',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
+              style: GoogleFonts.workSans(
+                fontSize: 16,
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -149,31 +151,26 @@ class _RatingsScreenState extends State<RatingsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: const [AppShadows.sm],
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Submit a Review',
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1D1B16),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 32),
 
           // Boarding House Selection
-          const Text(
+          Text(
             'Select Boarding House *',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            style: GoogleFonts.workSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
           ),
           const SizedBox(height: 12),
           StreamBuilder<List<BookingModel>>(
@@ -193,19 +190,20 @@ class _RatingsScreenState extends State<RatingsScreen> {
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(10),
-                  color: const Color(0xFFFBFBFB),
+                  border: Border.all(color: AppColors.border),
+                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.secondaryContainer,
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<BookingModel>(
                     value: _selectedBooking,
                     isExpanded: true,
-                    hint: const Text('Choose a boarding house to review...'),
+                    dropdownColor: Colors.white,
+                    hint: Text('Choose a boarding house to review...', style: GoogleFonts.workSans(color: AppColors.textSecondary, fontSize: 14)),
                     items: bookings.map((booking) {
                       return DropdownMenuItem(
                         value: booking,
-                        child: Text(booking.propertyName),
+                        child: Text(booking.propertyName, style: GoogleFonts.workSans(color: AppColors.textPrimary)),
                       );
                     }).toList(),
                     onChanged: (value) {
@@ -219,19 +217,20 @@ class _RatingsScreenState extends State<RatingsScreen> {
           const SizedBox(height: 32),
 
           // Rating
-          const Text(
+          Text(
             'Your Rating *',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            style: GoogleFonts.workSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
           ),
           const SizedBox(height: 12),
           Row(
             children: List.generate(5, (index) {
+              final active = index < _rating;
               return GestureDetector(
                 onTap: () => setState(() => _rating = index + 1),
                 child: Icon(
-                  index < _rating ? Icons.star_rounded : Icons.star_border_rounded,
+                  active ? Icons.star_rounded : Icons.star_border_rounded,
                   size: 48,
-                  color: index < _rating ? const Color(0xFFFFB800) : Colors.grey[300],
+                  color: active ? Colors.amber : Colors.grey[300],
                 ),
               );
             }),
@@ -239,36 +238,38 @@ class _RatingsScreenState extends State<RatingsScreen> {
           const SizedBox(height: 32),
 
           // Review Text
-          const Text(
+          Text(
             'Your Review *',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            style: GoogleFonts.workSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _reviewController,
             maxLines: 6,
+            style: GoogleFonts.workSans(fontSize: 14.5, color: AppColors.textPrimary),
             decoration: InputDecoration(
               hintText: 'Share your experience about this boarding house...',
+              hintStyle: GoogleFonts.workSans(color: Colors.grey, fontSize: 14),
               filled: true,
-              fillColor: const Color(0xFFFBFBFB),
+              fillColor: AppColors.secondaryContainer,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppColors.border),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppColors.border),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Color(0xFF5287B2)),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
               ),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             '$_charCount characters',
-            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+            style: GoogleFonts.workSans(fontSize: 12, color: AppColors.textMuted),
           ),
           const SizedBox(height: 32),
 
@@ -281,11 +282,11 @@ class _RatingsScreenState extends State<RatingsScreen> {
                   ? null
                   : _submitReview,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF5287B2),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: Colors.grey[300],
+                disabledBackgroundColor: Colors.grey[200],
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 0,
               ),
@@ -293,12 +294,12 @@ class _RatingsScreenState extends State<RatingsScreen> {
                   ? const CircularProgressIndicator(color: Colors.white)
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.send_rounded, size: 20),
-                        SizedBox(width: 10),
+                      children: [
+                        const Icon(Icons.send_rounded, size: 20),
+                        const SizedBox(width: 10),
                         Text(
                           'Submit Review',
-                          style: TextStyle(
+                          style: GoogleFonts.outfit(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -317,15 +318,15 @@ class _RatingsScreenState extends State<RatingsScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF9E6),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFFFE58F)),
+        color: AppColors.primaryContainer,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
       ),
       child: Text(
         'You need to have an approved booking before you can submit a rating.',
-        style: TextStyle(
+        style: GoogleFonts.workSans(
           fontSize: 14,
-          color: Colors.amber[900],
+          color: AppColors.textPrimary,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -336,12 +337,12 @@ class _RatingsScreenState extends State<RatingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Your Previous Reviews',
-          style: TextStyle(
+          style: GoogleFonts.outfit(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1D1B16),
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 32),
@@ -355,11 +356,11 @@ class _RatingsScreenState extends State<RatingsScreen> {
                   padding: const EdgeInsets.only(top: 48),
                   child: Column(
                     children: [
-                      Icon(Icons.rate_review_outlined, size: 64, color: Colors.grey[300]),
+                      Icon(Icons.rate_review_outlined, size: 64, color: AppColors.textMuted.withValues(alpha: 0.5)),
                       const SizedBox(height: 16),
                       Text(
                         'No reviews yet',
-                        style: TextStyle(color: Colors.grey[500], fontSize: 16),
+                        style: GoogleFonts.workSans(color: AppColors.textMuted, fontSize: 16),
                       ),
                     ],
                   ),
@@ -408,13 +409,8 @@ class _RatingsScreenState extends State<RatingsScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: const [AppShadows.sm],
+            border: Border.all(color: AppColors.border),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -424,15 +420,15 @@ class _RatingsScreenState extends State<RatingsScreen> {
                 children: [
                   Text(
                     property.name,
-                    style: const TextStyle(
+                    style: GoogleFonts.outfit(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1D1B16),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   Text(
                     DateFormat('MMM d, yyyy').format(rating.createdAt),
-                    style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                    style: GoogleFonts.workSans(fontSize: 13, color: AppColors.textSecondary),
                   ),
                 ],
               ),
@@ -442,7 +438,7 @@ class _RatingsScreenState extends State<RatingsScreen> {
                   return Icon(
                     index < rating.rating ? Icons.star_rounded : Icons.star_border_rounded,
                     size: 20,
-                    color: index < rating.rating ? const Color(0xFFFFB800) : Colors.grey[300],
+                    color: index < rating.rating ? Colors.amber : Colors.grey[300],
                   );
                 }),
               ),
@@ -450,9 +446,9 @@ class _RatingsScreenState extends State<RatingsScreen> {
                 const SizedBox(height: 16),
                 Text(
                   rating.review!,
-                  style: TextStyle(
+                  style: GoogleFonts.workSans(
                     fontSize: 15,
-                    color: Colors.grey[700],
+                    color: AppColors.textSecondary,
                     height: 1.5,
                   ),
                 ),

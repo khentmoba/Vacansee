@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/booking_provider.dart';
@@ -20,26 +21,30 @@ class OwnerPerformanceScreen extends StatelessWidget {
     final totalAvailable = propertyProvider.totalAvailableRooms;
     final totalRooms = totalOccupied + totalAvailable;
 
-    final occupancyRate = totalRooms > 0
-        ? (totalOccupied / totalRooms) * 100
-        : 0.0;
+    final occupancyRate =
+        totalRooms > 0 ? (totalOccupied / totalRooms) * 100 : 0.0;
 
-    // Filter approved or completed for total revenue
     final ownerBookings = bookingProvider.bookings;
     final approvedBookings = ownerBookings
         .where((b) =>
             b.status == BookingStatus.approved ||
             b.status == BookingStatus.completed)
         .toList();
+    final totalRevenue =
+        approvedBookings.fold(0.0, (sum, b) => sum + b.monthlyRate);
 
-    final totalRevenue = approvedBookings.fold(0.0, (sum, b) => sum + b.monthlyRate);
-
-    // Bookings Status Counts
-    final int pending = ownerBookings.where((b) => b.status == BookingStatus.pending).length;
-    final int approved = ownerBookings.where((b) => b.status == BookingStatus.approved).length;
-    final int rejected = ownerBookings.where((b) => b.status == BookingStatus.rejected).length;
-    final int completed = ownerBookings.where((b) => b.status == BookingStatus.completed).length;
-    final int cancelled = ownerBookings.where((b) => b.status == BookingStatus.cancelled).length;
+    final pending = ownerBookings
+        .where((b) => b.status == BookingStatus.pending)
+        .length;
+    final approved = ownerBookings
+        .where((b) => b.status == BookingStatus.approved)
+        .length;
+    final rejected = ownerBookings
+        .where((b) => b.status == BookingStatus.rejected)
+        .length;
+    final completed = ownerBookings
+        .where((b) => b.status == BookingStatus.completed)
+        .length;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -48,26 +53,25 @@ class OwnerPerformanceScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title
-            const Text(
+            Text(
               'Performance & Analytics',
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            const SizedBox(height: 6),
+            Text(
               'Track occupancy, revenues, and bookings conversion metrics.',
-              style: TextStyle(
+              style: GoogleFonts.openSans(
                 fontSize: 14,
-                color: Color(0xFF64748B),
+                color: AppColors.textMuted,
               ),
             ),
             const SizedBox(height: 24),
 
-            // Responsive KPI Row
+            // KPI Cards
             LayoutBuilder(
               builder: (context, constraints) {
                 final isWide = constraints.maxWidth > 700;
@@ -83,25 +87,26 @@ class OwnerPerformanceScreen extends StatelessWidget {
                       'Occupancy Rate',
                       '${occupancyRate.toStringAsFixed(1)}%',
                       Icons.percent_rounded,
-                      const Color(0xFF5287B2),
+                      AppColors.primary,
+                      progress: occupancyRate / 100,
                     ),
                     _buildKpiCard(
                       'Total Listings',
                       '$totalListings',
                       Icons.home_work_rounded,
-                      Colors.indigo,
+                      AppColors.secondary,
                     ),
                     _buildKpiCard(
                       'Pending Bookings',
                       '$pendingCount',
                       Icons.pending_actions_rounded,
-                      Colors.orange,
+                      AppColors.warning,
                     ),
                     _buildKpiCard(
                       'Total Bookings',
                       '${ownerBookings.length}',
                       Icons.book_online_rounded,
-                      Colors.teal,
+                      AppColors.success,
                     ),
                   ],
                 );
@@ -109,14 +114,14 @@ class OwnerPerformanceScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Revenue Chart card
+            // Revenue Chart
             SizedBox(
               height: 380,
               child: OwnerRevenueChart(bookings: ownerBookings),
             ),
             const SizedBox(height: 24),
 
-            // Two panels: Bookings Breakdown & Occupancy detail
+            // Breakdown panels
             LayoutBuilder(
               builder: (context, constraints) {
                 final isWide = constraints.maxWidth > 800;
@@ -124,32 +129,58 @@ class OwnerPerformanceScreen extends StatelessWidget {
                   direction: isWide ? Axis.horizontal : Axis.vertical,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Bookings Breakdown
                     Expanded(
                       flex: isWide ? 1 : 0,
                       child: _buildBreakdownCard(
                         title: 'Bookings Status Breakdown',
                         children: [
-                          _buildBreakdownRow('Completed', completed, Colors.green),
-                          _buildBreakdownRow('Approved', approved, Colors.blue),
-                          _buildBreakdownRow('Pending Action', pending, Colors.orange),
-                          _buildBreakdownRow('Rejected', rejected, Colors.red),
-                          _buildBreakdownRow('Cancelled', cancelled, Colors.grey),
+                          _buildBreakdownRow(
+                              'Completed', completed, AppColors.success),
+                          _buildBreakdownRow(
+                              'Approved', approved, AppColors.primary),
+                          _buildBreakdownRow(
+                              'Pending Action', pending, AppColors.warning),
+                          _buildBreakdownRow(
+                              'Rejected', rejected, AppColors.error),
+                          _buildBreakdownRow(
+                              'Cancelled',
+                              ownerBookings
+                                      .where(
+                                          (b) => b.status == BookingStatus.cancelled)
+                                      .length,
+                              Colors.grey),
                         ],
                       ),
                     ),
-                    if (isWide) const SizedBox(width: 24) else const SizedBox(height: 24),
-                    // Occupancy Detail card
+                    if (isWide)
+                      const SizedBox(width: 24)
+                    else
+                      const SizedBox(height: 24),
                     Expanded(
                       flex: isWide ? 1 : 0,
                       child: _buildBreakdownCard(
                         title: 'Room Occupancy Metrics',
                         children: [
-                          _buildBreakdownRow('Occupied Rooms', totalOccupied, const Color(0xFF5287B2)),
-                          _buildBreakdownRow('Vacant / Available Rooms', totalAvailable, Colors.teal),
-                          _buildBreakdownRow('Total Managed Rooms', totalRooms, Colors.black87),
-                          const Divider(height: 24, color: Color(0xFFF1F5F9)),
-                          _buildBreakdownRow('Total Verified Revenue', '₱${totalRevenue.toStringAsFixed(0)}', const Color(0xFF5287B2)),
+                          _buildBreakdownRow(
+                              'Occupied Rooms', totalOccupied, AppColors.primary,
+                              showBar: true,
+                              barValue: totalRooms > 0
+                                  ? totalOccupied / totalRooms
+                                  : 0.0),
+                          _buildBreakdownRow(
+                              'Vacant Rooms', totalAvailable, AppColors.success,
+                              showBar: true,
+                              barValue: totalRooms > 0
+                                  ? totalAvailable / totalRooms
+                                  : 0.0),
+                          const Divider(
+                              color: AppColors.divider, height: 24),
+                          _buildBreakdownRow(
+                              'Total Managed Rooms', totalRooms, Colors.black87),
+                          _buildBreakdownRow(
+                              'Total Revenue',
+                              '₱${totalRevenue.toStringAsFixed(0)}',
+                              AppColors.primary),
                         ],
                       ),
                     ),
@@ -163,7 +194,13 @@ class OwnerPerformanceScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildKpiCard(String label, String value, IconData icon, Color color) {
+  Widget _buildKpiCard(
+    String label,
+    String value,
+    IconData icon,
+    Color color, {
+    double? progress,
+  }) {
     bool isHovered = false;
     return StatefulBuilder(
       builder: (context, setStateBuilder) {
@@ -178,32 +215,54 @@ class OwnerPerformanceScreen extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isHovered ? color.withValues(alpha: 0.5) : const Color(0xFFE2E8F0),
+                color: isHovered
+                    ? color.withValues(alpha: 0.5)
+                    : AppColors.border,
                 width: isHovered ? 1.5 : 1.0,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: isHovered 
-                      ? color.withValues(alpha: 0.08) 
+                  color: isHovered
+                      ? color.withValues(alpha: 0.08)
                       : Colors.black.withValues(alpha: 0.02),
                   blurRadius: isHovered ? 12 : 6,
                   offset: Offset(0, isHovered ? 4 : 2),
                 ),
               ],
             ),
-            transform: Matrix4.translationValues(0.0, isHovered ? -2.0 : 0.0, 0.0),
+            transform: Matrix4.translationValues(
+                0.0, isHovered ? -2.0 : 0.0, 0.0),
             child: Row(
               children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: isHovered 
-                        ? color.withValues(alpha: 0.15) 
-                        : color.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icon, color: color, size: 20),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (progress != null)
+                      SizedBox(
+                        width: 42,
+                        height: 42,
+                        child: CircularProgressIndicator(
+                          value: progress,
+                          strokeWidth: 3,
+                          backgroundColor: AppColors.border,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(color),
+                        ),
+                      ),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: progress != null ? 32 : 38,
+                      height: progress != null ? 32 : 38,
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: isHovered
+                            ? color.withValues(alpha: 0.15)
+                            : color.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(icon, color: color, size: 18),
+                    ),
+                  ],
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -213,10 +272,10 @@ class OwnerPerformanceScreen extends StatelessWidget {
                     children: [
                       Text(
                         label,
-                        style: const TextStyle(
+                        style: GoogleFonts.openSans(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF64748B),
+                          color: AppColors.textMuted,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -224,10 +283,10 @@ class OwnerPerformanceScreen extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         value,
-                        style: const TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: AppColors.textPrimary,
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -242,7 +301,10 @@ class OwnerPerformanceScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBreakdownCard({required String title, required List<Widget> children}) {
+  Widget _buildBreakdownCard({
+    required String title,
+    required List<Widget> children,
+  }) {
     bool isHovered = false;
     return StatefulBuilder(
       builder: (context, setStateBuilder) {
@@ -256,30 +318,33 @@ class OwnerPerformanceScreen extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isHovered ? const Color(0xFF5287B2).withValues(alpha: 0.3) : const Color(0xFFE2E8F0),
+                color: isHovered
+                    ? AppColors.primary.withValues(alpha: 0.3)
+                    : AppColors.border,
                 width: isHovered ? 1.5 : 1.0,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: isHovered 
-                      ? const Color(0xFF5287B2).withValues(alpha: 0.05) 
+                  color: isHovered
+                      ? AppColors.primary.withValues(alpha: 0.05)
                       : Colors.black.withValues(alpha: 0.02),
                   blurRadius: isHovered ? 16 : 8,
                   offset: Offset(0, isHovered ? 6 : 4),
                 ),
               ],
             ),
-            transform: Matrix4.translationValues(0.0, isHovered ? -2.0 : 0.0, 0.0),
+            transform: Matrix4.translationValues(
+                0.0, isHovered ? -2.0 : 0.0, 0.0),
             padding: const EdgeInsets.all(24.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -292,41 +357,64 @@ class OwnerPerformanceScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBreakdownRow(String label, dynamic count, Color color) {
+  Widget _buildBreakdownRow(
+    String label,
+    dynamic count,
+    Color color, {
+    bool showBar = false,
+    double barValue = 0.0,
+  }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
+              Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    label,
+                    style: GoogleFonts.openSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
               Text(
-                label,
-                style: const TextStyle(
+                '$count',
+                style: GoogleFonts.poppins(
                   fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF475569),
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
           ),
-          Text(
-            '$count',
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF0F172A),
+          if (showBar) ...[
+            const SizedBox(height: 6),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: barValue,
+                backgroundColor: AppColors.border,
+                valueColor: AlwaysStoppedAnimation<Color>(color),
+                minHeight: 4,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_theme.dart';
 import '../../models/booking_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/booking_service.dart';
@@ -23,13 +25,20 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     final student = authProvider.user;
 
     if (student == null) {
-      return const Scaffold(body: Center(child: Text('Please log in')));
+      return Scaffold(
+        body: Center(
+          child: Text(
+            'Please log in',
+            style: GoogleFonts.workSans(color: AppColors.textPrimary),
+          ),
+        ),
+      );
     }
 
     final bookingService = BookingService();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FBFD),
+      backgroundColor: AppColors.background,
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isDesktop = constraints.maxWidth >= 800;
@@ -42,7 +51,12 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
               }
 
               if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
+                return Center(
+                  child: Text(
+                    'Error: ${snapshot.error}',
+                    style: GoogleFonts.workSans(color: AppColors.error),
+                  ),
+                );
               }
 
               final allBookings = snapshot.data ?? [];
@@ -77,21 +91,21 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'My Bookings',
-                            style: TextStyle(
+                            style: GoogleFonts.outfit(
                               fontSize: 32,
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF1D1B16),
+                              color: AppColors.textPrimary,
                               letterSpacing: -0.5,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Manage and track all your rental requests',
-                            style: TextStyle(
+                            style: GoogleFonts.workSans(
                               fontSize: 15,
-                              color: Colors.grey[600],
+                              color: AppColors.textSecondary,
                               fontWeight: FontWeight.w400,
                             ),
                           ),
@@ -107,13 +121,13 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
                       child: Row(
                         children: [
-                          _buildStatCard('Pending', pendingCount, const Color(0xFFF59E0B), Icons.hourglass_empty_rounded),
+                          _buildStatCard('Pending', pendingCount, AppColors.warning, Icons.hourglass_empty_rounded),
                           const SizedBox(width: 16),
-                          _buildStatCard('Approved', approvedCount, const Color(0xFF10B981), Icons.check_circle_outline_rounded),
+                          _buildStatCard('Approved', approvedCount, AppColors.success, Icons.check_circle_outline_rounded),
                           const SizedBox(width: 16),
-                          _buildStatCard('Completed', completedCount, const Color(0xFF5287B2), Icons.done_all_rounded),
+                          _buildStatCard('Completed', completedCount, AppColors.primary, Icons.done_all_rounded),
                           const SizedBox(width: 16),
-                          _buildStatCard('Total Bookings', totalCount, const Color(0xFF6B7280), Icons.bookmarks_rounded),
+                          _buildStatCard('Total Bookings', totalCount, AppColors.textMuted, Icons.bookmarks_rounded),
                         ],
                       ),
                     ),
@@ -142,16 +156,16 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                               child: ChoiceChip(
                                 label: Text(
                                   filter,
-                                  style: TextStyle(
+                                  style: GoogleFonts.workSans(
                                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                    color: isSelected ? Colors.white : const Color(0xFF4B5563),
+                                    color: isSelected ? Colors.white : AppColors.textSecondary,
                                   ),
                                 ),
                                 selected: isSelected,
-                                selectedColor: const Color(0xFF5287B2),
+                                selectedColor: AppColors.primary,
                                 backgroundColor: Colors.white,
                                 side: BorderSide(
-                                  color: isSelected ? Colors.transparent : const Color(0xFFE5E7EB),
+                                  color: isSelected ? Colors.transparent : AppColors.border,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
@@ -209,13 +223,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: const [AppShadows.sm],
         border: Border(
           left: BorderSide(color: accentColor, width: 4),
         ),
@@ -228,10 +236,10 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
             children: [
               Text(
                 value.toString(),
-                style: const TextStyle(
+                style: GoogleFonts.outfit(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1F2937),
+                  color: AppColors.textPrimary,
                 ),
               ),
               Icon(icon, size: 20, color: accentColor.withValues(alpha: 0.8)),
@@ -240,10 +248,10 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
           const SizedBox(height: 6),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.workSans(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: Colors.grey[500],
+              color: AppColors.textMuted,
             ),
           ),
         ],
@@ -260,17 +268,17 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEDF5FF),
+              decoration: const BoxDecoration(
+                color: AppColors.primaryContainer,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.bookmark_outline_rounded, size: 48, color: Color(0xFF5287B2)),
+              child: const Icon(Icons.bookmark_outline_rounded, size: 48, color: AppColors.primary),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'No Bookings Found',
-              style: TextStyle(
-                color: Color(0xFF1F2937),
+              style: GoogleFonts.outfit(
+                color: AppColors.textPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -279,7 +287,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
             Text(
               'Bookings fitting the status filter "$_selectedFilter" will appear here.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[500], fontSize: 14),
+              style: GoogleFonts.workSans(color: AppColors.textSecondary, fontSize: 14),
             ),
           ],
         ),
@@ -347,14 +355,8 @@ class _BookingCardState extends State<_BookingCard> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: const Color(0xFFF3F4F6)),
+        boxShadow: const [AppShadows.sm],
+        border: Border.all(color: AppColors.border),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -373,7 +375,7 @@ class _BookingCardState extends State<_BookingCard> {
                     height: 72,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color: const Color(0xFFF3F4F6),
+                      color: AppColors.background,
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: _loadingImage
@@ -398,10 +400,10 @@ class _BookingCardState extends State<_BookingCard> {
                             Expanded(
                               child: Text(
                                 widget.booking.propertyName,
-                                style: const TextStyle(
+                                style: GoogleFonts.outfit(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1F2937),
+                                  color: AppColors.textPrimary,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -416,9 +418,9 @@ class _BookingCardState extends State<_BookingCard> {
                           widget.booking.roomDescription,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
+                          style: GoogleFonts.workSans(
                             fontSize: 13,
-                            color: Colors.grey[600],
+                            color: AppColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -461,14 +463,20 @@ class _BookingCardState extends State<_BookingCard> {
               // Quick Actions
               if (widget.booking.status == BookingStatus.approved || widget.booking.status == BookingStatus.completed) ...[
                 const SizedBox(height: 12),
-                const Divider(height: 1, color: Color(0xFFF3F4F6)),
+                const Divider(height: 1, color: AppColors.divider),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
                       onPressed: () {},
-                      child: const Text('View Lease details', style: TextStyle(color: Color(0xFF6B7280))),
+                      child: Text(
+                        'View Lease details',
+                        style: GoogleFonts.workSans(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     ElevatedButton.icon(
@@ -476,7 +484,7 @@ class _BookingCardState extends State<_BookingCard> {
                       icon: const Icon(Icons.star_rounded, size: 16),
                       label: const Text('Rate Boarding House'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF5287B2),
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -500,16 +508,12 @@ class _BookingCardState extends State<_BookingCard> {
         : 'VB';
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF5287B2), Color(0xFF3B82F6)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppGradients.primaryGradient,
       ),
       child: Center(
         child: Text(
           initials,
-          style: const TextStyle(
+          style: GoogleFonts.outfit(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 18,
@@ -523,14 +527,14 @@ class _BookingCardState extends State<_BookingCard> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: Colors.grey[400]),
+        Icon(icon, size: 14, color: AppColors.textMuted),
         const SizedBox(width: 6),
         Text(
           value,
-          style: const TextStyle(
+          style: GoogleFonts.workSans(
             fontSize: 12.5,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF4B5563),
+            color: AppColors.textSecondary,
           ),
         ),
       ],
@@ -544,22 +548,22 @@ class _BookingCardState extends State<_BookingCard> {
 
     switch (status) {
       case BookingStatus.pending:
-        bgColor = const Color(0xFFFFF7E6);
-        textColor = const Color(0xFFD97706);
+        bgColor = AppColors.warning.withValues(alpha: 0.1);
+        textColor = AppColors.warning;
         break;
       case BookingStatus.approved:
-        bgColor = const Color(0xFFECFDF5);
-        textColor = const Color(0xFF059669);
+        bgColor = AppColors.success.withValues(alpha: 0.1);
+        textColor = AppColors.success;
         break;
       case BookingStatus.completed:
-        bgColor = const Color(0xFFEFF6FF);
-        textColor = const Color(0xFF2563EB);
+        bgColor = AppColors.primary.withValues(alpha: 0.1);
+        textColor = AppColors.primary;
         break;
       case BookingStatus.rejected:
       case BookingStatus.cancelled:
       case BookingStatus.expired:
-        bgColor = const Color(0xFFFEF2F2);
-        textColor = const Color(0xFFDC2626);
+        bgColor = AppColors.error.withValues(alpha: 0.1);
+        textColor = AppColors.error;
         break;
     }
 
@@ -571,7 +575,7 @@ class _BookingCardState extends State<_BookingCard> {
       ),
       child: Text(
         widget.booking.statusLabel,
-        style: TextStyle(
+        style: GoogleFonts.workSans(
           fontSize: 11.5,
           fontWeight: FontWeight.bold,
           color: textColor,
@@ -597,20 +601,20 @@ class _BookingCardState extends State<_BookingCard> {
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
+        color: AppColors.secondaryContainer,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFF3F4F6)),
+        border: Border.all(color: AppColors.primaryContainer),
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFF5287B2)),
+          const Icon(Icons.info_outline_rounded, size: 14, color: AppColors.primary),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
+              style: GoogleFonts.workSans(
                 fontSize: 11.5,
-                color: Color(0xFF4B5563),
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),

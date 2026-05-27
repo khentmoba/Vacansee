@@ -1,4 +1,6 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
@@ -18,7 +20,6 @@ import 'widgets/admin_property_card.dart';
 import 'widgets/admin_booking_filter_bar.dart';
 import 'widgets/admin_booking_card.dart';
 import 'widgets/admin_user_card.dart';
-
 import '../../models/admin_stats_model.dart';
 import '../../models/booking_model.dart';
 import '../../models/user_model.dart';
@@ -41,9 +42,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _refreshData();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refreshData());
   }
 
   Future<void> _refreshData() async {
@@ -54,30 +53,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final bookingProvider = context.read<BookingProvider>();
 
     adminProvider.loadStats();
-
     if (_currentView == AdminView.listings) {
       propertyProvider.loadAdminProperties();
     } else {
       propertyProvider.loadProperties();
     }
-
     if (_currentView == AdminView.bookings) {
       bookingProvider.loadAdminBookings(statusFilter: _bookingStatusFilter);
     } else {
       bookingProvider.loadRecentBookings(limit: 4);
     }
-
     if (_currentView == AdminView.users) {
       adminProvider.loadAllUsers();
     }
-
     authProvider.loadPendingOwners();
   }
 
   void _onViewChanged(AdminView view) {
-    setState(() {
-      _currentView = view;
-    });
+    setState(() => _currentView = view);
     _refreshData();
   }
 
@@ -88,7 +81,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final propertyProvider = context.watch<PropertyProvider>();
     final authProvider = context.watch<AuthProvider>();
     final stats = adminProvider.stats;
-
     final isMobile = MediaQuery.of(context).size.width < 900;
 
     Widget mainContent = adminProvider.isLoading && stats == null
@@ -96,16 +88,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         : RefreshIndicator(
             onRefresh: _refreshData,
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
+              duration: AppDurations.medium,
               child: KeyedSubtree(
                 key: ValueKey<AdminView>(_currentView),
-                child: _buildCurrentView(
-                  stats,
-                  bookingProvider,
-                  propertyProvider,
-                  adminProvider,
-                  authProvider,
-                ),
+                child: _buildCurrentView(stats, bookingProvider, propertyProvider, adminProvider, authProvider),
               ),
             ),
           );
@@ -113,32 +99,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
     if (isMobile) {
       return Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AdminTopNavBar(
-          currentView: _currentView,
-          onViewChanged: _onViewChanged,
-          isMobile: true,
-        ),
+        appBar: AdminTopNavBar(currentView: _currentView, onViewChanged: _onViewChanged, isMobile: true),
         drawer: Drawer(
           backgroundColor: Colors.white,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.horizontal(right: Radius.circular(24)),
-          ),
-          child: AdminSidebar(
-            currentView: _currentView,
-            onViewChanged: _onViewChanged,
-            inDrawer: true,
-          ),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(right: Radius.circular(24))),
+          child: AdminSidebar(currentView: _currentView, onViewChanged: _onViewChanged, inDrawer: true),
         ),
-        bottomNavigationBar: AdminBottomNav(
-          currentView: _currentView,
-          onViewChanged: _onViewChanged,
-        ),
-        body: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
-            child: mainContent,
-          ),
-        ),
+        bottomNavigationBar: AdminBottomNav(currentView: _currentView, onViewChanged: _onViewChanged),
+        body: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1200), child: mainContent)),
       );
     }
 
@@ -146,24 +114,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
       backgroundColor: AppColors.background,
       body: Row(
         children: [
-          AdminSidebar(
-            currentView: _currentView,
-            onViewChanged: _onViewChanged,
-          ),
+          AdminSidebar(currentView: _currentView, onViewChanged: _onViewChanged),
           Expanded(
             child: Column(
               children: [
-                AdminTopNavBar(
-                  currentView: _currentView,
-                  onViewChanged: _onViewChanged,
-                  isMobile: false,
-                ),
+                AdminTopNavBar(currentView: _currentView, onViewChanged: _onViewChanged, isMobile: false),
                 Expanded(
                   child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1200),
-                      child: mainContent,
-                    ),
+                    child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1200), child: mainContent),
                   ),
                 ),
               ],
@@ -185,17 +143,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
       case AdminView.dashboard:
         final isMobile = MediaQuery.of(context).size.width < 800;
         return ListView(
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 20 : 40,
-            vertical: isMobile ? 24 : 40,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 40, vertical: isMobile ? 24 : 40),
           children: [
             _buildHeader(),
             const SizedBox(height: 32),
             _buildStatsGrid(stats),
             const SizedBox(height: 24),
             _buildSolidStatsGrid(stats),
-            const SizedBox(height: 48),
+            const SizedBox(height: 32),
+            _buildOccupancyChart(propertyProvider),
+            const SizedBox(height: 40),
             _buildBottomGrids(bookingProvider),
           ],
         );
@@ -210,125 +167,157 @@ class _AdminDashboardState extends State<AdminDashboard> {
     }
   }
 
+  Widget _buildOccupancyChart(PropertyProvider propertyProvider) {
+    final totalOccupied = propertyProvider.totalOccupiedRooms;
+    final totalAvailable = propertyProvider.totalAvailableRooms;
+    final totalRooms = totalOccupied + totalAvailable;
+    final isMobile = MediaQuery.of(context).size.width < 800;
+
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 20 : 24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [AppShadows.md],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Room Occupancy Overview',
+            style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+          ),
+          const SizedBox(height: 20),
+          if (totalRooms == 0)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 40),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.pie_chart_outline, size: 48, color: AppColors.textMuted.withValues(alpha: 0.3)),
+                    const SizedBox(height: 12),
+                    Text('No room data available', style: GoogleFonts.workSans(color: AppColors.textMuted)),
+                  ],
+                ),
+              ),
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 180,
+                    child: PieChart(
+                      PieChartData(
+                        sections: [
+                          PieChartSectionData(
+                            value: totalOccupied.toDouble(),
+                            color: AppColors.primary,
+                            title: '${(totalOccupied / totalRooms * 100).toStringAsFixed(0)}%',
+                            titleStyle: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                            radius: 50,
+                          ),
+                          PieChartSectionData(
+                            value: totalAvailable.toDouble(),
+                            color: AppColors.success,
+                            title: '${(totalAvailable / totalRooms * 100).toStringAsFixed(0)}%',
+                            titleStyle: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                            radius: 50,
+                          ),
+                        ],
+                        sectionsSpace: 4,
+                        centerSpaceRadius: 40,
+                      ),
+                      duration: AppDurations.slow,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 32),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _legendItem(AppColors.primary, 'Occupied', totalOccupied.toString()),
+                    const SizedBox(height: 16),
+                    _legendItem(AppColors.success, 'Vacant', totalAvailable.toString()),
+                    const SizedBox(height: 16),
+                    _legendItem(AppColors.textMuted, 'Total Rooms', totalRooms.toString()),
+                  ],
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _legendItem(Color color, String label, String value) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 12, height: 12, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3))),
+        const SizedBox(width: 10),
+        Text(label, style: GoogleFonts.workSans(fontSize: 13, color: AppColors.textMuted, fontWeight: FontWeight.w500)),
+        const SizedBox(width: 12),
+        Text(value, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+      ],
+    );
+  }
+
   Widget _buildProfileView(AuthProvider authProvider) {
     final user = authProvider.user;
     if (user == null) return const Center(child: CircularProgressIndicator());
     final isMobile = MediaQuery.of(context).size.width < 800;
+    final initials = user.displayName.isNotEmpty
+        ? user.displayName.trim().split(' ').map((l) => l.isNotEmpty ? l[0] : '').take(2).join().toUpperCase()
+        : 'A';
 
     return ListView(
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 20 : 40,
-        vertical: isMobile ? 24 : 40,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 40, vertical: isMobile ? 24 : 40),
       children: [
-        // Profile Header Card
+        // Profile Header
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primary, AppColors.secondary],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            gradient: AppGradients.primaryGradient,
             borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.25),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
-              ),
-            ],
+            boxShadow: [AppShadows.xl.copyWith(color: AppColors.primary.withValues(alpha: 0.25))],
           ),
           padding: EdgeInsets.all(isMobile ? 24 : 40),
           child: isMobile
               ? Column(
                   children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.shield_outlined,
-                        color: AppColors.primary,
-                        size: 40,
-                      ),
+                    CircleAvatar(
+                      radius: 32,
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
+                      child: Text(initials, style: GoogleFonts.outfit(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
                     ),
-                    const SizedBox(height: 24),
-                    Text(
-                      user.displayName,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+                    const SizedBox(height: 20),
+                    Text(user.displayName, textAlign: TextAlign.center, style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
                     const SizedBox(height: 4),
-                    Text(
-                      'Administrator',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white.withValues(alpha: 0.9),
-                      ),
-                    ),
+                    Text('Administrator', style: GoogleFonts.workSans(fontSize: 16, color: Colors.white.withValues(alpha: 0.9))),
                   ],
                 )
               : Row(
                   children: [
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.shield_outlined,
-                        color: AppColors.primary,
-                        size: 50,
-                      ),
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
+                      child: Text(initials, style: GoogleFonts.outfit(color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold)),
                     ),
                     const SizedBox(width: 32),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          user.displayName,
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+                        Text(user.displayName, style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white)),
                         const SizedBox(height: 4),
-                        Text(
-                          'Administrator',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white.withValues(alpha: 0.9),
-                          ),
-                        ),
+                        Text('Administrator', style: GoogleFonts.workSans(fontSize: 18, color: Colors.white.withValues(alpha: 0.9))),
                         const SizedBox(height: 4),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Text(
-                            'Super Admin',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
+                          child: Text('Super Admin', style: GoogleFonts.outfit(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600)),
                         ),
                       ],
                     ),
@@ -336,23 +325,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
         ),
         const SizedBox(height: 40),
-        // Admin Information Section
+        // Personal Information
         Container(
           padding: EdgeInsets.all(isMobile ? 24 : 40),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: Colors.black.withValues(alpha: 0.05),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
-              ),
-            ],
+            border: const Border(top: BorderSide(color: AppColors.primary, width: 3)),
+            boxShadow: [AppShadows.lg],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,132 +340,48 @@ class _AdminDashboardState extends State<AdminDashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: Text(
-                      'Personal Information',
-                      style: TextStyle(
-                        fontSize: isMobile ? 18 : 22,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
+                  Row(
+                    children: [
+                      Icon(Icons.person_outline, size: 20, color: AppColors.primary),
+                      const SizedBox(width: 8),
+                      Text('Personal Information', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                    ],
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ProfileScreen(),
-                          ),
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.edit_rounded,
-                        color: AppColors.primary,
-                        size: 20,
-                      ),
-                      tooltip: 'Edit Profile',
-                      constraints: const BoxConstraints(),
-                      padding: const EdgeInsets.all(12),
-                    ),
+                  IconButton(
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen())),
+                    icon: const Icon(Icons.edit_rounded, color: AppColors.primary, size: 20),
+                    tooltip: 'Edit Profile',
+                    constraints: const BoxConstraints(),
+                    padding: const EdgeInsets.all(12),
                   ),
                 ],
               ),
               const SizedBox(height: 32),
               if (isMobile) ...[
-                _buildProfileField(
-                  'First Name',
-                  user.firstName ?? user.displayName.split(' ').first,
-                ),
-                const SizedBox(height: 24),
-                _buildProfileField(
-                  'Last Name',
-                  user.lastName ??
-                      (user.displayName.split(' ').length > 1
-                          ? user.displayName.split(' ')[1]
-                          : ''),
-                ),
-                const SizedBox(height: 24),
-                _buildProfileField(
-                  'Email Address',
-                  user.email,
-                  icon: Icons.email_outlined,
-                ),
-                const SizedBox(height: 24),
-                _buildProfileField(
-                  'Phone Number',
-                  user.phoneNumber ?? 'Not provided',
-                  icon: Icons.phone_outlined,
-                ),
+                _buildProfileField('First Name', user.firstName ?? user.displayName.split(' ').first),
+                const SizedBox(height: 20),
+                _buildProfileField('Last Name', user.lastName ?? (user.displayName.split(' ').length > 1 ? user.displayName.split(' ')[1] : '')),
+                const SizedBox(height: 20),
+                _buildProfileField('Email Address', user.email, icon: Icons.email_outlined),
+                const SizedBox(height: 20),
+                _buildProfileField('Phone Number', user.phoneNumber ?? 'Not provided', icon: Icons.phone_outlined),
               ] else ...[
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildProfileField(
-                        'First Name',
-                        user.firstName ?? user.displayName.split(' ').first,
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: _buildProfileField(
-                        'Last Name',
-                        user.lastName ??
-                            (user.displayName.split(' ').length > 1
-                                ? user.displayName.split(' ')[1]
-                                : ''),
-                      ),
-                    ),
-                  ],
-                ),
+                Row(children: [
+                  Expanded(child: _buildProfileField('First Name', user.firstName ?? user.displayName.split(' ').first)),
+                  const SizedBox(width: 24),
+                  Expanded(child: _buildProfileField('Last Name', user.lastName ?? (user.displayName.split(' ').length > 1 ? user.displayName.split(' ')[1] : ''))),
+                ]),
                 const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildProfileField(
-                        'Email Address',
-                        user.email,
-                        icon: Icons.email_outlined,
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: _buildProfileField(
-                        'Phone Number',
-                        user.phoneNumber ?? 'Not provided',
-                        icon: Icons.phone_outlined,
-                      ),
-                    ),
-                  ],
-                ),
+                Row(children: [
+                  Expanded(child: _buildProfileField('Email Address', user.email, icon: Icons.email_outlined)),
+                  const SizedBox(width: 24),
+                  Expanded(child: _buildProfileField('Phone Number', user.phoneNumber ?? 'Not provided', icon: Icons.phone_outlined)),
+                ]),
               ],
               const SizedBox(height: 24),
-              _buildProfileField(
-                'Admin Level',
-                'Super Admin',
-                icon: Icons.shield_outlined,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Admin level cannot be changed through this interface',
-                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-              ),
+              _buildProfileField('Admin Level', 'Super Admin', icon: Icons.shield_outlined),
               const SizedBox(height: 48),
-              const Text(
-                'System Permissions',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.5,
-                ),
-              ),
+              Text('System Permissions', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
               const SizedBox(height: 24),
               _buildPermissionSection('Core Management', [
                 _PermissionItem(label: 'Manage All Listings', isEnabled: true),
@@ -509,40 +405,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
       children: [
         Row(
           children: [
-            if (icon != null) ...[
-              Icon(icon, size: 16, color: Colors.grey[600]),
-              const SizedBox(width: 8),
-            ],
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: Colors.grey[700],
-              ),
-            ),
+            if (icon != null) ...[Icon(icon, size: 16, color: AppColors.textMuted), const SizedBox(width: 8)],
+            Text(label, style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
           ],
         ),
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: AppColors.background,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: Colors.black.withValues(alpha: 0.05),
-              width: 1.5,
-            ),
+            border: Border.all(color: AppColors.border),
           ),
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 15,
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          child: Text(value, style: GoogleFonts.outfit(fontSize: 15, color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
         ),
       ],
     );
@@ -553,57 +429,19 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final isMobile = MediaQuery.of(context).size.width < 800;
 
     return ListView(
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 20 : 40,
-        vertical: isMobile ? 24 : 40,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 40, vertical: isMobile ? 24 : 40),
       children: [
-        AdminKpiPanel(
-          items: [
-            KpiItem(
-              label: 'Total Users',
-              value: adminProvider.totalUsersCount.toString(),
-              icon: Icons.people_rounded,
-              color: AppColors.primary,
-            ),
-            KpiItem(
-              label: 'Tenants',
-              value: adminProvider.tenantsCount.toString(),
-              icon: Icons.person_rounded,
-              color: AppColors.secondary,
-            ),
-            KpiItem(
-              label: 'Property Owners',
-              value: adminProvider.ownersCount.toString(),
-              icon: Icons.business_center_rounded,
-              color: Colors.amber,
-            ),
-            KpiItem(
-              label: 'Administrators',
-              value: adminProvider.adminsCount.toString(),
-              icon: Icons.shield_rounded,
-              color: Colors.purple,
-            ),
-          ],
-        ),
+        AdminKpiPanel(items: [
+          KpiItem(label: 'Total Users', value: adminProvider.totalUsersCount.toString(), icon: Icons.people_rounded, color: AppColors.primary),
+          KpiItem(label: 'Tenants', value: adminProvider.tenantsCount.toString(), icon: Icons.person_rounded, color: AppColors.success),
+          KpiItem(label: 'Property Owners', value: adminProvider.ownersCount.toString(), icon: Icons.business_center_rounded, color: AppColors.warning),
+          KpiItem(label: 'Administrators', value: adminProvider.adminsCount.toString(), icon: Icons.shield_rounded, color: const Color(0xFF8B5CF6)),
+        ]),
         const SizedBox(height: 24),
+        // Search + Filter
         Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.black.withValues(alpha: 0.05),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.border), boxShadow: [AppShadows.md]),
           child: isMobile
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -613,30 +451,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       decoration: InputDecoration(
                         hintText: 'Search by name or email...',
                         prefixIcon: const Icon(Icons.search_rounded),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                            color: Colors.black.withValues(alpha: 0.05),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                            color: Colors.black.withValues(alpha: 0.05),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(
-                            color: AppColors.primary,
-                            width: 1.5,
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: const Color(0xFFF8FAFC),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                        ),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AppColors.border)),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AppColors.border)),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
+                        filled: true, fillColor: AppColors.background, contentPadding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -646,23 +464,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         children: [
                           _buildRoleFilterChip(null, 'All', adminProvider),
                           const SizedBox(width: 8),
-                          _buildRoleFilterChip(
-                            UserRole.student,
-                            'Tenants',
-                            adminProvider,
-                          ),
+                          _buildRoleFilterChip(UserRole.student, 'Tenants', adminProvider),
                           const SizedBox(width: 8),
-                          _buildRoleFilterChip(
-                            UserRole.owner,
-                            'Owners',
-                            adminProvider,
-                          ),
+                          _buildRoleFilterChip(UserRole.owner, 'Owners', adminProvider),
                           const SizedBox(width: 8),
-                          _buildRoleFilterChip(
-                            UserRole.admin,
-                            'Admins',
-                            adminProvider,
-                          ),
+                          _buildRoleFilterChip(UserRole.admin, 'Admins', adminProvider),
                         ],
                       ),
                     ),
@@ -676,90 +482,36 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         decoration: InputDecoration(
                           hintText: 'Search by name or email...',
                           prefixIcon: const Icon(Icons.search_rounded),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(
-                              color: Colors.black.withValues(alpha: 0.05),
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(
-                              color: Colors.black.withValues(alpha: 0.05),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(
-                              color: AppColors.primary,
-                              width: 1.5,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: const Color(0xFFF8FAFC),
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 14,
-                          ),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AppColors.border)),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AppColors.border)),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
+                          filled: true, fillColor: AppColors.background, contentPadding: const EdgeInsets.symmetric(vertical: 14),
                         ),
                       ),
                     ),
                     const SizedBox(width: 16),
                     _buildRoleFilterChip(null, 'All', adminProvider),
                     const SizedBox(width: 8),
-                    _buildRoleFilterChip(
-                      UserRole.student,
-                      'Tenants',
-                      adminProvider,
-                    ),
+                    _buildRoleFilterChip(UserRole.student, 'Tenants', adminProvider),
                     const SizedBox(width: 8),
-                    _buildRoleFilterChip(
-                      UserRole.owner,
-                      'Owners',
-                      adminProvider,
-                    ),
+                    _buildRoleFilterChip(UserRole.owner, 'Owners', adminProvider),
                     const SizedBox(width: 8),
-                    _buildRoleFilterChip(
-                      UserRole.admin,
-                      'Admins',
-                      adminProvider,
-                    ),
+                    _buildRoleFilterChip(UserRole.admin, 'Admins', adminProvider),
                   ],
                 ),
         ),
         const SizedBox(height: 32),
-        Text(
-          'Showing ${users.length} of ${adminProvider.totalUsersCount} users',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: Colors.grey[700],
-          ),
-        ),
+        Text('Showing ${users.length} of ${adminProvider.totalUsersCount} users',
+            style: GoogleFonts.workSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
         const SizedBox(height: 24),
         if (adminProvider.isLoading)
           const Center(child: CircularProgressIndicator())
         else if (users.isEmpty)
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 80),
-              child: Column(
-                children: [
-                  Icon(Icons.people_outline, size: 64, color: Colors.grey[300]),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No users found',
-                    style: TextStyle(fontSize: 18, color: Colors.grey[500]),
-                  ),
-                ],
-              ),
-            ),
-          )
+          _buildEmptyState(Icons.people_outline, 'No users found')
         else
           LayoutBuilder(
             builder: (context, constraints) {
-              final crossAxisCount = constraints.maxWidth < 600
-                  ? 1
-                  : (constraints.maxWidth < 1200 ? 2 : 3);
+              final crossAxisCount = constraints.maxWidth < 600 ? 1 : (constraints.maxWidth < 1200 ? 2 : 3);
               return GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -767,18 +519,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   crossAxisCount: crossAxisCount,
                   crossAxisSpacing: isMobile ? 16 : 24,
                   mainAxisSpacing: isMobile ? 16 : 24,
-                  childAspectRatio: isMobile
-                      ? 1.4
-                      : (constraints.maxWidth < 1200 ? 2.0 : 2.2),
+                  childAspectRatio: isMobile ? 1.4 : (constraints.maxWidth < 1200 ? 2.0 : 2.2),
                 ),
                 itemCount: users.length,
-                itemBuilder: (context, index) {
-                  return AdminUserCard(
-                    user: users[index],
-                    onViewDetails: () {},
-                    onEdit: () {},
-                  );
-                },
+                itemBuilder: (context, index) => AdminUserCard(user: users[index], onViewDetails: () {}, onEdit: () {}),
               );
             },
           ),
@@ -786,29 +530,19 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Widget _buildRoleFilterChip(
-    UserRole? role,
-    String label,
-    AdminProvider adminProvider,
-  ) {
+  Widget _buildRoleFilterChip(UserRole? role, String label, AdminProvider adminProvider) {
     final isSelected = _userRoleFilter == role;
     return ChoiceChip(
-      label: Text(label),
+      label: Text(label, style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600, color: isSelected ? Colors.white : AppColors.textMuted)),
       selected: isSelected,
       onSelected: (selected) {
         setState(() => _userRoleFilter = role);
         adminProvider.setRoleFilter(role);
       },
       selectedColor: AppColors.primary,
-      backgroundColor: const Color(0xFFF1F5F9),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(100),
-        side: const BorderSide(color: Colors.transparent),
-      ),
-      labelStyle: TextStyle(
-        color: isSelected ? Colors.white : Colors.grey[700],
-        fontWeight: FontWeight.bold,
-      ),
+      backgroundColor: AppColors.divider,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100), side: const BorderSide(color: Colors.transparent)),
+      labelStyle: TextStyle(color: isSelected ? Colors.white : AppColors.textMuted, fontWeight: FontWeight.bold),
     );
   }
 
@@ -817,39 +551,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final isMobile = MediaQuery.of(context).size.width < 800;
 
     return ListView(
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 20 : 40,
-        vertical: isMobile ? 24 : 40,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 40, vertical: isMobile ? 24 : 40),
       children: [
-        AdminKpiPanel(
-          items: [
-            KpiItem(
-              label: 'Total Bookings',
-              value: bookingProvider.totalBookingCount.toString(),
-              icon: Icons.calendar_month_rounded,
-              color: AppColors.primary,
-            ),
-            KpiItem(
-              label: 'Pending Requests',
-              value: bookingProvider.pendingBookingCount.toString(),
-              icon: Icons.pending_actions_rounded,
-              color: Colors.amber,
-            ),
-            KpiItem(
-              label: 'Approved Bookings',
-              value: bookingProvider.approvedBookingCount.toString(),
-              icon: Icons.check_circle_rounded,
-              color: AppColors.success,
-            ),
-            KpiItem(
-              label: 'Rejected Bookings',
-              value: bookingProvider.rejectedBookingCount.toString(),
-              icon: Icons.cancel_rounded,
-              color: AppColors.error,
-            ),
-          ],
-        ),
+        AdminKpiPanel(items: [
+          KpiItem(label: 'Total Bookings', value: bookingProvider.totalBookingCount.toString(), icon: Icons.calendar_month_rounded, color: AppColors.primary),
+          KpiItem(label: 'Pending Requests', value: bookingProvider.pendingBookingCount.toString(), icon: Icons.pending_actions_rounded, color: AppColors.warning),
+          KpiItem(label: 'Approved Bookings', value: bookingProvider.approvedBookingCount.toString(), icon: Icons.check_circle_rounded, color: AppColors.success),
+          KpiItem(label: 'Rejected Bookings', value: bookingProvider.rejectedBookingCount.toString(), icon: Icons.cancel_rounded, color: AppColors.error),
+        ]),
         const SizedBox(height: 24),
         AdminBookingFilterBar(
           selectedStatus: _bookingStatusFilter,
@@ -866,34 +575,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
         if (bookingProvider.isLoading)
           const Center(child: CircularProgressIndicator())
         else if (bookings.isEmpty)
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 80),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.calendar_month_outlined,
-                    size: 64,
-                    color: Colors.grey[300],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No bookings found',
-                    style: TextStyle(fontSize: 18, color: Colors.grey[500]),
-                  ),
-                ],
-              ),
-            ),
-          )
+          _buildEmptyState(Icons.calendar_month_outlined, 'No bookings found')
         else
-          ...bookings.map(
-            (booking) => AdminBookingCard(
-              booking: booking,
-              onTap: () {
-                // Navigate to booking detail
-              },
-            ),
-          ),
+          ...bookings.map((booking) => AdminBookingCard(booking: booking, onTap: () {})),
       ],
     );
   }
@@ -903,87 +587,31 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final isMobile = MediaQuery.of(context).size.width < 800;
 
     return ListView(
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 20 : 40,
-        vertical: isMobile ? 24 : 40,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 40, vertical: isMobile ? 24 : 40),
       children: [
         AdminSearchBar(
-          onSearch: (query) {
-            propertyProvider.setSearchQuery(query);
-            propertyProvider.loadAdminProperties();
-          },
-          onFilterTap: () {
-            // Implement filters dialog
-          },
+          onSearch: (query) { propertyProvider.setSearchQuery(query); propertyProvider.loadAdminProperties(); },
+          onFilterTap: () {},
         ),
         const SizedBox(height: 24),
-        AdminKpiPanel(
-          items: [
-            KpiItem(
-              label: 'Total Listings',
-              value: propertyProvider.totalListings.toString(),
-              icon: Icons.home_work_rounded,
-              color: AppColors.primary,
-            ),
-            KpiItem(
-              label: 'Available Listings',
-              value: propertyProvider.availableListings.toString(),
-              icon: Icons.home_rounded,
-              color: AppColors.success,
-            ),
-            KpiItem(
-              label: 'Fully Occupied',
-              value: propertyProvider.fullListings.toString(),
-              icon: Icons.house_rounded,
-              color: AppColors.error,
-            ),
-            KpiItem(
-              label: 'Available Rooms',
-              value: propertyProvider.totalAvailableRoomCount.toString(),
-              icon: Icons.single_bed_rounded,
-              color: AppColors.secondary,
-            ),
-          ],
-        ),
+        AdminKpiPanel(items: [
+          KpiItem(label: 'Total Listings', value: propertyProvider.totalListings.toString(), icon: Icons.home_work_rounded, color: AppColors.primary),
+          KpiItem(label: 'Available Listings', value: propertyProvider.availableListings.toString(), icon: Icons.home_rounded, color: AppColors.success),
+          KpiItem(label: 'Fully Occupied', value: propertyProvider.fullListings.toString(), icon: Icons.house_rounded, color: AppColors.error),
+          KpiItem(label: 'Available Rooms', value: propertyProvider.totalAvailableRoomCount.toString(), icon: Icons.single_bed_rounded, color: AppColors.secondary),
+        ]),
         const SizedBox(height: 32),
-        Text(
-          'Showing ${properties.length} of ${propertyProvider.totalListings} listings',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: Colors.grey[700],
-          ),
-        ),
+        Text('Showing ${properties.length} of ${propertyProvider.totalListings} listings',
+            style: GoogleFonts.workSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
         const SizedBox(height: 24),
         if (propertyProvider.isLoading)
           const Center(child: CircularProgressIndicator())
         else if (properties.isEmpty)
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 80),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.home_work_outlined,
-                    size: 64,
-                    color: Colors.grey[300],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No listings found',
-                    style: TextStyle(fontSize: 18, color: Colors.grey[500]),
-                  ),
-                ],
-              ),
-            ),
-          )
+          _buildEmptyState(Icons.home_work_outlined, 'No listings found')
         else
           LayoutBuilder(
             builder: (context, constraints) {
-              final crossAxisCount = constraints.maxWidth < 600
-                  ? 1
-                  : (constraints.maxWidth < 1200 ? 2 : 3);
+              final crossAxisCount = constraints.maxWidth < 600 ? 1 : (constraints.maxWidth < 1200 ? 2 : 3);
               return GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -991,19 +619,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   crossAxisCount: crossAxisCount,
                   crossAxisSpacing: isMobile ? 16 : 24,
                   mainAxisSpacing: isMobile ? 16 : 24,
-                  childAspectRatio: isMobile
-                      ? 0.7
-                      : (constraints.maxWidth < 1200 ? 0.8 : 0.85),
+                  childAspectRatio: isMobile ? 0.7 : (constraints.maxWidth < 1200 ? 0.8 : 0.85),
                 ),
                 itemCount: properties.length,
-                itemBuilder: (context, index) {
-                  return AdminPropertyCard(
-                    property: properties[index],
-                    onTap: () {
-                      // Navigate to property detail/moderation
-                    },
-                  );
-                },
+                itemBuilder: (context, index) => AdminPropertyCard(property: properties[index], onTap: () {}),
               );
             },
           ),
@@ -1013,45 +632,25 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Widget _buildHeader() {
     final now = DateTime.now();
-    final formatter = DateFormat('EEEE, MMMM d, yyyy');
-    final formattedDate = formatter.format(now);
+    final formattedDate = DateFormat('EEEE, MMMM d, yyyy').format(now);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Admin Dashboard',
-          style: TextStyle(
-            fontSize: 36,
-            fontWeight: FontWeight.w900,
-            color: AppColors.textPrimary,
-            letterSpacing: -1,
-          ),
-        ),
+        Text('Admin Dashboard', style: GoogleFonts.outfit(fontSize: 36, fontWeight: FontWeight.w900, color: AppColors.textPrimary, letterSpacing: -1)),
         const SizedBox(height: 6),
         Row(
           children: [
-            Icon(
-              Icons.calendar_today_rounded,
-              size: 14,
-              color: Colors.grey[500],
-            ),
+            Icon(Icons.calendar_today_rounded, size: 14, color: AppColors.textMuted),
             const SizedBox(width: 8),
-            Text(
-              formattedDate,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[500],
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            Text(formattedDate, style: GoogleFonts.workSans(fontSize: 14, color: AppColors.textMuted, fontWeight: FontWeight.w600)),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildStatsGrid(dynamic stats) {
+  Widget _buildStatsGrid(AdminStatsModel? stats) {
     final isMobile = MediaQuery.of(context).size.width < 800;
     return GridView.count(
       crossAxisCount: isMobile ? 2 : 4,
@@ -1061,47 +660,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
       physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: isMobile ? 1.2 : 1.4,
       children: [
-        AdminStatCard(
-          title: 'Total Listings',
-          value: stats?.totalProperties.toString() ?? '0',
-          icon: Icons.home_outlined,
-          iconColor: AppColors.primary,
-          iconBgColor: AppColors.primary.withValues(alpha: 0.08),
-          trendPercent: 4.8,
-          isPositiveTrend: true,
-        ),
-        AdminStatCard(
-          title: 'Occupancy Rate',
-          value: '${((stats?.occupancyRate ?? 0) * 100).toInt()}%',
-          icon: Icons.trending_up_rounded,
-          iconColor: AppColors.success,
-          iconBgColor: AppColors.success.withValues(alpha: 0.08),
-          trendPercent: 2.1,
-          isPositiveTrend: true,
-        ),
-        AdminStatCard(
-          title: 'Total Users',
-          value: stats?.totalUsers.toString() ?? '0',
-          icon: Icons.people_outline_rounded,
-          iconColor: const Color(0xFF8B5CF6),
-          iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.08),
-          trendPercent: 1.2,
-          isPositiveTrend: true,
-        ),
-        AdminStatCard(
-          title: 'Total Bookings',
-          value: stats?.totalBookings.toString() ?? '0',
-          icon: Icons.calendar_today_outlined,
-          iconColor: const Color(0xFFF59E0B),
-          iconBgColor: const Color(0xFFF59E0B).withValues(alpha: 0.08),
-          trendPercent: 0.4,
-          isPositiveTrend: false,
-        ),
+        AdminStatCard(title: 'Total Listings', value: stats?.totalProperties.toString() ?? '0', icon: Icons.home_outlined, iconColor: AppColors.primary, iconBgColor: AppColors.primary.withValues(alpha: 0.08), trendPercent: 4.8, isPositiveTrend: true),
+        AdminStatCard(title: 'Occupancy Rate', value: '${((stats?.occupancyRate ?? 0) * 100).toInt()}%', icon: Icons.trending_up_rounded, iconColor: AppColors.success, iconBgColor: AppColors.success.withValues(alpha: 0.08), trendPercent: 2.1, isPositiveTrend: true),
+        AdminStatCard(title: 'Total Users', value: stats?.totalUsers.toString() ?? '0', icon: Icons.people_outline_rounded, iconColor: const Color(0xFF8B5CF6), iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.08), trendPercent: 1.2, isPositiveTrend: true),
+        AdminStatCard(title: 'Total Bookings', value: stats?.totalBookings.toString() ?? '0', icon: Icons.calendar_today_outlined, iconColor: AppColors.warning, iconBgColor: AppColors.warning.withValues(alpha: 0.08), trendPercent: 0.4, isPositiveTrend: false),
       ],
     );
   }
 
-  Widget _buildSolidStatsGrid(dynamic stats) {
+  Widget _buildSolidStatsGrid(AdminStatsModel? stats) {
     final isMobile = MediaQuery.of(context).size.width < 800;
     return GridView.count(
       crossAxisCount: isMobile ? 1 : 3,
@@ -1111,31 +678,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
       physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: isMobile ? 4.5 : 3.2,
       children: [
-        AdminSolidStatCard(
-          title: 'Active Tenants',
-          value: stats?.activeTenants.toString() ?? '0',
-          icon: Icons.apartment_rounded,
-          backgroundColor: AppColors.primary,
-        ),
-        AdminSolidStatCard(
-          title: 'Property Owners',
-          value: stats?.totalOwners.toString() ?? '0',
-          icon: Icons.person_add_alt_1_outlined,
-          backgroundColor: AppColors.success,
-        ),
-        AdminSolidStatCard(
-          title: 'Pending Bookings',
-          value: stats?.pendingBookings.toString() ?? '0',
-          icon: Icons.access_time_rounded,
-          backgroundColor: const Color(0xFFF59E0B),
-        ),
+        AdminSolidStatCard(title: 'Active Tenants', value: stats?.activeTenants.toString() ?? '0', icon: Icons.apartment_rounded, backgroundColor: AppColors.primary),
+        AdminSolidStatCard(title: 'Property Owners', value: stats?.totalOwners.toString() ?? '0', icon: Icons.person_add_alt_1_outlined, backgroundColor: AppColors.success),
+        AdminSolidStatCard(title: 'Pending Bookings', value: stats?.pendingBookings.toString() ?? '0', icon: Icons.access_time_rounded, backgroundColor: AppColors.warning),
       ],
     );
   }
 
   Widget _buildBottomGrids(BookingProvider bookingProvider) {
     final isMobile = MediaQuery.of(context).size.width < 800;
-
     if (isMobile) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1146,14 +697,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
         ],
       );
     }
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Quick Actions
         Expanded(flex: 4, child: _buildQuickActions()),
         const SizedBox(width: 48),
-        // Recent Bookings
         Expanded(flex: 5, child: _buildRecentBookings(bookingProvider)),
       ],
     );
@@ -1163,15 +711,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Quick Actions',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
-            color: AppColors.textPrimary,
-            letterSpacing: -0.5,
-          ),
-        ),
+        Text('Quick Actions', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -0.5)),
         const SizedBox(height: 24),
         GridView.count(
           crossAxisCount: 2,
@@ -1181,34 +721,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
           physics: const NeverScrollableScrollPhysics(),
           childAspectRatio: 1.1,
           children: [
-            QuickActionCard(
-              label: 'Manage Listings',
-              subLabel: 'Approve & view listings',
-              icon: Icons.home_work_outlined,
-              accentColor: AppColors.primary,
-              onTap: () => _onViewChanged(AdminView.listings),
-            ),
-            QuickActionCard(
-              label: 'View Bookings',
-              subLabel: 'Track request stats',
-              icon: Icons.calendar_month_outlined,
-              accentColor: const Color(0xFFF59E0B),
-              onTap: () => _onViewChanged(AdminView.bookings),
-            ),
-            QuickActionCard(
-              label: 'User Management',
-              subLabel: 'Review owner verifications',
-              icon: Icons.group_outlined,
-              accentColor: const Color(0xFF8B5CF6),
-              onTap: () => _onViewChanged(AdminView.users),
-            ),
-            QuickActionCard(
-              label: 'Admin Profile',
-              subLabel: 'System permissions & settings',
-              icon: Icons.person_outline,
-              accentColor: AppColors.secondary,
-              onTap: () => _onViewChanged(AdminView.profile),
-            ),
+            QuickActionCard(label: 'Manage Listings', subLabel: 'Approve & view listings', icon: Icons.home_work_outlined, accentColor: AppColors.primary, onTap: () => _onViewChanged(AdminView.listings)),
+            QuickActionCard(label: 'View Bookings', subLabel: 'Track request stats', icon: Icons.calendar_month_outlined, accentColor: AppColors.warning, onTap: () => _onViewChanged(AdminView.bookings)),
+            QuickActionCard(label: 'User Management', subLabel: 'Review owner verifications', icon: Icons.group_outlined, accentColor: const Color(0xFF8B5CF6), onTap: () => _onViewChanged(AdminView.users)),
+            QuickActionCard(label: 'Admin Profile', subLabel: 'System permissions & settings', icon: Icons.person_outline, accentColor: AppColors.secondary, onTap: () => _onViewChanged(AdminView.profile)),
           ],
         ),
       ],
@@ -1216,74 +732,38 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildRecentBookings(BookingProvider bookingProvider) {
-    final isMobile = MediaQuery.of(context).size.width < 800;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Recent Bookings',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
-                letterSpacing: -0.5,
-              ),
-            ),
+            Text('Recent Bookings', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -0.5)),
             TextButton(
               onPressed: () => _onViewChanged(AdminView.bookings),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                textStyle: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.primary, textStyle: const TextStyle(fontWeight: FontWeight.bold)),
               child: const Text('View All'),
             ),
           ],
         ),
         const SizedBox(height: 24),
         Container(
-          padding: EdgeInsets.all(isMobile ? 16 : 24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.black.withValues(alpha: 0.05),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.border), boxShadow: [AppShadows.md]),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (bookingProvider.isLoading)
                 const Center(child: CircularProgressIndicator())
               else if (bookingProvider.bookings.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 40),
-                  child: Center(child: Text('No recent bookings')),
-                )
+                const Padding(padding: EdgeInsets.symmetric(vertical: 40), child: Center(child: Text('No recent bookings')))
               else
                 ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: bookingProvider.bookings.length > 4
-                      ? 4
-                      : bookingProvider.bookings.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    return RecentBookingRow(
-                      booking: bookingProvider.bookings[index],
-                    );
-                  },
+                  itemCount: bookingProvider.bookings.length > 4 ? 4 : bookingProvider.bookings.length,
+                  separatorBuilder: (context, index) => const SizedBox(height: 4),
+                  itemBuilder: (context, index) => RecentBookingRow(booking: bookingProvider.bookings[index]),
                 ),
             ],
           ),
@@ -1296,28 +776,28 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: Colors.grey[500],
-            letterSpacing: 0.5,
-          ),
-        ),
+        Text(title.toUpperCase(), style: GoogleFonts.workSans(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textMuted, letterSpacing: 0.5)),
         const SizedBox(height: 12),
         Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.black.withValues(alpha: 0.05),
-              width: 1.5,
-            ),
-          ),
-          child: Column(children: items.map((item) => item).toList()),
+          decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.border)),
+          child: Column(children: items),
         ),
       ],
+    );
+  }
+
+  Widget _buildEmptyState(IconData icon, String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 80),
+        child: Column(
+          children: [
+            Icon(icon, size: 64, color: AppColors.textMuted.withValues(alpha: 0.3)),
+            const SizedBox(height: 16),
+            Text(message, style: GoogleFonts.workSans(fontSize: 18, color: AppColors.textMuted)),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -1325,22 +805,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
 class _PermissionItem extends StatelessWidget {
   final String label;
   final bool isEnabled;
-
   const _PermissionItem({required this.label, required this.isEnabled});
 
   @override
   Widget build(BuildContext context) {
     return SwitchListTile.adaptive(
       value: isEnabled,
-      onChanged: null, // Read-only in this view
-      title: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-        ),
-      ),
+      onChanged: null,
+      title: Text(label, style: GoogleFonts.workSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
       activeTrackColor: AppColors.primary,
       dense: true,
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
