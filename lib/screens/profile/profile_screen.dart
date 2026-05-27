@@ -429,7 +429,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
-          value: _gender,
+          initialValue: _gender,
           items: const [
             DropdownMenuItem(value: 'male', child: Text('Male')),
             DropdownMenuItem(value: 'female', child: Text('Female')),
