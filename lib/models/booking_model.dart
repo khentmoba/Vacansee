@@ -80,6 +80,14 @@ class BookingModel with _$BookingModel {
     // Map 'id' to 'bookingId'
     flattened['id'] ??= json['id'] ?? json['booking_id'];
 
+    // Safety net: ensure required String fields are never null
+    flattened['property_name'] ??= '';
+    flattened['room_description'] ??= '';
+    flattened['student_name'] ??= '';
+    flattened['student_email'] ??= '';
+    flattened['room_id'] ??= '';
+    flattened['id'] ??= '';
+
     return flattened;
   }
 
